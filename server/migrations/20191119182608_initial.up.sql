@@ -3,19 +3,25 @@ CREATE TABLE users
     id TEXT PRIMARY KEY NOT NULL,
     email TEXT UNIQUE NOT NULL,
     password_hash BYTEA NOT NULL,
-    username TEXT NOT NULL,
+    username TEXT UNIQUE NOT NULL,
     avatar BYTEA
 );
 
-CREATE TABLE favorite
+CREATE TABLE favorites
+(
+    id TEXT PRIMARY KEY NOT NULL,
+    gif_data BYTEA,
+    gif_name TEXT NOT NULL
+);
+
+CREATE TABLE user_favorite
 (
     id TEXT PRIMARY KEY NOT NULL,
     user_id TEXT NOT NULL,
-    gif_id TEXT NOT NULL,
-    gif_data BYTEA,
-    gif_name TEXT NOT NULL,
+    favorite_id TEXT NOT NULL,
 
-    FOREIGN KEY (user_id) REFERENCES users (id)
+    FOREIGN KEY (user_id) REFERENCES users (id),
+    FOREIGN KEY (favorite_id) REFERENCES favorites (id)
 );
 
 CREATE TABLE hubs

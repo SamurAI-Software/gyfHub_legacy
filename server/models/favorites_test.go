@@ -494,58 +494,85 @@ func testFavoritesInsertWhitelist(t *testing.T) {
 	}
 }
 
-func testFavoriteToOneUserUsingUser(t *testing.T) {
+func testFavoriteToManyUserFavorites(t *testing.T) {
+	var err error
 	ctx := context.Background()
 	tx := MustTx(boil.BeginTx(ctx, nil))
 	defer func() { _ = tx.Rollback() }()
 
-	var local Favorite
-	var foreign User
+	var a Favorite
+	var b, c UserFavorite
 
 	seed := randomize.NewSeed()
-	if err := randomize.Struct(seed, &local, favoriteDBTypes, false, favoriteColumnsWithDefault...); err != nil {
+	if err = randomize.Struct(seed, &a, favoriteDBTypes, true, favoriteColumnsWithDefault...); err != nil {
 		t.Errorf("Unable to randomize Favorite struct: %s", err)
 	}
-	if err := randomize.Struct(seed, &foreign, userDBTypes, false, userColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize User struct: %s", err)
-	}
 
-	if err := foreign.Insert(ctx, tx, boil.Infer()); err != nil {
+	if err := a.Insert(ctx, tx, boil.Infer()); err != nil {
 		t.Fatal(err)
 	}
 
-	local.UserID = foreign.ID
-	if err := local.Insert(ctx, tx, boil.Infer()); err != nil {
+	if err = randomize.Struct(seed, &b, userFavoriteDBTypes, false, userFavoriteColumnsWithDefault...); err != nil {
+		t.Fatal(err)
+	}
+	if err = randomize.Struct(seed, &c, userFavoriteDBTypes, false, userFavoriteColumnsWithDefault...); err != nil {
 		t.Fatal(err)
 	}
 
-	check, err := local.User().One(ctx, tx)
+	b.FavoriteID = a.ID
+	c.FavoriteID = a.ID
+
+	if err = b.Insert(ctx, tx, boil.Infer()); err != nil {
+		t.Fatal(err)
+	}
+	if err = c.Insert(ctx, tx, boil.Infer()); err != nil {
+		t.Fatal(err)
+	}
+
+	check, err := a.UserFavorites().All(ctx, tx)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	if check.ID != foreign.ID {
-		t.Errorf("want: %v, got %v", foreign.ID, check.ID)
+	bFound, cFound := false, false
+	for _, v := range check {
+		if v.FavoriteID == b.FavoriteID {
+			bFound = true
+		}
+		if v.FavoriteID == c.FavoriteID {
+			cFound = true
+		}
 	}
 
-	slice := FavoriteSlice{&local}
-	if err = local.L.LoadUser(ctx, tx, false, (*[]*Favorite)(&slice), nil); err != nil {
-		t.Fatal(err)
+	if !bFound {
+		t.Error("expected to find b")
 	}
-	if local.R.User == nil {
-		t.Error("struct should have been eager loaded")
+	if !cFound {
+		t.Error("expected to find c")
 	}
 
-	local.R.User = nil
-	if err = local.L.LoadUser(ctx, tx, true, &local, nil); err != nil {
+	slice := FavoriteSlice{&a}
+	if err = a.L.LoadUserFavorites(ctx, tx, false, (*[]*Favorite)(&slice), nil); err != nil {
 		t.Fatal(err)
 	}
-	if local.R.User == nil {
-		t.Error("struct should have been eager loaded")
+	if got := len(a.R.UserFavorites); got != 2 {
+		t.Error("number of eager loaded records wrong, got:", got)
+	}
+
+	a.R.UserFavorites = nil
+	if err = a.L.LoadUserFavorites(ctx, tx, true, &a, nil); err != nil {
+		t.Fatal(err)
+	}
+	if got := len(a.R.UserFavorites); got != 2 {
+		t.Error("number of eager loaded records wrong, got:", got)
+	}
+
+	if t.Failed() {
+		t.Logf("%#v", check)
 	}
 }
 
-func testFavoriteToOneSetOpUserUsingUser(t *testing.T) {
+func testFavoriteToManyAddOpUserFavorites(t *testing.T) {
 	var err error
 
 	ctx := context.Background()
@@ -553,17 +580,17 @@ func testFavoriteToOneSetOpUserUsingUser(t *testing.T) {
 	defer func() { _ = tx.Rollback() }()
 
 	var a Favorite
-	var b, c User
+	var b, c, d, e UserFavorite
 
 	seed := randomize.NewSeed()
 	if err = randomize.Struct(seed, &a, favoriteDBTypes, false, strmangle.SetComplement(favoritePrimaryKeyColumns, favoriteColumnsWithoutDefault)...); err != nil {
 		t.Fatal(err)
 	}
-	if err = randomize.Struct(seed, &b, userDBTypes, false, strmangle.SetComplement(userPrimaryKeyColumns, userColumnsWithoutDefault)...); err != nil {
-		t.Fatal(err)
-	}
-	if err = randomize.Struct(seed, &c, userDBTypes, false, strmangle.SetComplement(userPrimaryKeyColumns, userColumnsWithoutDefault)...); err != nil {
-		t.Fatal(err)
+	foreigners := []*UserFavorite{&b, &c, &d, &e}
+	for _, x := range foreigners {
+		if err = randomize.Struct(seed, x, userFavoriteDBTypes, false, strmangle.SetComplement(userFavoritePrimaryKeyColumns, userFavoriteColumnsWithoutDefault)...); err != nil {
+			t.Fatal(err)
+		}
 	}
 
 	if err := a.Insert(ctx, tx, boil.Infer()); err != nil {
@@ -572,33 +599,51 @@ func testFavoriteToOneSetOpUserUsingUser(t *testing.T) {
 	if err = b.Insert(ctx, tx, boil.Infer()); err != nil {
 		t.Fatal(err)
 	}
+	if err = c.Insert(ctx, tx, boil.Infer()); err != nil {
+		t.Fatal(err)
+	}
 
-	for i, x := range []*User{&b, &c} {
-		err = a.SetUser(ctx, tx, i != 0, x)
+	foreignersSplitByInsertion := [][]*UserFavorite{
+		{&b, &c},
+		{&d, &e},
+	}
+
+	for i, x := range foreignersSplitByInsertion {
+		err = a.AddUserFavorites(ctx, tx, i != 0, x...)
 		if err != nil {
 			t.Fatal(err)
 		}
 
-		if a.R.User != x {
-			t.Error("relationship struct not set to correct value")
+		first := x[0]
+		second := x[1]
+
+		if a.ID != first.FavoriteID {
+			t.Error("foreign key was wrong value", a.ID, first.FavoriteID)
+		}
+		if a.ID != second.FavoriteID {
+			t.Error("foreign key was wrong value", a.ID, second.FavoriteID)
 		}
 
-		if x.R.Favorites[0] != &a {
-			t.Error("failed to append to foreign relationship struct")
+		if first.R.Favorite != &a {
+			t.Error("relationship was not added properly to the foreign slice")
 		}
-		if a.UserID != x.ID {
-			t.Error("foreign key was wrong value", a.UserID)
-		}
-
-		zero := reflect.Zero(reflect.TypeOf(a.UserID))
-		reflect.Indirect(reflect.ValueOf(&a.UserID)).Set(zero)
-
-		if err = a.Reload(ctx, tx); err != nil {
-			t.Fatal("failed to reload", err)
+		if second.R.Favorite != &a {
+			t.Error("relationship was not added properly to the foreign slice")
 		}
 
-		if a.UserID != x.ID {
-			t.Error("foreign key was wrong value", a.UserID, x.ID)
+		if a.R.UserFavorites[i*2] != first {
+			t.Error("relationship struct slice not set to correct value")
+		}
+		if a.R.UserFavorites[i*2+1] != second {
+			t.Error("relationship struct slice not set to correct value")
+		}
+
+		count, err := a.UserFavorites().Count(ctx, tx)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if want := int64((i + 1) * 2); count != want {
+			t.Error("want", want, "got", count)
 		}
 	}
 }
@@ -677,7 +722,7 @@ func testFavoritesSelect(t *testing.T) {
 }
 
 var (
-	favoriteDBTypes = map[string]string{`ID`: `text`, `UserID`: `text`, `GifID`: `text`, `GifData`: `bytea`, `GifName`: `text`}
+	favoriteDBTypes = map[string]string{`ID`: `text`, `GifData`: `bytea`, `GifName`: `text`}
 	_               = bytes.MinRead
 )
 
