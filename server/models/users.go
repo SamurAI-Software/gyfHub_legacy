@@ -26,7 +26,7 @@ import (
 type User struct {
 	ID           string     `boil:"id" json:"id" toml:"id" yaml:"id"`
 	Email        string     `boil:"email" json:"email" toml:"email" yaml:"email"`
-	PasswordHash string     `boil:"password_hash" json:"password_hash" toml:"password_hash" yaml:"password_hash"`
+	PasswordHash []byte     `boil:"password_hash" json:"password_hash" toml:"password_hash" yaml:"password_hash"`
 	Username     string     `boil:"username" json:"username" toml:"username" yaml:"username"`
 	Avatar       null.Bytes `boil:"avatar" json:"avatar,omitempty" toml:"avatar" yaml:"avatar,omitempty"`
 
@@ -50,16 +50,25 @@ var UserColumns = struct {
 
 // Generated where
 
+type whereHelper__byte struct{ field string }
+
+func (w whereHelper__byte) EQ(x []byte) qm.QueryMod  { return qmhelper.Where(w.field, qmhelper.EQ, x) }
+func (w whereHelper__byte) NEQ(x []byte) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.NEQ, x) }
+func (w whereHelper__byte) LT(x []byte) qm.QueryMod  { return qmhelper.Where(w.field, qmhelper.LT, x) }
+func (w whereHelper__byte) LTE(x []byte) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.LTE, x) }
+func (w whereHelper__byte) GT(x []byte) qm.QueryMod  { return qmhelper.Where(w.field, qmhelper.GT, x) }
+func (w whereHelper__byte) GTE(x []byte) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.GTE, x) }
+
 var UserWhere = struct {
 	ID           whereHelperstring
 	Email        whereHelperstring
-	PasswordHash whereHelperstring
+	PasswordHash whereHelper__byte
 	Username     whereHelperstring
 	Avatar       whereHelpernull_Bytes
 }{
 	ID:           whereHelperstring{field: "\"users\".\"id\""},
 	Email:        whereHelperstring{field: "\"users\".\"email\""},
-	PasswordHash: whereHelperstring{field: "\"users\".\"password_hash\""},
+	PasswordHash: whereHelper__byte{field: "\"users\".\"password_hash\""},
 	Username:     whereHelperstring{field: "\"users\".\"username\""},
 	Avatar:       whereHelpernull_Bytes{field: "\"users\".\"avatar\""},
 }
