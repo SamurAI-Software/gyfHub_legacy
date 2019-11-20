@@ -1,2 +1,5 @@
 .vscode
+.env
+go.mod
+go.sum
 sqlboiler.toml
