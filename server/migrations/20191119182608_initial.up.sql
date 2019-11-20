@@ -2,7 +2,7 @@ CREATE TABLE users
 (
     id TEXT PRIMARY KEY NOT NULL,
     email TEXT UNIQUE NOT NULL,
-    password_hash TEXT NOT NULL,
+    password_hash BYTEA NOT NULL,
     username TEXT NOT NULL,
     avatar BYTEA
 );
