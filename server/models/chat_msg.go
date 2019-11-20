@@ -24,11 +24,11 @@ import (
 
 // ChatMSG is an object representing the database table.
 type ChatMSG struct {
-	ID       string     `boil:"id" json:"id" toml:"id" yaml:"id"`
-	HubID    string     `boil:"hub_id" json:"hub_id" toml:"hub_id" yaml:"hub_id"`
-	GifData  null.Bytes `boil:"gif_data" json:"gif_data,omitempty" toml:"gif_data" yaml:"gif_data,omitempty"`
-	CreateAt null.Time  `boil:"create_at" json:"create_at,omitempty" toml:"create_at" yaml:"create_at,omitempty"`
-	UserID   string     `boil:"user_id" json:"user_id" toml:"user_id" yaml:"user_id"`
+	ID       string    `boil:"id" json:"id" toml:"id" yaml:"id"`
+	HubID    string    `boil:"hub_id" json:"hub_id" toml:"hub_id" yaml:"hub_id"`
+	GifID    string    `boil:"gif_id" json:"gif_id" toml:"gif_id" yaml:"gif_id"`
+	CreateAt null.Time `boil:"create_at" json:"create_at,omitempty" toml:"create_at" yaml:"create_at,omitempty"`
+	UserID   string    `boil:"user_id" json:"user_id" toml:"user_id" yaml:"user_id"`
 
 	R *chatMSGR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L chatMSGL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -37,13 +37,13 @@ type ChatMSG struct {
 var ChatMSGColumns = struct {
 	ID       string
 	HubID    string
-	GifData  string
+	GifID    string
 	CreateAt string
 	UserID   string
 }{
 	ID:       "id",
 	HubID:    "hub_id",
-	GifData:  "gif_data",
+	GifID:    "gif_id",
 	CreateAt: "create_at",
 	UserID:   "user_id",
 }
@@ -64,29 +64,6 @@ func (w whereHelperstring) IN(slice []string) qm.QueryMod {
 		values = append(values, value)
 	}
 	return qm.WhereIn(fmt.Sprintf("%s IN ?", w.field), values...)
-}
-
-type whereHelpernull_Bytes struct{ field string }
-
-func (w whereHelpernull_Bytes) EQ(x null.Bytes) qm.QueryMod {
-	return qmhelper.WhereNullEQ(w.field, false, x)
-}
-func (w whereHelpernull_Bytes) NEQ(x null.Bytes) qm.QueryMod {
-	return qmhelper.WhereNullEQ(w.field, true, x)
-}
-func (w whereHelpernull_Bytes) IsNull() qm.QueryMod    { return qmhelper.WhereIsNull(w.field) }
-func (w whereHelpernull_Bytes) IsNotNull() qm.QueryMod { return qmhelper.WhereIsNotNull(w.field) }
-func (w whereHelpernull_Bytes) LT(x null.Bytes) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.LT, x)
-}
-func (w whereHelpernull_Bytes) LTE(x null.Bytes) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.LTE, x)
-}
-func (w whereHelpernull_Bytes) GT(x null.Bytes) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.GT, x)
-}
-func (w whereHelpernull_Bytes) GTE(x null.Bytes) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.GTE, x)
 }
 
 type whereHelpernull_Time struct{ field string }
@@ -115,28 +92,31 @@ func (w whereHelpernull_Time) GTE(x null.Time) qm.QueryMod {
 var ChatMSGWhere = struct {
 	ID       whereHelperstring
 	HubID    whereHelperstring
-	GifData  whereHelpernull_Bytes
+	GifID    whereHelperstring
 	CreateAt whereHelpernull_Time
 	UserID   whereHelperstring
 }{
 	ID:       whereHelperstring{field: "\"chat_msg\".\"id\""},
 	HubID:    whereHelperstring{field: "\"chat_msg\".\"hub_id\""},
-	GifData:  whereHelpernull_Bytes{field: "\"chat_msg\".\"gif_data\""},
+	GifID:    whereHelperstring{field: "\"chat_msg\".\"gif_id\""},
 	CreateAt: whereHelpernull_Time{field: "\"chat_msg\".\"create_at\""},
 	UserID:   whereHelperstring{field: "\"chat_msg\".\"user_id\""},
 }
 
 // ChatMSGRels is where relationship names are stored.
 var ChatMSGRels = struct {
+	Gif  string
 	Hub  string
 	User string
 }{
+	Gif:  "Gif",
 	Hub:  "Hub",
 	User: "User",
 }
 
 // chatMSGR is where relationships are stored.
 type chatMSGR struct {
+	Gif  *Gif
 	Hub  *Hub
 	User *User
 }
@@ -150,8 +130,8 @@ func (*chatMSGR) NewStruct() *chatMSGR {
 type chatMSGL struct{}
 
 var (
-	chatMSGAllColumns            = []string{"id", "hub_id", "gif_data", "create_at", "user_id"}
-	chatMSGColumnsWithoutDefault = []string{"id", "hub_id", "gif_data", "create_at", "user_id"}
+	chatMSGAllColumns            = []string{"id", "hub_id", "gif_id", "create_at", "user_id"}
+	chatMSGColumnsWithoutDefault = []string{"id", "hub_id", "gif_id", "create_at", "user_id"}
 	chatMSGColumnsWithDefault    = []string{}
 	chatMSGPrimaryKeyColumns     = []string{"id"}
 )
@@ -431,6 +411,20 @@ func (q chatMSGQuery) Exists(ctx context.Context, exec boil.ContextExecutor) (bo
 	return count > 0, nil
 }
 
+// Gif pointed to by the foreign key.
+func (o *ChatMSG) Gif(mods ...qm.QueryMod) gifQuery {
+	queryMods := []qm.QueryMod{
+		qm.Where("\"id\" = ?", o.GifID),
+	}
+
+	queryMods = append(queryMods, mods...)
+
+	query := Gifs(queryMods...)
+	queries.SetFrom(query.Query, "\"gifs\"")
+
+	return query
+}
+
 // Hub pointed to by the foreign key.
 func (o *ChatMSG) Hub(mods ...qm.QueryMod) hubQuery {
 	queryMods := []qm.QueryMod{
@@ -457,6 +451,107 @@ func (o *ChatMSG) User(mods ...qm.QueryMod) userQuery {
 	queries.SetFrom(query.Query, "\"users\"")
 
 	return query
+}
+
+// LoadGif allows an eager lookup of values, cached into the
+// loaded structs of the objects. This is for an N-1 relationship.
+func (chatMSGL) LoadGif(ctx context.Context, e boil.ContextExecutor, singular bool, maybeChatMSG interface{}, mods queries.Applicator) error {
+	var slice []*ChatMSG
+	var object *ChatMSG
+
+	if singular {
+		object = maybeChatMSG.(*ChatMSG)
+	} else {
+		slice = *maybeChatMSG.(*[]*ChatMSG)
+	}
+
+	args := make([]interface{}, 0, 1)
+	if singular {
+		if object.R == nil {
+			object.R = &chatMSGR{}
+		}
+		args = append(args, object.GifID)
+
+	} else {
+	Outer:
+		for _, obj := range slice {
+			if obj.R == nil {
+				obj.R = &chatMSGR{}
+			}
+
+			for _, a := range args {
+				if a == obj.GifID {
+					continue Outer
+				}
+			}
+
+			args = append(args, obj.GifID)
+
+		}
+	}
+
+	if len(args) == 0 {
+		return nil
+	}
+
+	query := NewQuery(qm.From(`gifs`), qm.WhereIn(`gifs.id in ?`, args...))
+	if mods != nil {
+		mods.Apply(query)
+	}
+
+	results, err := query.QueryContext(ctx, e)
+	if err != nil {
+		return errors.Wrap(err, "failed to eager load Gif")
+	}
+
+	var resultSlice []*Gif
+	if err = queries.Bind(results, &resultSlice); err != nil {
+		return errors.Wrap(err, "failed to bind eager loaded slice Gif")
+	}
+
+	if err = results.Close(); err != nil {
+		return errors.Wrap(err, "failed to close results of eager load for gifs")
+	}
+	if err = results.Err(); err != nil {
+		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for gifs")
+	}
+
+	if len(chatMSGAfterSelectHooks) != 0 {
+		for _, obj := range resultSlice {
+			if err := obj.doAfterSelectHooks(ctx, e); err != nil {
+				return err
+			}
+		}
+	}
+
+	if len(resultSlice) == 0 {
+		return nil
+	}
+
+	if singular {
+		foreign := resultSlice[0]
+		object.R.Gif = foreign
+		if foreign.R == nil {
+			foreign.R = &gifR{}
+		}
+		foreign.R.ChatMSGS = append(foreign.R.ChatMSGS, object)
+		return nil
+	}
+
+	for _, local := range slice {
+		for _, foreign := range resultSlice {
+			if local.GifID == foreign.ID {
+				local.R.Gif = foreign
+				if foreign.R == nil {
+					foreign.R = &gifR{}
+				}
+				foreign.R.ChatMSGS = append(foreign.R.ChatMSGS, local)
+				break
+			}
+		}
+	}
+
+	return nil
 }
 
 // LoadHub allows an eager lookup of values, cached into the
@@ -656,6 +751,53 @@ func (chatMSGL) LoadUser(ctx context.Context, e boil.ContextExecutor, singular b
 				break
 			}
 		}
+	}
+
+	return nil
+}
+
+// SetGif of the chatMSG to the related item.
+// Sets o.R.Gif to related.
+// Adds o to related.R.ChatMSGS.
+func (o *ChatMSG) SetGif(ctx context.Context, exec boil.ContextExecutor, insert bool, related *Gif) error {
+	var err error
+	if insert {
+		if err = related.Insert(ctx, exec, boil.Infer()); err != nil {
+			return errors.Wrap(err, "failed to insert into foreign table")
+		}
+	}
+
+	updateQuery := fmt.Sprintf(
+		"UPDATE \"chat_msg\" SET %s WHERE %s",
+		strmangle.SetParamNames("\"", "\"", 1, []string{"gif_id"}),
+		strmangle.WhereClause("\"", "\"", 2, chatMSGPrimaryKeyColumns),
+	)
+	values := []interface{}{related.ID, o.ID}
+
+	if boil.IsDebug(ctx) {
+		writer := boil.DebugWriterFrom(ctx)
+		fmt.Fprintln(writer, updateQuery)
+		fmt.Fprintln(writer, values)
+	}
+	if _, err = exec.ExecContext(ctx, updateQuery, values...); err != nil {
+		return errors.Wrap(err, "failed to update local table")
+	}
+
+	o.GifID = related.ID
+	if o.R == nil {
+		o.R = &chatMSGR{
+			Gif: related,
+		}
+	} else {
+		o.R.Gif = related
+	}
+
+	if related.R == nil {
+		related.R = &gifR{
+			ChatMSGS: ChatMSGSlice{o},
+		}
+	} else {
+		related.R.ChatMSGS = append(related.R.ChatMSGS, o)
 	}
 
 	return nil

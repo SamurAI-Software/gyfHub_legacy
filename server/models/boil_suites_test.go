@@ -13,119 +13,143 @@ import "testing"
 // Separating the tests thusly grants avoidance of Postgres deadlocks.
 func TestParent(t *testing.T) {
 	t.Run("ChatMSGS", testChatMSGS)
-	t.Run("Favorites", testFavorites)
+	t.Run("Followers", testFollowers)
+	t.Run("Gifs", testGifs)
 	t.Run("HubUsers", testHubUsers)
 	t.Run("Hubs", testHubs)
 	t.Run("SchemaMigrations", testSchemaMigrations)
 	t.Run("UserFavorites", testUserFavorites)
+	t.Run("UserGifs", testUserGifs)
 	t.Run("Users", testUsers)
 }
 
 func TestDelete(t *testing.T) {
 	t.Run("ChatMSGS", testChatMSGSDelete)
-	t.Run("Favorites", testFavoritesDelete)
+	t.Run("Followers", testFollowersDelete)
+	t.Run("Gifs", testGifsDelete)
 	t.Run("HubUsers", testHubUsersDelete)
 	t.Run("Hubs", testHubsDelete)
 	t.Run("SchemaMigrations", testSchemaMigrationsDelete)
 	t.Run("UserFavorites", testUserFavoritesDelete)
+	t.Run("UserGifs", testUserGifsDelete)
 	t.Run("Users", testUsersDelete)
 }
 
 func TestQueryDeleteAll(t *testing.T) {
 	t.Run("ChatMSGS", testChatMSGSQueryDeleteAll)
-	t.Run("Favorites", testFavoritesQueryDeleteAll)
+	t.Run("Followers", testFollowersQueryDeleteAll)
+	t.Run("Gifs", testGifsQueryDeleteAll)
 	t.Run("HubUsers", testHubUsersQueryDeleteAll)
 	t.Run("Hubs", testHubsQueryDeleteAll)
 	t.Run("SchemaMigrations", testSchemaMigrationsQueryDeleteAll)
 	t.Run("UserFavorites", testUserFavoritesQueryDeleteAll)
+	t.Run("UserGifs", testUserGifsQueryDeleteAll)
 	t.Run("Users", testUsersQueryDeleteAll)
 }
 
 func TestSliceDeleteAll(t *testing.T) {
 	t.Run("ChatMSGS", testChatMSGSSliceDeleteAll)
-	t.Run("Favorites", testFavoritesSliceDeleteAll)
+	t.Run("Followers", testFollowersSliceDeleteAll)
+	t.Run("Gifs", testGifsSliceDeleteAll)
 	t.Run("HubUsers", testHubUsersSliceDeleteAll)
 	t.Run("Hubs", testHubsSliceDeleteAll)
 	t.Run("SchemaMigrations", testSchemaMigrationsSliceDeleteAll)
 	t.Run("UserFavorites", testUserFavoritesSliceDeleteAll)
+	t.Run("UserGifs", testUserGifsSliceDeleteAll)
 	t.Run("Users", testUsersSliceDeleteAll)
 }
 
 func TestExists(t *testing.T) {
 	t.Run("ChatMSGS", testChatMSGSExists)
-	t.Run("Favorites", testFavoritesExists)
+	t.Run("Followers", testFollowersExists)
+	t.Run("Gifs", testGifsExists)
 	t.Run("HubUsers", testHubUsersExists)
 	t.Run("Hubs", testHubsExists)
 	t.Run("SchemaMigrations", testSchemaMigrationsExists)
 	t.Run("UserFavorites", testUserFavoritesExists)
+	t.Run("UserGifs", testUserGifsExists)
 	t.Run("Users", testUsersExists)
 }
 
 func TestFind(t *testing.T) {
 	t.Run("ChatMSGS", testChatMSGSFind)
-	t.Run("Favorites", testFavoritesFind)
+	t.Run("Followers", testFollowersFind)
+	t.Run("Gifs", testGifsFind)
 	t.Run("HubUsers", testHubUsersFind)
 	t.Run("Hubs", testHubsFind)
 	t.Run("SchemaMigrations", testSchemaMigrationsFind)
 	t.Run("UserFavorites", testUserFavoritesFind)
+	t.Run("UserGifs", testUserGifsFind)
 	t.Run("Users", testUsersFind)
 }
 
 func TestBind(t *testing.T) {
 	t.Run("ChatMSGS", testChatMSGSBind)
-	t.Run("Favorites", testFavoritesBind)
+	t.Run("Followers", testFollowersBind)
+	t.Run("Gifs", testGifsBind)
 	t.Run("HubUsers", testHubUsersBind)
 	t.Run("Hubs", testHubsBind)
 	t.Run("SchemaMigrations", testSchemaMigrationsBind)
 	t.Run("UserFavorites", testUserFavoritesBind)
+	t.Run("UserGifs", testUserGifsBind)
 	t.Run("Users", testUsersBind)
 }
 
 func TestOne(t *testing.T) {
 	t.Run("ChatMSGS", testChatMSGSOne)
-	t.Run("Favorites", testFavoritesOne)
+	t.Run("Followers", testFollowersOne)
+	t.Run("Gifs", testGifsOne)
 	t.Run("HubUsers", testHubUsersOne)
 	t.Run("Hubs", testHubsOne)
 	t.Run("SchemaMigrations", testSchemaMigrationsOne)
 	t.Run("UserFavorites", testUserFavoritesOne)
+	t.Run("UserGifs", testUserGifsOne)
 	t.Run("Users", testUsersOne)
 }
 
 func TestAll(t *testing.T) {
 	t.Run("ChatMSGS", testChatMSGSAll)
-	t.Run("Favorites", testFavoritesAll)
+	t.Run("Followers", testFollowersAll)
+	t.Run("Gifs", testGifsAll)
 	t.Run("HubUsers", testHubUsersAll)
 	t.Run("Hubs", testHubsAll)
 	t.Run("SchemaMigrations", testSchemaMigrationsAll)
 	t.Run("UserFavorites", testUserFavoritesAll)
+	t.Run("UserGifs", testUserGifsAll)
 	t.Run("Users", testUsersAll)
 }
 
 func TestCount(t *testing.T) {
 	t.Run("ChatMSGS", testChatMSGSCount)
-	t.Run("Favorites", testFavoritesCount)
+	t.Run("Followers", testFollowersCount)
+	t.Run("Gifs", testGifsCount)
 	t.Run("HubUsers", testHubUsersCount)
 	t.Run("Hubs", testHubsCount)
 	t.Run("SchemaMigrations", testSchemaMigrationsCount)
 	t.Run("UserFavorites", testUserFavoritesCount)
+	t.Run("UserGifs", testUserGifsCount)
 	t.Run("Users", testUsersCount)
 }
 
 func TestHooks(t *testing.T) {
 	t.Run("ChatMSGS", testChatMSGSHooks)
-	t.Run("Favorites", testFavoritesHooks)
+	t.Run("Followers", testFollowersHooks)
+	t.Run("Gifs", testGifsHooks)
 	t.Run("HubUsers", testHubUsersHooks)
 	t.Run("Hubs", testHubsHooks)
 	t.Run("SchemaMigrations", testSchemaMigrationsHooks)
 	t.Run("UserFavorites", testUserFavoritesHooks)
+	t.Run("UserGifs", testUserGifsHooks)
 	t.Run("Users", testUsersHooks)
 }
 
 func TestInsert(t *testing.T) {
 	t.Run("ChatMSGS", testChatMSGSInsert)
 	t.Run("ChatMSGS", testChatMSGSInsertWhitelist)
-	t.Run("Favorites", testFavoritesInsert)
-	t.Run("Favorites", testFavoritesInsertWhitelist)
+	t.Run("Followers", testFollowersInsert)
+	t.Run("Followers", testFollowersInsertWhitelist)
+	t.Run("Gifs", testGifsInsert)
+	t.Run("Gifs", testGifsInsertWhitelist)
 	t.Run("HubUsers", testHubUsersInsert)
 	t.Run("HubUsers", testHubUsersInsertWhitelist)
 	t.Run("Hubs", testHubsInsert)
@@ -134,6 +158,8 @@ func TestInsert(t *testing.T) {
 	t.Run("SchemaMigrations", testSchemaMigrationsInsertWhitelist)
 	t.Run("UserFavorites", testUserFavoritesInsert)
 	t.Run("UserFavorites", testUserFavoritesInsertWhitelist)
+	t.Run("UserGifs", testUserGifsInsert)
+	t.Run("UserGifs", testUserGifsInsertWhitelist)
 	t.Run("Users", testUsersInsert)
 	t.Run("Users", testUsersInsertWhitelist)
 }
@@ -141,41 +167,57 @@ func TestInsert(t *testing.T) {
 // TestToOne tests cannot be run in parallel
 // or deadlocks can occur.
 func TestToOne(t *testing.T) {
+	t.Run("ChatMSGToGifUsingGif", testChatMSGToOneGifUsingGif)
 	t.Run("ChatMSGToHubUsingHub", testChatMSGToOneHubUsingHub)
 	t.Run("ChatMSGToUserUsingUser", testChatMSGToOneUserUsingUser)
+	t.Run("FollowerToUserUsingFollower", testFollowerToOneUserUsingFollower)
+	t.Run("FollowerToUserUsingUser", testFollowerToOneUserUsingUser)
 	t.Run("HubUserToHubUsingHub", testHubUserToOneHubUsingHub)
 	t.Run("HubUserToUserUsingUser", testHubUserToOneUserUsingUser)
 	t.Run("HubToUserUsingUser", testHubToOneUserUsingUser)
-	t.Run("UserFavoriteToFavoriteUsingFavorite", testUserFavoriteToOneFavoriteUsingFavorite)
+	t.Run("UserFavoriteToGifUsingGif", testUserFavoriteToOneGifUsingGif)
 	t.Run("UserFavoriteToUserUsingUser", testUserFavoriteToOneUserUsingUser)
+	t.Run("UserGifToGifUsingGif", testUserGifToOneGifUsingGif)
+	t.Run("UserGifToUserUsingUser", testUserGifToOneUserUsingUser)
 }
 
 // TestOneToOne tests cannot be run in parallel
 // or deadlocks can occur.
-func TestOneToOne(t *testing.T) {}
+func TestOneToOne(t *testing.T) {
+	t.Run("GifToUserGifUsingUserGif", testGifOneToOneUserGifUsingUserGif)
+}
 
 // TestToMany tests cannot be run in parallel
 // or deadlocks can occur.
 func TestToMany(t *testing.T) {
-	t.Run("FavoriteToUserFavorites", testFavoriteToManyUserFavorites)
+	t.Run("GifToChatMSGS", testGifToManyChatMSGS)
+	t.Run("GifToUserFavorites", testGifToManyUserFavorites)
 	t.Run("HubToChatMSGS", testHubToManyChatMSGS)
 	t.Run("HubToHubUsers", testHubToManyHubUsers)
 	t.Run("UserToChatMSGS", testUserToManyChatMSGS)
+	t.Run("UserToFollowerFollowers", testUserToManyFollowerFollowers)
+	t.Run("UserToFollowers", testUserToManyFollowers)
 	t.Run("UserToHubUsers", testUserToManyHubUsers)
 	t.Run("UserToHubs", testUserToManyHubs)
 	t.Run("UserToUserFavorites", testUserToManyUserFavorites)
+	t.Run("UserToUserGifs", testUserToManyUserGifs)
 }
 
 // TestToOneSet tests cannot be run in parallel
 // or deadlocks can occur.
 func TestToOneSet(t *testing.T) {
+	t.Run("ChatMSGToGifUsingChatMSGS", testChatMSGToOneSetOpGifUsingGif)
 	t.Run("ChatMSGToHubUsingChatMSGS", testChatMSGToOneSetOpHubUsingHub)
 	t.Run("ChatMSGToUserUsingChatMSGS", testChatMSGToOneSetOpUserUsingUser)
+	t.Run("FollowerToUserUsingFollowerFollowers", testFollowerToOneSetOpUserUsingFollower)
+	t.Run("FollowerToUserUsingFollowers", testFollowerToOneSetOpUserUsingUser)
 	t.Run("HubUserToHubUsingHubUsers", testHubUserToOneSetOpHubUsingHub)
 	t.Run("HubUserToUserUsingHubUsers", testHubUserToOneSetOpUserUsingUser)
 	t.Run("HubToUserUsingHubs", testHubToOneSetOpUserUsingUser)
-	t.Run("UserFavoriteToFavoriteUsingUserFavorites", testUserFavoriteToOneSetOpFavoriteUsingFavorite)
+	t.Run("UserFavoriteToGifUsingUserFavorites", testUserFavoriteToOneSetOpGifUsingGif)
 	t.Run("UserFavoriteToUserUsingUserFavorites", testUserFavoriteToOneSetOpUserUsingUser)
+	t.Run("UserGifToGifUsingUserGif", testUserGifToOneSetOpGifUsingGif)
+	t.Run("UserGifToUserUsingUserGifs", testUserGifToOneSetOpUserUsingUser)
 }
 
 // TestToOneRemove tests cannot be run in parallel
@@ -184,7 +226,9 @@ func TestToOneRemove(t *testing.T) {}
 
 // TestOneToOneSet tests cannot be run in parallel
 // or deadlocks can occur.
-func TestOneToOneSet(t *testing.T) {}
+func TestOneToOneSet(t *testing.T) {
+	t.Run("GifToUserGifUsingUserGif", testGifOneToOneSetOpUserGifUsingUserGif)
+}
 
 // TestOneToOneRemove tests cannot be run in parallel
 // or deadlocks can occur.
@@ -193,13 +237,17 @@ func TestOneToOneRemove(t *testing.T) {}
 // TestToManyAdd tests cannot be run in parallel
 // or deadlocks can occur.
 func TestToManyAdd(t *testing.T) {
-	t.Run("FavoriteToUserFavorites", testFavoriteToManyAddOpUserFavorites)
+	t.Run("GifToChatMSGS", testGifToManyAddOpChatMSGS)
+	t.Run("GifToUserFavorites", testGifToManyAddOpUserFavorites)
 	t.Run("HubToChatMSGS", testHubToManyAddOpChatMSGS)
 	t.Run("HubToHubUsers", testHubToManyAddOpHubUsers)
 	t.Run("UserToChatMSGS", testUserToManyAddOpChatMSGS)
+	t.Run("UserToFollowerFollowers", testUserToManyAddOpFollowerFollowers)
+	t.Run("UserToFollowers", testUserToManyAddOpFollowers)
 	t.Run("UserToHubUsers", testUserToManyAddOpHubUsers)
 	t.Run("UserToHubs", testUserToManyAddOpHubs)
 	t.Run("UserToUserFavorites", testUserToManyAddOpUserFavorites)
+	t.Run("UserToUserGifs", testUserToManyAddOpUserGifs)
 }
 
 // TestToManySet tests cannot be run in parallel
@@ -212,50 +260,60 @@ func TestToManyRemove(t *testing.T) {}
 
 func TestReload(t *testing.T) {
 	t.Run("ChatMSGS", testChatMSGSReload)
-	t.Run("Favorites", testFavoritesReload)
+	t.Run("Followers", testFollowersReload)
+	t.Run("Gifs", testGifsReload)
 	t.Run("HubUsers", testHubUsersReload)
 	t.Run("Hubs", testHubsReload)
 	t.Run("SchemaMigrations", testSchemaMigrationsReload)
 	t.Run("UserFavorites", testUserFavoritesReload)
+	t.Run("UserGifs", testUserGifsReload)
 	t.Run("Users", testUsersReload)
 }
 
 func TestReloadAll(t *testing.T) {
 	t.Run("ChatMSGS", testChatMSGSReloadAll)
-	t.Run("Favorites", testFavoritesReloadAll)
+	t.Run("Followers", testFollowersReloadAll)
+	t.Run("Gifs", testGifsReloadAll)
 	t.Run("HubUsers", testHubUsersReloadAll)
 	t.Run("Hubs", testHubsReloadAll)
 	t.Run("SchemaMigrations", testSchemaMigrationsReloadAll)
 	t.Run("UserFavorites", testUserFavoritesReloadAll)
+	t.Run("UserGifs", testUserGifsReloadAll)
 	t.Run("Users", testUsersReloadAll)
 }
 
 func TestSelect(t *testing.T) {
 	t.Run("ChatMSGS", testChatMSGSSelect)
-	t.Run("Favorites", testFavoritesSelect)
+	t.Run("Followers", testFollowersSelect)
+	t.Run("Gifs", testGifsSelect)
 	t.Run("HubUsers", testHubUsersSelect)
 	t.Run("Hubs", testHubsSelect)
 	t.Run("SchemaMigrations", testSchemaMigrationsSelect)
 	t.Run("UserFavorites", testUserFavoritesSelect)
+	t.Run("UserGifs", testUserGifsSelect)
 	t.Run("Users", testUsersSelect)
 }
 
 func TestUpdate(t *testing.T) {
 	t.Run("ChatMSGS", testChatMSGSUpdate)
-	t.Run("Favorites", testFavoritesUpdate)
+	t.Run("Followers", testFollowersUpdate)
+	t.Run("Gifs", testGifsUpdate)
 	t.Run("HubUsers", testHubUsersUpdate)
 	t.Run("Hubs", testHubsUpdate)
 	t.Run("SchemaMigrations", testSchemaMigrationsUpdate)
 	t.Run("UserFavorites", testUserFavoritesUpdate)
+	t.Run("UserGifs", testUserGifsUpdate)
 	t.Run("Users", testUsersUpdate)
 }
 
 func TestSliceUpdateAll(t *testing.T) {
 	t.Run("ChatMSGS", testChatMSGSSliceUpdateAll)
-	t.Run("Favorites", testFavoritesSliceUpdateAll)
+	t.Run("Followers", testFollowersSliceUpdateAll)
+	t.Run("Gifs", testGifsSliceUpdateAll)
 	t.Run("HubUsers", testHubUsersSliceUpdateAll)
 	t.Run("Hubs", testHubsSliceUpdateAll)
 	t.Run("SchemaMigrations", testSchemaMigrationsSliceUpdateAll)
 	t.Run("UserFavorites", testUserFavoritesSliceUpdateAll)
+	t.Run("UserGifs", testUserGifsSliceUpdateAll)
 	t.Run("Users", testUsersSliceUpdateAll)
 }

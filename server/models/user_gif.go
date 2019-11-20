@@ -21,17 +21,17 @@ import (
 	"github.com/volatiletech/sqlboiler/strmangle"
 )
 
-// UserFavorite is an object representing the database table.
-type UserFavorite struct {
+// UserGif is an object representing the database table.
+type UserGif struct {
 	ID     string `boil:"id" json:"id" toml:"id" yaml:"id"`
 	UserID string `boil:"user_id" json:"user_id" toml:"user_id" yaml:"user_id"`
 	GifID  string `boil:"gif_id" json:"gif_id" toml:"gif_id" yaml:"gif_id"`
 
-	R *userFavoriteR `boil:"-" json:"-" toml:"-" yaml:"-"`
-	L userFavoriteL  `boil:"-" json:"-" toml:"-" yaml:"-"`
+	R *userGifR `boil:"-" json:"-" toml:"-" yaml:"-"`
+	L userGifL  `boil:"-" json:"-" toml:"-" yaml:"-"`
 }
 
-var UserFavoriteColumns = struct {
+var UserGifColumns = struct {
 	ID     string
 	UserID string
 	GifID  string
@@ -43,18 +43,18 @@ var UserFavoriteColumns = struct {
 
 // Generated where
 
-var UserFavoriteWhere = struct {
+var UserGifWhere = struct {
 	ID     whereHelperstring
 	UserID whereHelperstring
 	GifID  whereHelperstring
 }{
-	ID:     whereHelperstring{field: "\"user_favorite\".\"id\""},
-	UserID: whereHelperstring{field: "\"user_favorite\".\"user_id\""},
-	GifID:  whereHelperstring{field: "\"user_favorite\".\"gif_id\""},
+	ID:     whereHelperstring{field: "\"user_gif\".\"id\""},
+	UserID: whereHelperstring{field: "\"user_gif\".\"user_id\""},
+	GifID:  whereHelperstring{field: "\"user_gif\".\"gif_id\""},
 }
 
-// UserFavoriteRels is where relationship names are stored.
-var UserFavoriteRels = struct {
+// UserGifRels is where relationship names are stored.
+var UserGifRels = struct {
 	Gif  string
 	User string
 }{
@@ -62,50 +62,50 @@ var UserFavoriteRels = struct {
 	User: "User",
 }
 
-// userFavoriteR is where relationships are stored.
-type userFavoriteR struct {
+// userGifR is where relationships are stored.
+type userGifR struct {
 	Gif  *Gif
 	User *User
 }
 
 // NewStruct creates a new relationship struct
-func (*userFavoriteR) NewStruct() *userFavoriteR {
-	return &userFavoriteR{}
+func (*userGifR) NewStruct() *userGifR {
+	return &userGifR{}
 }
 
-// userFavoriteL is where Load methods for each relationship are stored.
-type userFavoriteL struct{}
+// userGifL is where Load methods for each relationship are stored.
+type userGifL struct{}
 
 var (
-	userFavoriteAllColumns            = []string{"id", "user_id", "gif_id"}
-	userFavoriteColumnsWithoutDefault = []string{"id", "user_id", "gif_id"}
-	userFavoriteColumnsWithDefault    = []string{}
-	userFavoritePrimaryKeyColumns     = []string{"id"}
+	userGifAllColumns            = []string{"id", "user_id", "gif_id"}
+	userGifColumnsWithoutDefault = []string{"id", "user_id", "gif_id"}
+	userGifColumnsWithDefault    = []string{}
+	userGifPrimaryKeyColumns     = []string{"id"}
 )
 
 type (
-	// UserFavoriteSlice is an alias for a slice of pointers to UserFavorite.
-	// This should generally be used opposed to []UserFavorite.
-	UserFavoriteSlice []*UserFavorite
-	// UserFavoriteHook is the signature for custom UserFavorite hook methods
-	UserFavoriteHook func(context.Context, boil.ContextExecutor, *UserFavorite) error
+	// UserGifSlice is an alias for a slice of pointers to UserGif.
+	// This should generally be used opposed to []UserGif.
+	UserGifSlice []*UserGif
+	// UserGifHook is the signature for custom UserGif hook methods
+	UserGifHook func(context.Context, boil.ContextExecutor, *UserGif) error
 
-	userFavoriteQuery struct {
+	userGifQuery struct {
 		*queries.Query
 	}
 )
 
 // Cache for insert, update and upsert
 var (
-	userFavoriteType                 = reflect.TypeOf(&UserFavorite{})
-	userFavoriteMapping              = queries.MakeStructMapping(userFavoriteType)
-	userFavoritePrimaryKeyMapping, _ = queries.BindMapping(userFavoriteType, userFavoriteMapping, userFavoritePrimaryKeyColumns)
-	userFavoriteInsertCacheMut       sync.RWMutex
-	userFavoriteInsertCache          = make(map[string]insertCache)
-	userFavoriteUpdateCacheMut       sync.RWMutex
-	userFavoriteUpdateCache          = make(map[string]updateCache)
-	userFavoriteUpsertCacheMut       sync.RWMutex
-	userFavoriteUpsertCache          = make(map[string]insertCache)
+	userGifType                 = reflect.TypeOf(&UserGif{})
+	userGifMapping              = queries.MakeStructMapping(userGifType)
+	userGifPrimaryKeyMapping, _ = queries.BindMapping(userGifType, userGifMapping, userGifPrimaryKeyColumns)
+	userGifInsertCacheMut       sync.RWMutex
+	userGifInsertCache          = make(map[string]insertCache)
+	userGifUpdateCacheMut       sync.RWMutex
+	userGifUpdateCache          = make(map[string]updateCache)
+	userGifUpsertCacheMut       sync.RWMutex
+	userGifUpsertCache          = make(map[string]insertCache)
 )
 
 var (
@@ -116,24 +116,24 @@ var (
 	_ = qmhelper.Where
 )
 
-var userFavoriteBeforeInsertHooks []UserFavoriteHook
-var userFavoriteBeforeUpdateHooks []UserFavoriteHook
-var userFavoriteBeforeDeleteHooks []UserFavoriteHook
-var userFavoriteBeforeUpsertHooks []UserFavoriteHook
+var userGifBeforeInsertHooks []UserGifHook
+var userGifBeforeUpdateHooks []UserGifHook
+var userGifBeforeDeleteHooks []UserGifHook
+var userGifBeforeUpsertHooks []UserGifHook
 
-var userFavoriteAfterInsertHooks []UserFavoriteHook
-var userFavoriteAfterSelectHooks []UserFavoriteHook
-var userFavoriteAfterUpdateHooks []UserFavoriteHook
-var userFavoriteAfterDeleteHooks []UserFavoriteHook
-var userFavoriteAfterUpsertHooks []UserFavoriteHook
+var userGifAfterInsertHooks []UserGifHook
+var userGifAfterSelectHooks []UserGifHook
+var userGifAfterUpdateHooks []UserGifHook
+var userGifAfterDeleteHooks []UserGifHook
+var userGifAfterUpsertHooks []UserGifHook
 
 // doBeforeInsertHooks executes all "before insert" hooks.
-func (o *UserFavorite) doBeforeInsertHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
+func (o *UserGif) doBeforeInsertHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
 	if boil.HooksAreSkipped(ctx) {
 		return nil
 	}
 
-	for _, hook := range userFavoriteBeforeInsertHooks {
+	for _, hook := range userGifBeforeInsertHooks {
 		if err := hook(ctx, exec, o); err != nil {
 			return err
 		}
@@ -143,12 +143,12 @@ func (o *UserFavorite) doBeforeInsertHooks(ctx context.Context, exec boil.Contex
 }
 
 // doBeforeUpdateHooks executes all "before Update" hooks.
-func (o *UserFavorite) doBeforeUpdateHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
+func (o *UserGif) doBeforeUpdateHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
 	if boil.HooksAreSkipped(ctx) {
 		return nil
 	}
 
-	for _, hook := range userFavoriteBeforeUpdateHooks {
+	for _, hook := range userGifBeforeUpdateHooks {
 		if err := hook(ctx, exec, o); err != nil {
 			return err
 		}
@@ -158,12 +158,12 @@ func (o *UserFavorite) doBeforeUpdateHooks(ctx context.Context, exec boil.Contex
 }
 
 // doBeforeDeleteHooks executes all "before Delete" hooks.
-func (o *UserFavorite) doBeforeDeleteHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
+func (o *UserGif) doBeforeDeleteHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
 	if boil.HooksAreSkipped(ctx) {
 		return nil
 	}
 
-	for _, hook := range userFavoriteBeforeDeleteHooks {
+	for _, hook := range userGifBeforeDeleteHooks {
 		if err := hook(ctx, exec, o); err != nil {
 			return err
 		}
@@ -173,12 +173,12 @@ func (o *UserFavorite) doBeforeDeleteHooks(ctx context.Context, exec boil.Contex
 }
 
 // doBeforeUpsertHooks executes all "before Upsert" hooks.
-func (o *UserFavorite) doBeforeUpsertHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
+func (o *UserGif) doBeforeUpsertHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
 	if boil.HooksAreSkipped(ctx) {
 		return nil
 	}
 
-	for _, hook := range userFavoriteBeforeUpsertHooks {
+	for _, hook := range userGifBeforeUpsertHooks {
 		if err := hook(ctx, exec, o); err != nil {
 			return err
 		}
@@ -188,12 +188,12 @@ func (o *UserFavorite) doBeforeUpsertHooks(ctx context.Context, exec boil.Contex
 }
 
 // doAfterInsertHooks executes all "after Insert" hooks.
-func (o *UserFavorite) doAfterInsertHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
+func (o *UserGif) doAfterInsertHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
 	if boil.HooksAreSkipped(ctx) {
 		return nil
 	}
 
-	for _, hook := range userFavoriteAfterInsertHooks {
+	for _, hook := range userGifAfterInsertHooks {
 		if err := hook(ctx, exec, o); err != nil {
 			return err
 		}
@@ -203,12 +203,12 @@ func (o *UserFavorite) doAfterInsertHooks(ctx context.Context, exec boil.Context
 }
 
 // doAfterSelectHooks executes all "after Select" hooks.
-func (o *UserFavorite) doAfterSelectHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
+func (o *UserGif) doAfterSelectHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
 	if boil.HooksAreSkipped(ctx) {
 		return nil
 	}
 
-	for _, hook := range userFavoriteAfterSelectHooks {
+	for _, hook := range userGifAfterSelectHooks {
 		if err := hook(ctx, exec, o); err != nil {
 			return err
 		}
@@ -218,12 +218,12 @@ func (o *UserFavorite) doAfterSelectHooks(ctx context.Context, exec boil.Context
 }
 
 // doAfterUpdateHooks executes all "after Update" hooks.
-func (o *UserFavorite) doAfterUpdateHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
+func (o *UserGif) doAfterUpdateHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
 	if boil.HooksAreSkipped(ctx) {
 		return nil
 	}
 
-	for _, hook := range userFavoriteAfterUpdateHooks {
+	for _, hook := range userGifAfterUpdateHooks {
 		if err := hook(ctx, exec, o); err != nil {
 			return err
 		}
@@ -233,12 +233,12 @@ func (o *UserFavorite) doAfterUpdateHooks(ctx context.Context, exec boil.Context
 }
 
 // doAfterDeleteHooks executes all "after Delete" hooks.
-func (o *UserFavorite) doAfterDeleteHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
+func (o *UserGif) doAfterDeleteHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
 	if boil.HooksAreSkipped(ctx) {
 		return nil
 	}
 
-	for _, hook := range userFavoriteAfterDeleteHooks {
+	for _, hook := range userGifAfterDeleteHooks {
 		if err := hook(ctx, exec, o); err != nil {
 			return err
 		}
@@ -248,12 +248,12 @@ func (o *UserFavorite) doAfterDeleteHooks(ctx context.Context, exec boil.Context
 }
 
 // doAfterUpsertHooks executes all "after Upsert" hooks.
-func (o *UserFavorite) doAfterUpsertHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
+func (o *UserGif) doAfterUpsertHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
 	if boil.HooksAreSkipped(ctx) {
 		return nil
 	}
 
-	for _, hook := range userFavoriteAfterUpsertHooks {
+	for _, hook := range userGifAfterUpsertHooks {
 		if err := hook(ctx, exec, o); err != nil {
 			return err
 		}
@@ -262,33 +262,33 @@ func (o *UserFavorite) doAfterUpsertHooks(ctx context.Context, exec boil.Context
 	return nil
 }
 
-// AddUserFavoriteHook registers your hook function for all future operations.
-func AddUserFavoriteHook(hookPoint boil.HookPoint, userFavoriteHook UserFavoriteHook) {
+// AddUserGifHook registers your hook function for all future operations.
+func AddUserGifHook(hookPoint boil.HookPoint, userGifHook UserGifHook) {
 	switch hookPoint {
 	case boil.BeforeInsertHook:
-		userFavoriteBeforeInsertHooks = append(userFavoriteBeforeInsertHooks, userFavoriteHook)
+		userGifBeforeInsertHooks = append(userGifBeforeInsertHooks, userGifHook)
 	case boil.BeforeUpdateHook:
-		userFavoriteBeforeUpdateHooks = append(userFavoriteBeforeUpdateHooks, userFavoriteHook)
+		userGifBeforeUpdateHooks = append(userGifBeforeUpdateHooks, userGifHook)
 	case boil.BeforeDeleteHook:
-		userFavoriteBeforeDeleteHooks = append(userFavoriteBeforeDeleteHooks, userFavoriteHook)
+		userGifBeforeDeleteHooks = append(userGifBeforeDeleteHooks, userGifHook)
 	case boil.BeforeUpsertHook:
-		userFavoriteBeforeUpsertHooks = append(userFavoriteBeforeUpsertHooks, userFavoriteHook)
+		userGifBeforeUpsertHooks = append(userGifBeforeUpsertHooks, userGifHook)
 	case boil.AfterInsertHook:
-		userFavoriteAfterInsertHooks = append(userFavoriteAfterInsertHooks, userFavoriteHook)
+		userGifAfterInsertHooks = append(userGifAfterInsertHooks, userGifHook)
 	case boil.AfterSelectHook:
-		userFavoriteAfterSelectHooks = append(userFavoriteAfterSelectHooks, userFavoriteHook)
+		userGifAfterSelectHooks = append(userGifAfterSelectHooks, userGifHook)
 	case boil.AfterUpdateHook:
-		userFavoriteAfterUpdateHooks = append(userFavoriteAfterUpdateHooks, userFavoriteHook)
+		userGifAfterUpdateHooks = append(userGifAfterUpdateHooks, userGifHook)
 	case boil.AfterDeleteHook:
-		userFavoriteAfterDeleteHooks = append(userFavoriteAfterDeleteHooks, userFavoriteHook)
+		userGifAfterDeleteHooks = append(userGifAfterDeleteHooks, userGifHook)
 	case boil.AfterUpsertHook:
-		userFavoriteAfterUpsertHooks = append(userFavoriteAfterUpsertHooks, userFavoriteHook)
+		userGifAfterUpsertHooks = append(userGifAfterUpsertHooks, userGifHook)
 	}
 }
 
-// One returns a single userFavorite record from the query.
-func (q userFavoriteQuery) One(ctx context.Context, exec boil.ContextExecutor) (*UserFavorite, error) {
-	o := &UserFavorite{}
+// One returns a single userGif record from the query.
+func (q userGifQuery) One(ctx context.Context, exec boil.ContextExecutor) (*UserGif, error) {
+	o := &UserGif{}
 
 	queries.SetLimit(q.Query, 1)
 
@@ -297,7 +297,7 @@ func (q userFavoriteQuery) One(ctx context.Context, exec boil.ContextExecutor) (
 		if errors.Cause(err) == sql.ErrNoRows {
 			return nil, sql.ErrNoRows
 		}
-		return nil, errors.Wrap(err, "models: failed to execute a one query for user_favorite")
+		return nil, errors.Wrap(err, "models: failed to execute a one query for user_gif")
 	}
 
 	if err := o.doAfterSelectHooks(ctx, exec); err != nil {
@@ -307,16 +307,16 @@ func (q userFavoriteQuery) One(ctx context.Context, exec boil.ContextExecutor) (
 	return o, nil
 }
 
-// All returns all UserFavorite records from the query.
-func (q userFavoriteQuery) All(ctx context.Context, exec boil.ContextExecutor) (UserFavoriteSlice, error) {
-	var o []*UserFavorite
+// All returns all UserGif records from the query.
+func (q userGifQuery) All(ctx context.Context, exec boil.ContextExecutor) (UserGifSlice, error) {
+	var o []*UserGif
 
 	err := q.Bind(ctx, exec, &o)
 	if err != nil {
-		return nil, errors.Wrap(err, "models: failed to assign all query results to UserFavorite slice")
+		return nil, errors.Wrap(err, "models: failed to assign all query results to UserGif slice")
 	}
 
-	if len(userFavoriteAfterSelectHooks) != 0 {
+	if len(userGifAfterSelectHooks) != 0 {
 		for _, obj := range o {
 			if err := obj.doAfterSelectHooks(ctx, exec); err != nil {
 				return o, err
@@ -327,8 +327,8 @@ func (q userFavoriteQuery) All(ctx context.Context, exec boil.ContextExecutor) (
 	return o, nil
 }
 
-// Count returns the count of all UserFavorite records in the query.
-func (q userFavoriteQuery) Count(ctx context.Context, exec boil.ContextExecutor) (int64, error) {
+// Count returns the count of all UserGif records in the query.
+func (q userGifQuery) Count(ctx context.Context, exec boil.ContextExecutor) (int64, error) {
 	var count int64
 
 	queries.SetSelect(q.Query, nil)
@@ -336,14 +336,14 @@ func (q userFavoriteQuery) Count(ctx context.Context, exec boil.ContextExecutor)
 
 	err := q.Query.QueryRowContext(ctx, exec).Scan(&count)
 	if err != nil {
-		return 0, errors.Wrap(err, "models: failed to count user_favorite rows")
+		return 0, errors.Wrap(err, "models: failed to count user_gif rows")
 	}
 
 	return count, nil
 }
 
 // Exists checks if the row exists in the table.
-func (q userFavoriteQuery) Exists(ctx context.Context, exec boil.ContextExecutor) (bool, error) {
+func (q userGifQuery) Exists(ctx context.Context, exec boil.ContextExecutor) (bool, error) {
 	var count int64
 
 	queries.SetSelect(q.Query, nil)
@@ -352,14 +352,14 @@ func (q userFavoriteQuery) Exists(ctx context.Context, exec boil.ContextExecutor
 
 	err := q.Query.QueryRowContext(ctx, exec).Scan(&count)
 	if err != nil {
-		return false, errors.Wrap(err, "models: failed to check if user_favorite exists")
+		return false, errors.Wrap(err, "models: failed to check if user_gif exists")
 	}
 
 	return count > 0, nil
 }
 
 // Gif pointed to by the foreign key.
-func (o *UserFavorite) Gif(mods ...qm.QueryMod) gifQuery {
+func (o *UserGif) Gif(mods ...qm.QueryMod) gifQuery {
 	queryMods := []qm.QueryMod{
 		qm.Where("\"id\" = ?", o.GifID),
 	}
@@ -373,7 +373,7 @@ func (o *UserFavorite) Gif(mods ...qm.QueryMod) gifQuery {
 }
 
 // User pointed to by the foreign key.
-func (o *UserFavorite) User(mods ...qm.QueryMod) userQuery {
+func (o *UserGif) User(mods ...qm.QueryMod) userQuery {
 	queryMods := []qm.QueryMod{
 		qm.Where("\"id\" = ?", o.UserID),
 	}
@@ -388,20 +388,20 @@ func (o *UserFavorite) User(mods ...qm.QueryMod) userQuery {
 
 // LoadGif allows an eager lookup of values, cached into the
 // loaded structs of the objects. This is for an N-1 relationship.
-func (userFavoriteL) LoadGif(ctx context.Context, e boil.ContextExecutor, singular bool, maybeUserFavorite interface{}, mods queries.Applicator) error {
-	var slice []*UserFavorite
-	var object *UserFavorite
+func (userGifL) LoadGif(ctx context.Context, e boil.ContextExecutor, singular bool, maybeUserGif interface{}, mods queries.Applicator) error {
+	var slice []*UserGif
+	var object *UserGif
 
 	if singular {
-		object = maybeUserFavorite.(*UserFavorite)
+		object = maybeUserGif.(*UserGif)
 	} else {
-		slice = *maybeUserFavorite.(*[]*UserFavorite)
+		slice = *maybeUserGif.(*[]*UserGif)
 	}
 
 	args := make([]interface{}, 0, 1)
 	if singular {
 		if object.R == nil {
-			object.R = &userFavoriteR{}
+			object.R = &userGifR{}
 		}
 		args = append(args, object.GifID)
 
@@ -409,7 +409,7 @@ func (userFavoriteL) LoadGif(ctx context.Context, e boil.ContextExecutor, singul
 	Outer:
 		for _, obj := range slice {
 			if obj.R == nil {
-				obj.R = &userFavoriteR{}
+				obj.R = &userGifR{}
 			}
 
 			for _, a := range args {
@@ -449,7 +449,7 @@ func (userFavoriteL) LoadGif(ctx context.Context, e boil.ContextExecutor, singul
 		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for gifs")
 	}
 
-	if len(userFavoriteAfterSelectHooks) != 0 {
+	if len(userGifAfterSelectHooks) != 0 {
 		for _, obj := range resultSlice {
 			if err := obj.doAfterSelectHooks(ctx, e); err != nil {
 				return err
@@ -467,7 +467,7 @@ func (userFavoriteL) LoadGif(ctx context.Context, e boil.ContextExecutor, singul
 		if foreign.R == nil {
 			foreign.R = &gifR{}
 		}
-		foreign.R.UserFavorites = append(foreign.R.UserFavorites, object)
+		foreign.R.UserGif = object
 		return nil
 	}
 
@@ -478,7 +478,7 @@ func (userFavoriteL) LoadGif(ctx context.Context, e boil.ContextExecutor, singul
 				if foreign.R == nil {
 					foreign.R = &gifR{}
 				}
-				foreign.R.UserFavorites = append(foreign.R.UserFavorites, local)
+				foreign.R.UserGif = local
 				break
 			}
 		}
@@ -489,20 +489,20 @@ func (userFavoriteL) LoadGif(ctx context.Context, e boil.ContextExecutor, singul
 
 // LoadUser allows an eager lookup of values, cached into the
 // loaded structs of the objects. This is for an N-1 relationship.
-func (userFavoriteL) LoadUser(ctx context.Context, e boil.ContextExecutor, singular bool, maybeUserFavorite interface{}, mods queries.Applicator) error {
-	var slice []*UserFavorite
-	var object *UserFavorite
+func (userGifL) LoadUser(ctx context.Context, e boil.ContextExecutor, singular bool, maybeUserGif interface{}, mods queries.Applicator) error {
+	var slice []*UserGif
+	var object *UserGif
 
 	if singular {
-		object = maybeUserFavorite.(*UserFavorite)
+		object = maybeUserGif.(*UserGif)
 	} else {
-		slice = *maybeUserFavorite.(*[]*UserFavorite)
+		slice = *maybeUserGif.(*[]*UserGif)
 	}
 
 	args := make([]interface{}, 0, 1)
 	if singular {
 		if object.R == nil {
-			object.R = &userFavoriteR{}
+			object.R = &userGifR{}
 		}
 		args = append(args, object.UserID)
 
@@ -510,7 +510,7 @@ func (userFavoriteL) LoadUser(ctx context.Context, e boil.ContextExecutor, singu
 	Outer:
 		for _, obj := range slice {
 			if obj.R == nil {
-				obj.R = &userFavoriteR{}
+				obj.R = &userGifR{}
 			}
 
 			for _, a := range args {
@@ -550,7 +550,7 @@ func (userFavoriteL) LoadUser(ctx context.Context, e boil.ContextExecutor, singu
 		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for users")
 	}
 
-	if len(userFavoriteAfterSelectHooks) != 0 {
+	if len(userGifAfterSelectHooks) != 0 {
 		for _, obj := range resultSlice {
 			if err := obj.doAfterSelectHooks(ctx, e); err != nil {
 				return err
@@ -568,7 +568,7 @@ func (userFavoriteL) LoadUser(ctx context.Context, e boil.ContextExecutor, singu
 		if foreign.R == nil {
 			foreign.R = &userR{}
 		}
-		foreign.R.UserFavorites = append(foreign.R.UserFavorites, object)
+		foreign.R.UserGifs = append(foreign.R.UserGifs, object)
 		return nil
 	}
 
@@ -579,7 +579,7 @@ func (userFavoriteL) LoadUser(ctx context.Context, e boil.ContextExecutor, singu
 				if foreign.R == nil {
 					foreign.R = &userR{}
 				}
-				foreign.R.UserFavorites = append(foreign.R.UserFavorites, local)
+				foreign.R.UserGifs = append(foreign.R.UserGifs, local)
 				break
 			}
 		}
@@ -588,10 +588,10 @@ func (userFavoriteL) LoadUser(ctx context.Context, e boil.ContextExecutor, singu
 	return nil
 }
 
-// SetGif of the userFavorite to the related item.
+// SetGif of the userGif to the related item.
 // Sets o.R.Gif to related.
-// Adds o to related.R.UserFavorites.
-func (o *UserFavorite) SetGif(ctx context.Context, exec boil.ContextExecutor, insert bool, related *Gif) error {
+// Adds o to related.R.UserGif.
+func (o *UserGif) SetGif(ctx context.Context, exec boil.ContextExecutor, insert bool, related *Gif) error {
 	var err error
 	if insert {
 		if err = related.Insert(ctx, exec, boil.Infer()); err != nil {
@@ -600,9 +600,9 @@ func (o *UserFavorite) SetGif(ctx context.Context, exec boil.ContextExecutor, in
 	}
 
 	updateQuery := fmt.Sprintf(
-		"UPDATE \"user_favorite\" SET %s WHERE %s",
+		"UPDATE \"user_gif\" SET %s WHERE %s",
 		strmangle.SetParamNames("\"", "\"", 1, []string{"gif_id"}),
-		strmangle.WhereClause("\"", "\"", 2, userFavoritePrimaryKeyColumns),
+		strmangle.WhereClause("\"", "\"", 2, userGifPrimaryKeyColumns),
 	)
 	values := []interface{}{related.ID, o.ID}
 
@@ -617,7 +617,7 @@ func (o *UserFavorite) SetGif(ctx context.Context, exec boil.ContextExecutor, in
 
 	o.GifID = related.ID
 	if o.R == nil {
-		o.R = &userFavoriteR{
+		o.R = &userGifR{
 			Gif: related,
 		}
 	} else {
@@ -626,19 +626,19 @@ func (o *UserFavorite) SetGif(ctx context.Context, exec boil.ContextExecutor, in
 
 	if related.R == nil {
 		related.R = &gifR{
-			UserFavorites: UserFavoriteSlice{o},
+			UserGif: o,
 		}
 	} else {
-		related.R.UserFavorites = append(related.R.UserFavorites, o)
+		related.R.UserGif = o
 	}
 
 	return nil
 }
 
-// SetUser of the userFavorite to the related item.
+// SetUser of the userGif to the related item.
 // Sets o.R.User to related.
-// Adds o to related.R.UserFavorites.
-func (o *UserFavorite) SetUser(ctx context.Context, exec boil.ContextExecutor, insert bool, related *User) error {
+// Adds o to related.R.UserGifs.
+func (o *UserGif) SetUser(ctx context.Context, exec boil.ContextExecutor, insert bool, related *User) error {
 	var err error
 	if insert {
 		if err = related.Insert(ctx, exec, boil.Infer()); err != nil {
@@ -647,9 +647,9 @@ func (o *UserFavorite) SetUser(ctx context.Context, exec boil.ContextExecutor, i
 	}
 
 	updateQuery := fmt.Sprintf(
-		"UPDATE \"user_favorite\" SET %s WHERE %s",
+		"UPDATE \"user_gif\" SET %s WHERE %s",
 		strmangle.SetParamNames("\"", "\"", 1, []string{"user_id"}),
-		strmangle.WhereClause("\"", "\"", 2, userFavoritePrimaryKeyColumns),
+		strmangle.WhereClause("\"", "\"", 2, userGifPrimaryKeyColumns),
 	)
 	values := []interface{}{related.ID, o.ID}
 
@@ -664,7 +664,7 @@ func (o *UserFavorite) SetUser(ctx context.Context, exec boil.ContextExecutor, i
 
 	o.UserID = related.ID
 	if o.R == nil {
-		o.R = &userFavoriteR{
+		o.R = &userGifR{
 			User: related,
 		}
 	} else {
@@ -673,52 +673,52 @@ func (o *UserFavorite) SetUser(ctx context.Context, exec boil.ContextExecutor, i
 
 	if related.R == nil {
 		related.R = &userR{
-			UserFavorites: UserFavoriteSlice{o},
+			UserGifs: UserGifSlice{o},
 		}
 	} else {
-		related.R.UserFavorites = append(related.R.UserFavorites, o)
+		related.R.UserGifs = append(related.R.UserGifs, o)
 	}
 
 	return nil
 }
 
-// UserFavorites retrieves all the records using an executor.
-func UserFavorites(mods ...qm.QueryMod) userFavoriteQuery {
-	mods = append(mods, qm.From("\"user_favorite\""))
-	return userFavoriteQuery{NewQuery(mods...)}
+// UserGifs retrieves all the records using an executor.
+func UserGifs(mods ...qm.QueryMod) userGifQuery {
+	mods = append(mods, qm.From("\"user_gif\""))
+	return userGifQuery{NewQuery(mods...)}
 }
 
-// FindUserFavorite retrieves a single record by ID with an executor.
+// FindUserGif retrieves a single record by ID with an executor.
 // If selectCols is empty Find will return all columns.
-func FindUserFavorite(ctx context.Context, exec boil.ContextExecutor, iD string, selectCols ...string) (*UserFavorite, error) {
-	userFavoriteObj := &UserFavorite{}
+func FindUserGif(ctx context.Context, exec boil.ContextExecutor, iD string, selectCols ...string) (*UserGif, error) {
+	userGifObj := &UserGif{}
 
 	sel := "*"
 	if len(selectCols) > 0 {
 		sel = strings.Join(strmangle.IdentQuoteSlice(dialect.LQ, dialect.RQ, selectCols), ",")
 	}
 	query := fmt.Sprintf(
-		"select %s from \"user_favorite\" where \"id\"=$1", sel,
+		"select %s from \"user_gif\" where \"id\"=$1", sel,
 	)
 
 	q := queries.Raw(query, iD)
 
-	err := q.Bind(ctx, exec, userFavoriteObj)
+	err := q.Bind(ctx, exec, userGifObj)
 	if err != nil {
 		if errors.Cause(err) == sql.ErrNoRows {
 			return nil, sql.ErrNoRows
 		}
-		return nil, errors.Wrap(err, "models: unable to select from user_favorite")
+		return nil, errors.Wrap(err, "models: unable to select from user_gif")
 	}
 
-	return userFavoriteObj, nil
+	return userGifObj, nil
 }
 
 // Insert a single record using an executor.
 // See boil.Columns.InsertColumnSet documentation to understand column list inference for inserts.
-func (o *UserFavorite) Insert(ctx context.Context, exec boil.ContextExecutor, columns boil.Columns) error {
+func (o *UserGif) Insert(ctx context.Context, exec boil.ContextExecutor, columns boil.Columns) error {
 	if o == nil {
-		return errors.New("models: no user_favorite provided for insertion")
+		return errors.New("models: no user_gif provided for insertion")
 	}
 
 	var err error
@@ -727,33 +727,33 @@ func (o *UserFavorite) Insert(ctx context.Context, exec boil.ContextExecutor, co
 		return err
 	}
 
-	nzDefaults := queries.NonZeroDefaultSet(userFavoriteColumnsWithDefault, o)
+	nzDefaults := queries.NonZeroDefaultSet(userGifColumnsWithDefault, o)
 
 	key := makeCacheKey(columns, nzDefaults)
-	userFavoriteInsertCacheMut.RLock()
-	cache, cached := userFavoriteInsertCache[key]
-	userFavoriteInsertCacheMut.RUnlock()
+	userGifInsertCacheMut.RLock()
+	cache, cached := userGifInsertCache[key]
+	userGifInsertCacheMut.RUnlock()
 
 	if !cached {
 		wl, returnColumns := columns.InsertColumnSet(
-			userFavoriteAllColumns,
-			userFavoriteColumnsWithDefault,
-			userFavoriteColumnsWithoutDefault,
+			userGifAllColumns,
+			userGifColumnsWithDefault,
+			userGifColumnsWithoutDefault,
 			nzDefaults,
 		)
 
-		cache.valueMapping, err = queries.BindMapping(userFavoriteType, userFavoriteMapping, wl)
+		cache.valueMapping, err = queries.BindMapping(userGifType, userGifMapping, wl)
 		if err != nil {
 			return err
 		}
-		cache.retMapping, err = queries.BindMapping(userFavoriteType, userFavoriteMapping, returnColumns)
+		cache.retMapping, err = queries.BindMapping(userGifType, userGifMapping, returnColumns)
 		if err != nil {
 			return err
 		}
 		if len(wl) != 0 {
-			cache.query = fmt.Sprintf("INSERT INTO \"user_favorite\" (\"%s\") %%sVALUES (%s)%%s", strings.Join(wl, "\",\""), strmangle.Placeholders(dialect.UseIndexPlaceholders, len(wl), 1, 1))
+			cache.query = fmt.Sprintf("INSERT INTO \"user_gif\" (\"%s\") %%sVALUES (%s)%%s", strings.Join(wl, "\",\""), strmangle.Placeholders(dialect.UseIndexPlaceholders, len(wl), 1, 1))
 		} else {
-			cache.query = "INSERT INTO \"user_favorite\" %sDEFAULT VALUES%s"
+			cache.query = "INSERT INTO \"user_gif\" %sDEFAULT VALUES%s"
 		}
 
 		var queryOutput, queryReturning string
@@ -781,49 +781,49 @@ func (o *UserFavorite) Insert(ctx context.Context, exec boil.ContextExecutor, co
 	}
 
 	if err != nil {
-		return errors.Wrap(err, "models: unable to insert into user_favorite")
+		return errors.Wrap(err, "models: unable to insert into user_gif")
 	}
 
 	if !cached {
-		userFavoriteInsertCacheMut.Lock()
-		userFavoriteInsertCache[key] = cache
-		userFavoriteInsertCacheMut.Unlock()
+		userGifInsertCacheMut.Lock()
+		userGifInsertCache[key] = cache
+		userGifInsertCacheMut.Unlock()
 	}
 
 	return o.doAfterInsertHooks(ctx, exec)
 }
 
-// Update uses an executor to update the UserFavorite.
+// Update uses an executor to update the UserGif.
 // See boil.Columns.UpdateColumnSet documentation to understand column list inference for updates.
 // Update does not automatically update the record in case of default values. Use .Reload() to refresh the records.
-func (o *UserFavorite) Update(ctx context.Context, exec boil.ContextExecutor, columns boil.Columns) (int64, error) {
+func (o *UserGif) Update(ctx context.Context, exec boil.ContextExecutor, columns boil.Columns) (int64, error) {
 	var err error
 	if err = o.doBeforeUpdateHooks(ctx, exec); err != nil {
 		return 0, err
 	}
 	key := makeCacheKey(columns, nil)
-	userFavoriteUpdateCacheMut.RLock()
-	cache, cached := userFavoriteUpdateCache[key]
-	userFavoriteUpdateCacheMut.RUnlock()
+	userGifUpdateCacheMut.RLock()
+	cache, cached := userGifUpdateCache[key]
+	userGifUpdateCacheMut.RUnlock()
 
 	if !cached {
 		wl := columns.UpdateColumnSet(
-			userFavoriteAllColumns,
-			userFavoritePrimaryKeyColumns,
+			userGifAllColumns,
+			userGifPrimaryKeyColumns,
 		)
 
 		if !columns.IsWhitelist() {
 			wl = strmangle.SetComplement(wl, []string{"created_at"})
 		}
 		if len(wl) == 0 {
-			return 0, errors.New("models: unable to update user_favorite, could not build whitelist")
+			return 0, errors.New("models: unable to update user_gif, could not build whitelist")
 		}
 
-		cache.query = fmt.Sprintf("UPDATE \"user_favorite\" SET %s WHERE %s",
+		cache.query = fmt.Sprintf("UPDATE \"user_gif\" SET %s WHERE %s",
 			strmangle.SetParamNames("\"", "\"", 1, wl),
-			strmangle.WhereClause("\"", "\"", len(wl)+1, userFavoritePrimaryKeyColumns),
+			strmangle.WhereClause("\"", "\"", len(wl)+1, userGifPrimaryKeyColumns),
 		)
-		cache.valueMapping, err = queries.BindMapping(userFavoriteType, userFavoriteMapping, append(wl, userFavoritePrimaryKeyColumns...))
+		cache.valueMapping, err = queries.BindMapping(userGifType, userGifMapping, append(wl, userGifPrimaryKeyColumns...))
 		if err != nil {
 			return 0, err
 		}
@@ -839,42 +839,42 @@ func (o *UserFavorite) Update(ctx context.Context, exec boil.ContextExecutor, co
 	var result sql.Result
 	result, err = exec.ExecContext(ctx, cache.query, values...)
 	if err != nil {
-		return 0, errors.Wrap(err, "models: unable to update user_favorite row")
+		return 0, errors.Wrap(err, "models: unable to update user_gif row")
 	}
 
 	rowsAff, err := result.RowsAffected()
 	if err != nil {
-		return 0, errors.Wrap(err, "models: failed to get rows affected by update for user_favorite")
+		return 0, errors.Wrap(err, "models: failed to get rows affected by update for user_gif")
 	}
 
 	if !cached {
-		userFavoriteUpdateCacheMut.Lock()
-		userFavoriteUpdateCache[key] = cache
-		userFavoriteUpdateCacheMut.Unlock()
+		userGifUpdateCacheMut.Lock()
+		userGifUpdateCache[key] = cache
+		userGifUpdateCacheMut.Unlock()
 	}
 
 	return rowsAff, o.doAfterUpdateHooks(ctx, exec)
 }
 
 // UpdateAll updates all rows with the specified column values.
-func (q userFavoriteQuery) UpdateAll(ctx context.Context, exec boil.ContextExecutor, cols M) (int64, error) {
+func (q userGifQuery) UpdateAll(ctx context.Context, exec boil.ContextExecutor, cols M) (int64, error) {
 	queries.SetUpdate(q.Query, cols)
 
 	result, err := q.Query.ExecContext(ctx, exec)
 	if err != nil {
-		return 0, errors.Wrap(err, "models: unable to update all for user_favorite")
+		return 0, errors.Wrap(err, "models: unable to update all for user_gif")
 	}
 
 	rowsAff, err := result.RowsAffected()
 	if err != nil {
-		return 0, errors.Wrap(err, "models: unable to retrieve rows affected for user_favorite")
+		return 0, errors.Wrap(err, "models: unable to retrieve rows affected for user_gif")
 	}
 
 	return rowsAff, nil
 }
 
 // UpdateAll updates all rows with the specified column values, using an executor.
-func (o UserFavoriteSlice) UpdateAll(ctx context.Context, exec boil.ContextExecutor, cols M) (int64, error) {
+func (o UserGifSlice) UpdateAll(ctx context.Context, exec boil.ContextExecutor, cols M) (int64, error) {
 	ln := int64(len(o))
 	if ln == 0 {
 		return 0, nil
@@ -896,13 +896,13 @@ func (o UserFavoriteSlice) UpdateAll(ctx context.Context, exec boil.ContextExecu
 
 	// Append all of the primary key values for each column
 	for _, obj := range o {
-		pkeyArgs := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(obj)), userFavoritePrimaryKeyMapping)
+		pkeyArgs := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(obj)), userGifPrimaryKeyMapping)
 		args = append(args, pkeyArgs...)
 	}
 
-	sql := fmt.Sprintf("UPDATE \"user_favorite\" SET %s WHERE %s",
+	sql := fmt.Sprintf("UPDATE \"user_gif\" SET %s WHERE %s",
 		strmangle.SetParamNames("\"", "\"", 1, colNames),
-		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), len(colNames)+1, userFavoritePrimaryKeyColumns, len(o)))
+		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), len(colNames)+1, userGifPrimaryKeyColumns, len(o)))
 
 	if boil.IsDebug(ctx) {
 		writer := boil.DebugWriterFrom(ctx)
@@ -911,28 +911,28 @@ func (o UserFavoriteSlice) UpdateAll(ctx context.Context, exec boil.ContextExecu
 	}
 	result, err := exec.ExecContext(ctx, sql, args...)
 	if err != nil {
-		return 0, errors.Wrap(err, "models: unable to update all in userFavorite slice")
+		return 0, errors.Wrap(err, "models: unable to update all in userGif slice")
 	}
 
 	rowsAff, err := result.RowsAffected()
 	if err != nil {
-		return 0, errors.Wrap(err, "models: unable to retrieve rows affected all in update all userFavorite")
+		return 0, errors.Wrap(err, "models: unable to retrieve rows affected all in update all userGif")
 	}
 	return rowsAff, nil
 }
 
 // Upsert attempts an insert using an executor, and does an update or ignore on conflict.
 // See boil.Columns documentation for how to properly use updateColumns and insertColumns.
-func (o *UserFavorite) Upsert(ctx context.Context, exec boil.ContextExecutor, updateOnConflict bool, conflictColumns []string, updateColumns, insertColumns boil.Columns) error {
+func (o *UserGif) Upsert(ctx context.Context, exec boil.ContextExecutor, updateOnConflict bool, conflictColumns []string, updateColumns, insertColumns boil.Columns) error {
 	if o == nil {
-		return errors.New("models: no user_favorite provided for upsert")
+		return errors.New("models: no user_gif provided for upsert")
 	}
 
 	if err := o.doBeforeUpsertHooks(ctx, exec); err != nil {
 		return err
 	}
 
-	nzDefaults := queries.NonZeroDefaultSet(userFavoriteColumnsWithDefault, o)
+	nzDefaults := queries.NonZeroDefaultSet(userGifColumnsWithDefault, o)
 
 	// Build cache key in-line uglily - mysql vs psql problems
 	buf := strmangle.GetBuffer()
@@ -962,41 +962,41 @@ func (o *UserFavorite) Upsert(ctx context.Context, exec boil.ContextExecutor, up
 	key := buf.String()
 	strmangle.PutBuffer(buf)
 
-	userFavoriteUpsertCacheMut.RLock()
-	cache, cached := userFavoriteUpsertCache[key]
-	userFavoriteUpsertCacheMut.RUnlock()
+	userGifUpsertCacheMut.RLock()
+	cache, cached := userGifUpsertCache[key]
+	userGifUpsertCacheMut.RUnlock()
 
 	var err error
 
 	if !cached {
 		insert, ret := insertColumns.InsertColumnSet(
-			userFavoriteAllColumns,
-			userFavoriteColumnsWithDefault,
-			userFavoriteColumnsWithoutDefault,
+			userGifAllColumns,
+			userGifColumnsWithDefault,
+			userGifColumnsWithoutDefault,
 			nzDefaults,
 		)
 		update := updateColumns.UpdateColumnSet(
-			userFavoriteAllColumns,
-			userFavoritePrimaryKeyColumns,
+			userGifAllColumns,
+			userGifPrimaryKeyColumns,
 		)
 
 		if updateOnConflict && len(update) == 0 {
-			return errors.New("models: unable to upsert user_favorite, could not build update column list")
+			return errors.New("models: unable to upsert user_gif, could not build update column list")
 		}
 
 		conflict := conflictColumns
 		if len(conflict) == 0 {
-			conflict = make([]string, len(userFavoritePrimaryKeyColumns))
-			copy(conflict, userFavoritePrimaryKeyColumns)
+			conflict = make([]string, len(userGifPrimaryKeyColumns))
+			copy(conflict, userGifPrimaryKeyColumns)
 		}
-		cache.query = buildUpsertQueryPostgres(dialect, "\"user_favorite\"", updateOnConflict, ret, update, conflict, insert)
+		cache.query = buildUpsertQueryPostgres(dialect, "\"user_gif\"", updateOnConflict, ret, update, conflict, insert)
 
-		cache.valueMapping, err = queries.BindMapping(userFavoriteType, userFavoriteMapping, insert)
+		cache.valueMapping, err = queries.BindMapping(userGifType, userGifMapping, insert)
 		if err != nil {
 			return err
 		}
 		if len(ret) != 0 {
-			cache.retMapping, err = queries.BindMapping(userFavoriteType, userFavoriteMapping, ret)
+			cache.retMapping, err = queries.BindMapping(userGifType, userGifMapping, ret)
 			if err != nil {
 				return err
 			}
@@ -1024,31 +1024,31 @@ func (o *UserFavorite) Upsert(ctx context.Context, exec boil.ContextExecutor, up
 		_, err = exec.ExecContext(ctx, cache.query, vals...)
 	}
 	if err != nil {
-		return errors.Wrap(err, "models: unable to upsert user_favorite")
+		return errors.Wrap(err, "models: unable to upsert user_gif")
 	}
 
 	if !cached {
-		userFavoriteUpsertCacheMut.Lock()
-		userFavoriteUpsertCache[key] = cache
-		userFavoriteUpsertCacheMut.Unlock()
+		userGifUpsertCacheMut.Lock()
+		userGifUpsertCache[key] = cache
+		userGifUpsertCacheMut.Unlock()
 	}
 
 	return o.doAfterUpsertHooks(ctx, exec)
 }
 
-// Delete deletes a single UserFavorite record with an executor.
+// Delete deletes a single UserGif record with an executor.
 // Delete will match against the primary key column to find the record to delete.
-func (o *UserFavorite) Delete(ctx context.Context, exec boil.ContextExecutor) (int64, error) {
+func (o *UserGif) Delete(ctx context.Context, exec boil.ContextExecutor) (int64, error) {
 	if o == nil {
-		return 0, errors.New("models: no UserFavorite provided for delete")
+		return 0, errors.New("models: no UserGif provided for delete")
 	}
 
 	if err := o.doBeforeDeleteHooks(ctx, exec); err != nil {
 		return 0, err
 	}
 
-	args := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(o)), userFavoritePrimaryKeyMapping)
-	sql := "DELETE FROM \"user_favorite\" WHERE \"id\"=$1"
+	args := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(o)), userGifPrimaryKeyMapping)
+	sql := "DELETE FROM \"user_gif\" WHERE \"id\"=$1"
 
 	if boil.IsDebug(ctx) {
 		writer := boil.DebugWriterFrom(ctx)
@@ -1057,12 +1057,12 @@ func (o *UserFavorite) Delete(ctx context.Context, exec boil.ContextExecutor) (i
 	}
 	result, err := exec.ExecContext(ctx, sql, args...)
 	if err != nil {
-		return 0, errors.Wrap(err, "models: unable to delete from user_favorite")
+		return 0, errors.Wrap(err, "models: unable to delete from user_gif")
 	}
 
 	rowsAff, err := result.RowsAffected()
 	if err != nil {
-		return 0, errors.Wrap(err, "models: failed to get rows affected by delete for user_favorite")
+		return 0, errors.Wrap(err, "models: failed to get rows affected by delete for user_gif")
 	}
 
 	if err := o.doAfterDeleteHooks(ctx, exec); err != nil {
@@ -1073,33 +1073,33 @@ func (o *UserFavorite) Delete(ctx context.Context, exec boil.ContextExecutor) (i
 }
 
 // DeleteAll deletes all matching rows.
-func (q userFavoriteQuery) DeleteAll(ctx context.Context, exec boil.ContextExecutor) (int64, error) {
+func (q userGifQuery) DeleteAll(ctx context.Context, exec boil.ContextExecutor) (int64, error) {
 	if q.Query == nil {
-		return 0, errors.New("models: no userFavoriteQuery provided for delete all")
+		return 0, errors.New("models: no userGifQuery provided for delete all")
 	}
 
 	queries.SetDelete(q.Query)
 
 	result, err := q.Query.ExecContext(ctx, exec)
 	if err != nil {
-		return 0, errors.Wrap(err, "models: unable to delete all from user_favorite")
+		return 0, errors.Wrap(err, "models: unable to delete all from user_gif")
 	}
 
 	rowsAff, err := result.RowsAffected()
 	if err != nil {
-		return 0, errors.Wrap(err, "models: failed to get rows affected by deleteall for user_favorite")
+		return 0, errors.Wrap(err, "models: failed to get rows affected by deleteall for user_gif")
 	}
 
 	return rowsAff, nil
 }
 
 // DeleteAll deletes all rows in the slice, using an executor.
-func (o UserFavoriteSlice) DeleteAll(ctx context.Context, exec boil.ContextExecutor) (int64, error) {
+func (o UserGifSlice) DeleteAll(ctx context.Context, exec boil.ContextExecutor) (int64, error) {
 	if len(o) == 0 {
 		return 0, nil
 	}
 
-	if len(userFavoriteBeforeDeleteHooks) != 0 {
+	if len(userGifBeforeDeleteHooks) != 0 {
 		for _, obj := range o {
 			if err := obj.doBeforeDeleteHooks(ctx, exec); err != nil {
 				return 0, err
@@ -1109,12 +1109,12 @@ func (o UserFavoriteSlice) DeleteAll(ctx context.Context, exec boil.ContextExecu
 
 	var args []interface{}
 	for _, obj := range o {
-		pkeyArgs := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(obj)), userFavoritePrimaryKeyMapping)
+		pkeyArgs := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(obj)), userGifPrimaryKeyMapping)
 		args = append(args, pkeyArgs...)
 	}
 
-	sql := "DELETE FROM \"user_favorite\" WHERE " +
-		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), 1, userFavoritePrimaryKeyColumns, len(o))
+	sql := "DELETE FROM \"user_gif\" WHERE " +
+		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), 1, userGifPrimaryKeyColumns, len(o))
 
 	if boil.IsDebug(ctx) {
 		writer := boil.DebugWriterFrom(ctx)
@@ -1123,15 +1123,15 @@ func (o UserFavoriteSlice) DeleteAll(ctx context.Context, exec boil.ContextExecu
 	}
 	result, err := exec.ExecContext(ctx, sql, args...)
 	if err != nil {
-		return 0, errors.Wrap(err, "models: unable to delete all from userFavorite slice")
+		return 0, errors.Wrap(err, "models: unable to delete all from userGif slice")
 	}
 
 	rowsAff, err := result.RowsAffected()
 	if err != nil {
-		return 0, errors.Wrap(err, "models: failed to get rows affected by deleteall for user_favorite")
+		return 0, errors.Wrap(err, "models: failed to get rows affected by deleteall for user_gif")
 	}
 
-	if len(userFavoriteAfterDeleteHooks) != 0 {
+	if len(userGifAfterDeleteHooks) != 0 {
 		for _, obj := range o {
 			if err := obj.doAfterDeleteHooks(ctx, exec); err != nil {
 				return 0, err
@@ -1144,8 +1144,8 @@ func (o UserFavoriteSlice) DeleteAll(ctx context.Context, exec boil.ContextExecu
 
 // Reload refetches the object from the database
 // using the primary keys with an executor.
-func (o *UserFavorite) Reload(ctx context.Context, exec boil.ContextExecutor) error {
-	ret, err := FindUserFavorite(ctx, exec, o.ID)
+func (o *UserGif) Reload(ctx context.Context, exec boil.ContextExecutor) error {
+	ret, err := FindUserGif(ctx, exec, o.ID)
 	if err != nil {
 		return err
 	}
@@ -1156,26 +1156,26 @@ func (o *UserFavorite) Reload(ctx context.Context, exec boil.ContextExecutor) er
 
 // ReloadAll refetches every row with matching primary key column values
 // and overwrites the original object slice with the newly updated slice.
-func (o *UserFavoriteSlice) ReloadAll(ctx context.Context, exec boil.ContextExecutor) error {
+func (o *UserGifSlice) ReloadAll(ctx context.Context, exec boil.ContextExecutor) error {
 	if o == nil || len(*o) == 0 {
 		return nil
 	}
 
-	slice := UserFavoriteSlice{}
+	slice := UserGifSlice{}
 	var args []interface{}
 	for _, obj := range *o {
-		pkeyArgs := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(obj)), userFavoritePrimaryKeyMapping)
+		pkeyArgs := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(obj)), userGifPrimaryKeyMapping)
 		args = append(args, pkeyArgs...)
 	}
 
-	sql := "SELECT \"user_favorite\".* FROM \"user_favorite\" WHERE " +
-		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), 1, userFavoritePrimaryKeyColumns, len(*o))
+	sql := "SELECT \"user_gif\".* FROM \"user_gif\" WHERE " +
+		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), 1, userGifPrimaryKeyColumns, len(*o))
 
 	q := queries.Raw(sql, args...)
 
 	err := q.Bind(ctx, exec, &slice)
 	if err != nil {
-		return errors.Wrap(err, "models: unable to reload all in UserFavoriteSlice")
+		return errors.Wrap(err, "models: unable to reload all in UserGifSlice")
 	}
 
 	*o = slice
@@ -1183,10 +1183,10 @@ func (o *UserFavoriteSlice) ReloadAll(ctx context.Context, exec boil.ContextExec
 	return nil
 }
 
-// UserFavoriteExists checks if the UserFavorite row exists.
-func UserFavoriteExists(ctx context.Context, exec boil.ContextExecutor, iD string) (bool, error) {
+// UserGifExists checks if the UserGif row exists.
+func UserGifExists(ctx context.Context, exec boil.ContextExecutor, iD string) (bool, error) {
 	var exists bool
-	sql := "select exists(select 1 from \"user_favorite\" where \"id\"=$1 limit 1)"
+	sql := "select exists(select 1 from \"user_gif\" where \"id\"=$1 limit 1)"
 
 	if boil.IsDebug(ctx) {
 		writer := boil.DebugWriterFrom(ctx)
@@ -1197,7 +1197,7 @@ func UserFavoriteExists(ctx context.Context, exec boil.ContextExecutor, iD strin
 
 	err := row.Scan(&exists)
 	if err != nil {
-		return false, errors.Wrap(err, "models: unable to check if user_favorite exists")
+		return false, errors.Wrap(err, "models: unable to check if user_gif exists")
 	}
 
 	return exists, nil
