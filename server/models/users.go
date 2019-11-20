@@ -75,23 +75,23 @@ var UserWhere = struct {
 
 // UserRels is where relationship names are stored.
 var UserRels = struct {
-	ChatMSGS  string
-	Favorites string
-	HubUsers  string
-	Hubs      string
+	ChatMSGS      string
+	HubUsers      string
+	Hubs          string
+	UserFavorites string
 }{
-	ChatMSGS:  "ChatMSGS",
-	Favorites: "Favorites",
-	HubUsers:  "HubUsers",
-	Hubs:      "Hubs",
+	ChatMSGS:      "ChatMSGS",
+	HubUsers:      "HubUsers",
+	Hubs:          "Hubs",
+	UserFavorites: "UserFavorites",
 }
 
 // userR is where relationships are stored.
 type userR struct {
-	ChatMSGS  ChatMSGSlice
-	Favorites FavoriteSlice
-	HubUsers  HubUserSlice
-	Hubs      HubSlice
+	ChatMSGS      ChatMSGSlice
+	HubUsers      HubUserSlice
+	Hubs          HubSlice
+	UserFavorites UserFavoriteSlice
 }
 
 // NewStruct creates a new relationship struct
@@ -405,27 +405,6 @@ func (o *User) ChatMSGS(mods ...qm.QueryMod) chatMSGQuery {
 	return query
 }
 
-// Favorites retrieves all the favorite's Favorites with an executor.
-func (o *User) Favorites(mods ...qm.QueryMod) favoriteQuery {
-	var queryMods []qm.QueryMod
-	if len(mods) != 0 {
-		queryMods = append(queryMods, mods...)
-	}
-
-	queryMods = append(queryMods,
-		qm.Where("\"favorite\".\"user_id\"=?", o.ID),
-	)
-
-	query := Favorites(queryMods...)
-	queries.SetFrom(query.Query, "\"favorite\"")
-
-	if len(queries.GetSelect(query.Query)) == 0 {
-		queries.SetSelect(query.Query, []string{"\"favorite\".*"})
-	}
-
-	return query
-}
-
 // HubUsers retrieves all the hub_user's HubUsers with an executor.
 func (o *User) HubUsers(mods ...qm.QueryMod) hubUserQuery {
 	var queryMods []qm.QueryMod
@@ -463,6 +442,27 @@ func (o *User) Hubs(mods ...qm.QueryMod) hubQuery {
 
 	if len(queries.GetSelect(query.Query)) == 0 {
 		queries.SetSelect(query.Query, []string{"\"hubs\".*"})
+	}
+
+	return query
+}
+
+// UserFavorites retrieves all the user_favorite's UserFavorites with an executor.
+func (o *User) UserFavorites(mods ...qm.QueryMod) userFavoriteQuery {
+	var queryMods []qm.QueryMod
+	if len(mods) != 0 {
+		queryMods = append(queryMods, mods...)
+	}
+
+	queryMods = append(queryMods,
+		qm.Where("\"user_favorite\".\"user_id\"=?", o.ID),
+	)
+
+	query := UserFavorites(queryMods...)
+	queries.SetFrom(query.Query, "\"user_favorite\"")
+
+	if len(queries.GetSelect(query.Query)) == 0 {
+		queries.SetSelect(query.Query, []string{"\"user_favorite\".*"})
 	}
 
 	return query
@@ -553,101 +553,6 @@ func (userL) LoadChatMSGS(ctx context.Context, e boil.ContextExecutor, singular 
 				local.R.ChatMSGS = append(local.R.ChatMSGS, foreign)
 				if foreign.R == nil {
 					foreign.R = &chatMSGR{}
-				}
-				foreign.R.User = local
-				break
-			}
-		}
-	}
-
-	return nil
-}
-
-// LoadFavorites allows an eager lookup of values, cached into the
-// loaded structs of the objects. This is for a 1-M or N-M relationship.
-func (userL) LoadFavorites(ctx context.Context, e boil.ContextExecutor, singular bool, maybeUser interface{}, mods queries.Applicator) error {
-	var slice []*User
-	var object *User
-
-	if singular {
-		object = maybeUser.(*User)
-	} else {
-		slice = *maybeUser.(*[]*User)
-	}
-
-	args := make([]interface{}, 0, 1)
-	if singular {
-		if object.R == nil {
-			object.R = &userR{}
-		}
-		args = append(args, object.ID)
-	} else {
-	Outer:
-		for _, obj := range slice {
-			if obj.R == nil {
-				obj.R = &userR{}
-			}
-
-			for _, a := range args {
-				if a == obj.ID {
-					continue Outer
-				}
-			}
-
-			args = append(args, obj.ID)
-		}
-	}
-
-	if len(args) == 0 {
-		return nil
-	}
-
-	query := NewQuery(qm.From(`favorite`), qm.WhereIn(`favorite.user_id in ?`, args...))
-	if mods != nil {
-		mods.Apply(query)
-	}
-
-	results, err := query.QueryContext(ctx, e)
-	if err != nil {
-		return errors.Wrap(err, "failed to eager load favorite")
-	}
-
-	var resultSlice []*Favorite
-	if err = queries.Bind(results, &resultSlice); err != nil {
-		return errors.Wrap(err, "failed to bind eager loaded slice favorite")
-	}
-
-	if err = results.Close(); err != nil {
-		return errors.Wrap(err, "failed to close results in eager load on favorite")
-	}
-	if err = results.Err(); err != nil {
-		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for favorite")
-	}
-
-	if len(favoriteAfterSelectHooks) != 0 {
-		for _, obj := range resultSlice {
-			if err := obj.doAfterSelectHooks(ctx, e); err != nil {
-				return err
-			}
-		}
-	}
-	if singular {
-		object.R.Favorites = resultSlice
-		for _, foreign := range resultSlice {
-			if foreign.R == nil {
-				foreign.R = &favoriteR{}
-			}
-			foreign.R.User = object
-		}
-		return nil
-	}
-
-	for _, foreign := range resultSlice {
-		for _, local := range slice {
-			if local.ID == foreign.UserID {
-				local.R.Favorites = append(local.R.Favorites, foreign)
-				if foreign.R == nil {
-					foreign.R = &favoriteR{}
 				}
 				foreign.R.User = local
 				break
@@ -848,6 +753,101 @@ func (userL) LoadHubs(ctx context.Context, e boil.ContextExecutor, singular bool
 	return nil
 }
 
+// LoadUserFavorites allows an eager lookup of values, cached into the
+// loaded structs of the objects. This is for a 1-M or N-M relationship.
+func (userL) LoadUserFavorites(ctx context.Context, e boil.ContextExecutor, singular bool, maybeUser interface{}, mods queries.Applicator) error {
+	var slice []*User
+	var object *User
+
+	if singular {
+		object = maybeUser.(*User)
+	} else {
+		slice = *maybeUser.(*[]*User)
+	}
+
+	args := make([]interface{}, 0, 1)
+	if singular {
+		if object.R == nil {
+			object.R = &userR{}
+		}
+		args = append(args, object.ID)
+	} else {
+	Outer:
+		for _, obj := range slice {
+			if obj.R == nil {
+				obj.R = &userR{}
+			}
+
+			for _, a := range args {
+				if a == obj.ID {
+					continue Outer
+				}
+			}
+
+			args = append(args, obj.ID)
+		}
+	}
+
+	if len(args) == 0 {
+		return nil
+	}
+
+	query := NewQuery(qm.From(`user_favorite`), qm.WhereIn(`user_favorite.user_id in ?`, args...))
+	if mods != nil {
+		mods.Apply(query)
+	}
+
+	results, err := query.QueryContext(ctx, e)
+	if err != nil {
+		return errors.Wrap(err, "failed to eager load user_favorite")
+	}
+
+	var resultSlice []*UserFavorite
+	if err = queries.Bind(results, &resultSlice); err != nil {
+		return errors.Wrap(err, "failed to bind eager loaded slice user_favorite")
+	}
+
+	if err = results.Close(); err != nil {
+		return errors.Wrap(err, "failed to close results in eager load on user_favorite")
+	}
+	if err = results.Err(); err != nil {
+		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for user_favorite")
+	}
+
+	if len(userFavoriteAfterSelectHooks) != 0 {
+		for _, obj := range resultSlice {
+			if err := obj.doAfterSelectHooks(ctx, e); err != nil {
+				return err
+			}
+		}
+	}
+	if singular {
+		object.R.UserFavorites = resultSlice
+		for _, foreign := range resultSlice {
+			if foreign.R == nil {
+				foreign.R = &userFavoriteR{}
+			}
+			foreign.R.User = object
+		}
+		return nil
+	}
+
+	for _, foreign := range resultSlice {
+		for _, local := range slice {
+			if local.ID == foreign.UserID {
+				local.R.UserFavorites = append(local.R.UserFavorites, foreign)
+				if foreign.R == nil {
+					foreign.R = &userFavoriteR{}
+				}
+				foreign.R.User = local
+				break
+			}
+		}
+	}
+
+	return nil
+}
+
 // AddChatMSGS adds the given related objects to the existing relationships
 // of the user, optionally inserting them as new records.
 // Appends related to o.R.ChatMSGS.
@@ -892,59 +892,6 @@ func (o *User) AddChatMSGS(ctx context.Context, exec boil.ContextExecutor, inser
 	for _, rel := range related {
 		if rel.R == nil {
 			rel.R = &chatMSGR{
-				User: o,
-			}
-		} else {
-			rel.R.User = o
-		}
-	}
-	return nil
-}
-
-// AddFavorites adds the given related objects to the existing relationships
-// of the user, optionally inserting them as new records.
-// Appends related to o.R.Favorites.
-// Sets related.R.User appropriately.
-func (o *User) AddFavorites(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*Favorite) error {
-	var err error
-	for _, rel := range related {
-		if insert {
-			rel.UserID = o.ID
-			if err = rel.Insert(ctx, exec, boil.Infer()); err != nil {
-				return errors.Wrap(err, "failed to insert into foreign table")
-			}
-		} else {
-			updateQuery := fmt.Sprintf(
-				"UPDATE \"favorite\" SET %s WHERE %s",
-				strmangle.SetParamNames("\"", "\"", 1, []string{"user_id"}),
-				strmangle.WhereClause("\"", "\"", 2, favoritePrimaryKeyColumns),
-			)
-			values := []interface{}{o.ID, rel.ID}
-
-			if boil.IsDebug(ctx) {
-				writer := boil.DebugWriterFrom(ctx)
-				fmt.Fprintln(writer, updateQuery)
-				fmt.Fprintln(writer, values)
-			}
-			if _, err = exec.ExecContext(ctx, updateQuery, values...); err != nil {
-				return errors.Wrap(err, "failed to update foreign table")
-			}
-
-			rel.UserID = o.ID
-		}
-	}
-
-	if o.R == nil {
-		o.R = &userR{
-			Favorites: related,
-		}
-	} else {
-		o.R.Favorites = append(o.R.Favorites, related...)
-	}
-
-	for _, rel := range related {
-		if rel.R == nil {
-			rel.R = &favoriteR{
 				User: o,
 			}
 		} else {
@@ -1051,6 +998,59 @@ func (o *User) AddHubs(ctx context.Context, exec boil.ContextExecutor, insert bo
 	for _, rel := range related {
 		if rel.R == nil {
 			rel.R = &hubR{
+				User: o,
+			}
+		} else {
+			rel.R.User = o
+		}
+	}
+	return nil
+}
+
+// AddUserFavorites adds the given related objects to the existing relationships
+// of the user, optionally inserting them as new records.
+// Appends related to o.R.UserFavorites.
+// Sets related.R.User appropriately.
+func (o *User) AddUserFavorites(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*UserFavorite) error {
+	var err error
+	for _, rel := range related {
+		if insert {
+			rel.UserID = o.ID
+			if err = rel.Insert(ctx, exec, boil.Infer()); err != nil {
+				return errors.Wrap(err, "failed to insert into foreign table")
+			}
+		} else {
+			updateQuery := fmt.Sprintf(
+				"UPDATE \"user_favorite\" SET %s WHERE %s",
+				strmangle.SetParamNames("\"", "\"", 1, []string{"user_id"}),
+				strmangle.WhereClause("\"", "\"", 2, userFavoritePrimaryKeyColumns),
+			)
+			values := []interface{}{o.ID, rel.ID}
+
+			if boil.IsDebug(ctx) {
+				writer := boil.DebugWriterFrom(ctx)
+				fmt.Fprintln(writer, updateQuery)
+				fmt.Fprintln(writer, values)
+			}
+			if _, err = exec.ExecContext(ctx, updateQuery, values...); err != nil {
+				return errors.Wrap(err, "failed to update foreign table")
+			}
+
+			rel.UserID = o.ID
+		}
+	}
+
+	if o.R == nil {
+		o.R = &userR{
+			UserFavorites: related,
+		}
+	} else {
+		o.R.UserFavorites = append(o.R.UserFavorites, related...)
+	}
+
+	for _, rel := range related {
+		if rel.R == nil {
+			rel.R = &userFavoriteR{
 				User: o,
 			}
 		} else {

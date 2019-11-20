@@ -25,8 +25,6 @@ import (
 // Favorite is an object representing the database table.
 type Favorite struct {
 	ID      string     `boil:"id" json:"id" toml:"id" yaml:"id"`
-	UserID  string     `boil:"user_id" json:"user_id" toml:"user_id" yaml:"user_id"`
-	GifID   string     `boil:"gif_id" json:"gif_id" toml:"gif_id" yaml:"gif_id"`
 	GifData null.Bytes `boil:"gif_data" json:"gif_data,omitempty" toml:"gif_data" yaml:"gif_data,omitempty"`
 	GifName string     `boil:"gif_name" json:"gif_name" toml:"gif_name" yaml:"gif_name"`
 
@@ -36,14 +34,10 @@ type Favorite struct {
 
 var FavoriteColumns = struct {
 	ID      string
-	UserID  string
-	GifID   string
 	GifData string
 	GifName string
 }{
 	ID:      "id",
-	UserID:  "user_id",
-	GifID:   "gif_id",
 	GifData: "gif_data",
 	GifName: "gif_name",
 }
@@ -52,28 +46,24 @@ var FavoriteColumns = struct {
 
 var FavoriteWhere = struct {
 	ID      whereHelperstring
-	UserID  whereHelperstring
-	GifID   whereHelperstring
 	GifData whereHelpernull_Bytes
 	GifName whereHelperstring
 }{
-	ID:      whereHelperstring{field: "\"favorite\".\"id\""},
-	UserID:  whereHelperstring{field: "\"favorite\".\"user_id\""},
-	GifID:   whereHelperstring{field: "\"favorite\".\"gif_id\""},
-	GifData: whereHelpernull_Bytes{field: "\"favorite\".\"gif_data\""},
-	GifName: whereHelperstring{field: "\"favorite\".\"gif_name\""},
+	ID:      whereHelperstring{field: "\"favorites\".\"id\""},
+	GifData: whereHelpernull_Bytes{field: "\"favorites\".\"gif_data\""},
+	GifName: whereHelperstring{field: "\"favorites\".\"gif_name\""},
 }
 
 // FavoriteRels is where relationship names are stored.
 var FavoriteRels = struct {
-	User string
+	UserFavorites string
 }{
-	User: "User",
+	UserFavorites: "UserFavorites",
 }
 
 // favoriteR is where relationships are stored.
 type favoriteR struct {
-	User *User
+	UserFavorites UserFavoriteSlice
 }
 
 // NewStruct creates a new relationship struct
@@ -85,8 +75,8 @@ func (*favoriteR) NewStruct() *favoriteR {
 type favoriteL struct{}
 
 var (
-	favoriteAllColumns            = []string{"id", "user_id", "gif_id", "gif_data", "gif_name"}
-	favoriteColumnsWithoutDefault = []string{"id", "user_id", "gif_id", "gif_data", "gif_name"}
+	favoriteAllColumns            = []string{"id", "gif_data", "gif_name"}
+	favoriteColumnsWithoutDefault = []string{"id", "gif_data", "gif_name"}
 	favoriteColumnsWithDefault    = []string{}
 	favoritePrimaryKeyColumns     = []string{"id"}
 )
@@ -305,7 +295,7 @@ func (q favoriteQuery) One(ctx context.Context, exec boil.ContextExecutor) (*Fav
 		if errors.Cause(err) == sql.ErrNoRows {
 			return nil, sql.ErrNoRows
 		}
-		return nil, errors.Wrap(err, "models: failed to execute a one query for favorite")
+		return nil, errors.Wrap(err, "models: failed to execute a one query for favorites")
 	}
 
 	if err := o.doAfterSelectHooks(ctx, exec); err != nil {
@@ -344,7 +334,7 @@ func (q favoriteQuery) Count(ctx context.Context, exec boil.ContextExecutor) (in
 
 	err := q.Query.QueryRowContext(ctx, exec).Scan(&count)
 	if err != nil {
-		return 0, errors.Wrap(err, "models: failed to count favorite rows")
+		return 0, errors.Wrap(err, "models: failed to count favorites rows")
 	}
 
 	return count, nil
@@ -360,29 +350,36 @@ func (q favoriteQuery) Exists(ctx context.Context, exec boil.ContextExecutor) (b
 
 	err := q.Query.QueryRowContext(ctx, exec).Scan(&count)
 	if err != nil {
-		return false, errors.Wrap(err, "models: failed to check if favorite exists")
+		return false, errors.Wrap(err, "models: failed to check if favorites exists")
 	}
 
 	return count > 0, nil
 }
 
-// User pointed to by the foreign key.
-func (o *Favorite) User(mods ...qm.QueryMod) userQuery {
-	queryMods := []qm.QueryMod{
-		qm.Where("\"id\" = ?", o.UserID),
+// UserFavorites retrieves all the user_favorite's UserFavorites with an executor.
+func (o *Favorite) UserFavorites(mods ...qm.QueryMod) userFavoriteQuery {
+	var queryMods []qm.QueryMod
+	if len(mods) != 0 {
+		queryMods = append(queryMods, mods...)
 	}
 
-	queryMods = append(queryMods, mods...)
+	queryMods = append(queryMods,
+		qm.Where("\"user_favorite\".\"favorite_id\"=?", o.ID),
+	)
 
-	query := Users(queryMods...)
-	queries.SetFrom(query.Query, "\"users\"")
+	query := UserFavorites(queryMods...)
+	queries.SetFrom(query.Query, "\"user_favorite\"")
+
+	if len(queries.GetSelect(query.Query)) == 0 {
+		queries.SetSelect(query.Query, []string{"\"user_favorite\".*"})
+	}
 
 	return query
 }
 
-// LoadUser allows an eager lookup of values, cached into the
-// loaded structs of the objects. This is for an N-1 relationship.
-func (favoriteL) LoadUser(ctx context.Context, e boil.ContextExecutor, singular bool, maybeFavorite interface{}, mods queries.Applicator) error {
+// LoadUserFavorites allows an eager lookup of values, cached into the
+// loaded structs of the objects. This is for a 1-M or N-M relationship.
+func (favoriteL) LoadUserFavorites(ctx context.Context, e boil.ContextExecutor, singular bool, maybeFavorite interface{}, mods queries.Applicator) error {
 	var slice []*Favorite
 	var object *Favorite
 
@@ -397,8 +394,7 @@ func (favoriteL) LoadUser(ctx context.Context, e boil.ContextExecutor, singular 
 		if object.R == nil {
 			object.R = &favoriteR{}
 		}
-		args = append(args, object.UserID)
-
+		args = append(args, object.ID)
 	} else {
 	Outer:
 		for _, obj := range slice {
@@ -407,13 +403,12 @@ func (favoriteL) LoadUser(ctx context.Context, e boil.ContextExecutor, singular 
 			}
 
 			for _, a := range args {
-				if a == obj.UserID {
+				if a == obj.ID {
 					continue Outer
 				}
 			}
 
-			args = append(args, obj.UserID)
-
+			args = append(args, obj.ID)
 		}
 	}
 
@@ -421,58 +416,54 @@ func (favoriteL) LoadUser(ctx context.Context, e boil.ContextExecutor, singular 
 		return nil
 	}
 
-	query := NewQuery(qm.From(`users`), qm.WhereIn(`users.id in ?`, args...))
+	query := NewQuery(qm.From(`user_favorite`), qm.WhereIn(`user_favorite.favorite_id in ?`, args...))
 	if mods != nil {
 		mods.Apply(query)
 	}
 
 	results, err := query.QueryContext(ctx, e)
 	if err != nil {
-		return errors.Wrap(err, "failed to eager load User")
+		return errors.Wrap(err, "failed to eager load user_favorite")
 	}
 
-	var resultSlice []*User
+	var resultSlice []*UserFavorite
 	if err = queries.Bind(results, &resultSlice); err != nil {
-		return errors.Wrap(err, "failed to bind eager loaded slice User")
+		return errors.Wrap(err, "failed to bind eager loaded slice user_favorite")
 	}
 
 	if err = results.Close(); err != nil {
-		return errors.Wrap(err, "failed to close results of eager load for users")
+		return errors.Wrap(err, "failed to close results in eager load on user_favorite")
 	}
 	if err = results.Err(); err != nil {
-		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for users")
+		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for user_favorite")
 	}
 
-	if len(favoriteAfterSelectHooks) != 0 {
+	if len(userFavoriteAfterSelectHooks) != 0 {
 		for _, obj := range resultSlice {
 			if err := obj.doAfterSelectHooks(ctx, e); err != nil {
 				return err
 			}
 		}
 	}
-
-	if len(resultSlice) == 0 {
-		return nil
-	}
-
 	if singular {
-		foreign := resultSlice[0]
-		object.R.User = foreign
-		if foreign.R == nil {
-			foreign.R = &userR{}
+		object.R.UserFavorites = resultSlice
+		for _, foreign := range resultSlice {
+			if foreign.R == nil {
+				foreign.R = &userFavoriteR{}
+			}
+			foreign.R.Favorite = object
 		}
-		foreign.R.Favorites = append(foreign.R.Favorites, object)
 		return nil
 	}
 
-	for _, local := range slice {
-		for _, foreign := range resultSlice {
-			if local.UserID == foreign.ID {
-				local.R.User = foreign
+	for _, foreign := range resultSlice {
+		for _, local := range slice {
+			if local.ID == foreign.FavoriteID {
+				local.R.UserFavorites = append(local.R.UserFavorites, foreign)
 				if foreign.R == nil {
-					foreign.R = &userR{}
+					foreign.R = &userFavoriteR{}
 				}
-				foreign.R.Favorites = append(foreign.R.Favorites, local)
+				foreign.R.Favorite = local
 				break
 			}
 		}
@@ -481,56 +472,62 @@ func (favoriteL) LoadUser(ctx context.Context, e boil.ContextExecutor, singular 
 	return nil
 }
 
-// SetUser of the favorite to the related item.
-// Sets o.R.User to related.
-// Adds o to related.R.Favorites.
-func (o *Favorite) SetUser(ctx context.Context, exec boil.ContextExecutor, insert bool, related *User) error {
+// AddUserFavorites adds the given related objects to the existing relationships
+// of the favorite, optionally inserting them as new records.
+// Appends related to o.R.UserFavorites.
+// Sets related.R.Favorite appropriately.
+func (o *Favorite) AddUserFavorites(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*UserFavorite) error {
 	var err error
-	if insert {
-		if err = related.Insert(ctx, exec, boil.Infer()); err != nil {
-			return errors.Wrap(err, "failed to insert into foreign table")
+	for _, rel := range related {
+		if insert {
+			rel.FavoriteID = o.ID
+			if err = rel.Insert(ctx, exec, boil.Infer()); err != nil {
+				return errors.Wrap(err, "failed to insert into foreign table")
+			}
+		} else {
+			updateQuery := fmt.Sprintf(
+				"UPDATE \"user_favorite\" SET %s WHERE %s",
+				strmangle.SetParamNames("\"", "\"", 1, []string{"favorite_id"}),
+				strmangle.WhereClause("\"", "\"", 2, userFavoritePrimaryKeyColumns),
+			)
+			values := []interface{}{o.ID, rel.ID}
+
+			if boil.IsDebug(ctx) {
+				writer := boil.DebugWriterFrom(ctx)
+				fmt.Fprintln(writer, updateQuery)
+				fmt.Fprintln(writer, values)
+			}
+			if _, err = exec.ExecContext(ctx, updateQuery, values...); err != nil {
+				return errors.Wrap(err, "failed to update foreign table")
+			}
+
+			rel.FavoriteID = o.ID
 		}
 	}
 
-	updateQuery := fmt.Sprintf(
-		"UPDATE \"favorite\" SET %s WHERE %s",
-		strmangle.SetParamNames("\"", "\"", 1, []string{"user_id"}),
-		strmangle.WhereClause("\"", "\"", 2, favoritePrimaryKeyColumns),
-	)
-	values := []interface{}{related.ID, o.ID}
-
-	if boil.IsDebug(ctx) {
-		writer := boil.DebugWriterFrom(ctx)
-		fmt.Fprintln(writer, updateQuery)
-		fmt.Fprintln(writer, values)
-	}
-	if _, err = exec.ExecContext(ctx, updateQuery, values...); err != nil {
-		return errors.Wrap(err, "failed to update local table")
-	}
-
-	o.UserID = related.ID
 	if o.R == nil {
 		o.R = &favoriteR{
-			User: related,
+			UserFavorites: related,
 		}
 	} else {
-		o.R.User = related
+		o.R.UserFavorites = append(o.R.UserFavorites, related...)
 	}
 
-	if related.R == nil {
-		related.R = &userR{
-			Favorites: FavoriteSlice{o},
+	for _, rel := range related {
+		if rel.R == nil {
+			rel.R = &userFavoriteR{
+				Favorite: o,
+			}
+		} else {
+			rel.R.Favorite = o
 		}
-	} else {
-		related.R.Favorites = append(related.R.Favorites, o)
 	}
-
 	return nil
 }
 
 // Favorites retrieves all the records using an executor.
 func Favorites(mods ...qm.QueryMod) favoriteQuery {
-	mods = append(mods, qm.From("\"favorite\""))
+	mods = append(mods, qm.From("\"favorites\""))
 	return favoriteQuery{NewQuery(mods...)}
 }
 
@@ -544,7 +541,7 @@ func FindFavorite(ctx context.Context, exec boil.ContextExecutor, iD string, sel
 		sel = strings.Join(strmangle.IdentQuoteSlice(dialect.LQ, dialect.RQ, selectCols), ",")
 	}
 	query := fmt.Sprintf(
-		"select %s from \"favorite\" where \"id\"=$1", sel,
+		"select %s from \"favorites\" where \"id\"=$1", sel,
 	)
 
 	q := queries.Raw(query, iD)
@@ -554,7 +551,7 @@ func FindFavorite(ctx context.Context, exec boil.ContextExecutor, iD string, sel
 		if errors.Cause(err) == sql.ErrNoRows {
 			return nil, sql.ErrNoRows
 		}
-		return nil, errors.Wrap(err, "models: unable to select from favorite")
+		return nil, errors.Wrap(err, "models: unable to select from favorites")
 	}
 
 	return favoriteObj, nil
@@ -564,7 +561,7 @@ func FindFavorite(ctx context.Context, exec boil.ContextExecutor, iD string, sel
 // See boil.Columns.InsertColumnSet documentation to understand column list inference for inserts.
 func (o *Favorite) Insert(ctx context.Context, exec boil.ContextExecutor, columns boil.Columns) error {
 	if o == nil {
-		return errors.New("models: no favorite provided for insertion")
+		return errors.New("models: no favorites provided for insertion")
 	}
 
 	var err error
@@ -597,9 +594,9 @@ func (o *Favorite) Insert(ctx context.Context, exec boil.ContextExecutor, column
 			return err
 		}
 		if len(wl) != 0 {
-			cache.query = fmt.Sprintf("INSERT INTO \"favorite\" (\"%s\") %%sVALUES (%s)%%s", strings.Join(wl, "\",\""), strmangle.Placeholders(dialect.UseIndexPlaceholders, len(wl), 1, 1))
+			cache.query = fmt.Sprintf("INSERT INTO \"favorites\" (\"%s\") %%sVALUES (%s)%%s", strings.Join(wl, "\",\""), strmangle.Placeholders(dialect.UseIndexPlaceholders, len(wl), 1, 1))
 		} else {
-			cache.query = "INSERT INTO \"favorite\" %sDEFAULT VALUES%s"
+			cache.query = "INSERT INTO \"favorites\" %sDEFAULT VALUES%s"
 		}
 
 		var queryOutput, queryReturning string
@@ -627,7 +624,7 @@ func (o *Favorite) Insert(ctx context.Context, exec boil.ContextExecutor, column
 	}
 
 	if err != nil {
-		return errors.Wrap(err, "models: unable to insert into favorite")
+		return errors.Wrap(err, "models: unable to insert into favorites")
 	}
 
 	if !cached {
@@ -662,10 +659,10 @@ func (o *Favorite) Update(ctx context.Context, exec boil.ContextExecutor, column
 			wl = strmangle.SetComplement(wl, []string{"created_at"})
 		}
 		if len(wl) == 0 {
-			return 0, errors.New("models: unable to update favorite, could not build whitelist")
+			return 0, errors.New("models: unable to update favorites, could not build whitelist")
 		}
 
-		cache.query = fmt.Sprintf("UPDATE \"favorite\" SET %s WHERE %s",
+		cache.query = fmt.Sprintf("UPDATE \"favorites\" SET %s WHERE %s",
 			strmangle.SetParamNames("\"", "\"", 1, wl),
 			strmangle.WhereClause("\"", "\"", len(wl)+1, favoritePrimaryKeyColumns),
 		)
@@ -685,12 +682,12 @@ func (o *Favorite) Update(ctx context.Context, exec boil.ContextExecutor, column
 	var result sql.Result
 	result, err = exec.ExecContext(ctx, cache.query, values...)
 	if err != nil {
-		return 0, errors.Wrap(err, "models: unable to update favorite row")
+		return 0, errors.Wrap(err, "models: unable to update favorites row")
 	}
 
 	rowsAff, err := result.RowsAffected()
 	if err != nil {
-		return 0, errors.Wrap(err, "models: failed to get rows affected by update for favorite")
+		return 0, errors.Wrap(err, "models: failed to get rows affected by update for favorites")
 	}
 
 	if !cached {
@@ -708,12 +705,12 @@ func (q favoriteQuery) UpdateAll(ctx context.Context, exec boil.ContextExecutor,
 
 	result, err := q.Query.ExecContext(ctx, exec)
 	if err != nil {
-		return 0, errors.Wrap(err, "models: unable to update all for favorite")
+		return 0, errors.Wrap(err, "models: unable to update all for favorites")
 	}
 
 	rowsAff, err := result.RowsAffected()
 	if err != nil {
-		return 0, errors.Wrap(err, "models: unable to retrieve rows affected for favorite")
+		return 0, errors.Wrap(err, "models: unable to retrieve rows affected for favorites")
 	}
 
 	return rowsAff, nil
@@ -746,7 +743,7 @@ func (o FavoriteSlice) UpdateAll(ctx context.Context, exec boil.ContextExecutor,
 		args = append(args, pkeyArgs...)
 	}
 
-	sql := fmt.Sprintf("UPDATE \"favorite\" SET %s WHERE %s",
+	sql := fmt.Sprintf("UPDATE \"favorites\" SET %s WHERE %s",
 		strmangle.SetParamNames("\"", "\"", 1, colNames),
 		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), len(colNames)+1, favoritePrimaryKeyColumns, len(o)))
 
@@ -771,7 +768,7 @@ func (o FavoriteSlice) UpdateAll(ctx context.Context, exec boil.ContextExecutor,
 // See boil.Columns documentation for how to properly use updateColumns and insertColumns.
 func (o *Favorite) Upsert(ctx context.Context, exec boil.ContextExecutor, updateOnConflict bool, conflictColumns []string, updateColumns, insertColumns boil.Columns) error {
 	if o == nil {
-		return errors.New("models: no favorite provided for upsert")
+		return errors.New("models: no favorites provided for upsert")
 	}
 
 	if err := o.doBeforeUpsertHooks(ctx, exec); err != nil {
@@ -827,7 +824,7 @@ func (o *Favorite) Upsert(ctx context.Context, exec boil.ContextExecutor, update
 		)
 
 		if updateOnConflict && len(update) == 0 {
-			return errors.New("models: unable to upsert favorite, could not build update column list")
+			return errors.New("models: unable to upsert favorites, could not build update column list")
 		}
 
 		conflict := conflictColumns
@@ -835,7 +832,7 @@ func (o *Favorite) Upsert(ctx context.Context, exec boil.ContextExecutor, update
 			conflict = make([]string, len(favoritePrimaryKeyColumns))
 			copy(conflict, favoritePrimaryKeyColumns)
 		}
-		cache.query = buildUpsertQueryPostgres(dialect, "\"favorite\"", updateOnConflict, ret, update, conflict, insert)
+		cache.query = buildUpsertQueryPostgres(dialect, "\"favorites\"", updateOnConflict, ret, update, conflict, insert)
 
 		cache.valueMapping, err = queries.BindMapping(favoriteType, favoriteMapping, insert)
 		if err != nil {
@@ -870,7 +867,7 @@ func (o *Favorite) Upsert(ctx context.Context, exec boil.ContextExecutor, update
 		_, err = exec.ExecContext(ctx, cache.query, vals...)
 	}
 	if err != nil {
-		return errors.Wrap(err, "models: unable to upsert favorite")
+		return errors.Wrap(err, "models: unable to upsert favorites")
 	}
 
 	if !cached {
@@ -894,7 +891,7 @@ func (o *Favorite) Delete(ctx context.Context, exec boil.ContextExecutor) (int64
 	}
 
 	args := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(o)), favoritePrimaryKeyMapping)
-	sql := "DELETE FROM \"favorite\" WHERE \"id\"=$1"
+	sql := "DELETE FROM \"favorites\" WHERE \"id\"=$1"
 
 	if boil.IsDebug(ctx) {
 		writer := boil.DebugWriterFrom(ctx)
@@ -903,12 +900,12 @@ func (o *Favorite) Delete(ctx context.Context, exec boil.ContextExecutor) (int64
 	}
 	result, err := exec.ExecContext(ctx, sql, args...)
 	if err != nil {
-		return 0, errors.Wrap(err, "models: unable to delete from favorite")
+		return 0, errors.Wrap(err, "models: unable to delete from favorites")
 	}
 
 	rowsAff, err := result.RowsAffected()
 	if err != nil {
-		return 0, errors.Wrap(err, "models: failed to get rows affected by delete for favorite")
+		return 0, errors.Wrap(err, "models: failed to get rows affected by delete for favorites")
 	}
 
 	if err := o.doAfterDeleteHooks(ctx, exec); err != nil {
@@ -928,12 +925,12 @@ func (q favoriteQuery) DeleteAll(ctx context.Context, exec boil.ContextExecutor)
 
 	result, err := q.Query.ExecContext(ctx, exec)
 	if err != nil {
-		return 0, errors.Wrap(err, "models: unable to delete all from favorite")
+		return 0, errors.Wrap(err, "models: unable to delete all from favorites")
 	}
 
 	rowsAff, err := result.RowsAffected()
 	if err != nil {
-		return 0, errors.Wrap(err, "models: failed to get rows affected by deleteall for favorite")
+		return 0, errors.Wrap(err, "models: failed to get rows affected by deleteall for favorites")
 	}
 
 	return rowsAff, nil
@@ -959,7 +956,7 @@ func (o FavoriteSlice) DeleteAll(ctx context.Context, exec boil.ContextExecutor)
 		args = append(args, pkeyArgs...)
 	}
 
-	sql := "DELETE FROM \"favorite\" WHERE " +
+	sql := "DELETE FROM \"favorites\" WHERE " +
 		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), 1, favoritePrimaryKeyColumns, len(o))
 
 	if boil.IsDebug(ctx) {
@@ -974,7 +971,7 @@ func (o FavoriteSlice) DeleteAll(ctx context.Context, exec boil.ContextExecutor)
 
 	rowsAff, err := result.RowsAffected()
 	if err != nil {
-		return 0, errors.Wrap(err, "models: failed to get rows affected by deleteall for favorite")
+		return 0, errors.Wrap(err, "models: failed to get rows affected by deleteall for favorites")
 	}
 
 	if len(favoriteAfterDeleteHooks) != 0 {
@@ -1014,7 +1011,7 @@ func (o *FavoriteSlice) ReloadAll(ctx context.Context, exec boil.ContextExecutor
 		args = append(args, pkeyArgs...)
 	}
 
-	sql := "SELECT \"favorite\".* FROM \"favorite\" WHERE " +
+	sql := "SELECT \"favorites\".* FROM \"favorites\" WHERE " +
 		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), 1, favoritePrimaryKeyColumns, len(*o))
 
 	q := queries.Raw(sql, args...)
@@ -1032,7 +1029,7 @@ func (o *FavoriteSlice) ReloadAll(ctx context.Context, exec boil.ContextExecutor
 // FavoriteExists checks if the Favorite row exists.
 func FavoriteExists(ctx context.Context, exec boil.ContextExecutor, iD string) (bool, error) {
 	var exists bool
-	sql := "select exists(select 1 from \"favorite\" where \"id\"=$1 limit 1)"
+	sql := "select exists(select 1 from \"favorites\" where \"id\"=$1 limit 1)"
 
 	if boil.IsDebug(ctx) {
 		writer := boil.DebugWriterFrom(ctx)
@@ -1043,7 +1040,7 @@ func FavoriteExists(ctx context.Context, exec boil.ContextExecutor, iD string) (
 
 	err := row.Scan(&exists)
 	if err != nil {
-		return false, errors.Wrap(err, "models: unable to check if favorite exists")
+		return false, errors.Wrap(err, "models: unable to check if favorites exists")
 	}
 
 	return exists, nil
