@@ -18,7 +18,11 @@ CREATE TABLE favorite
     FOREIGN KEY (user_id) REFERENCES users (id)
 );
 
+<<<<<<< HEAD
 CREATE TABLE rooms
+=======
+CREATE TABLE hubs
+>>>>>>> developer
 (
     id TEXT PRIMARY KEY NOT NULL,
     logo BYTEA,
@@ -32,21 +36,36 @@ CREATE TABLE rooms
 CREATE TABLE chat_msg
 (
     id TEXT PRIMARY KEY NOT NULL,
+<<<<<<< HEAD
     room_id TEXT NOT NULL,
+=======
+    hub_id TEXT NOT NULL,
+>>>>>>> developer
     gif_data BYTEA,
     create_at TIMESTAMP,
     user_id TEXT NOT NULL,
 
+<<<<<<< HEAD
     FOREIGN KEY (room_id) REFERENCES rooms (id),
+=======
+    FOREIGN KEY (hub_id) REFERENCES hubs (id),
+>>>>>>> developer
     FOREIGN KEY (user_id) REFERENCES users (id)
 );
 
 CREATE TABLE room_user
 (
     id TEXT PRIMARY KEY NOT NULL,
+<<<<<<< HEAD
     room_id TEXT NOT NULL,
     user_id TEXT NOT NULL,
 
     FOREIGN KEY (room_id) REFERENCES rooms (id),
+=======
+    hub_id TEXT NOT NULL,
+    user_id TEXT NOT NULL,
+
+    FOREIGN KEY (hub_id) REFERENCES hubs (id),
+>>>>>>> developer
     FOREIGN KEY (user_id) REFERENCES users (id)
 );
