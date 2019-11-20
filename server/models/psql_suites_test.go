@@ -8,7 +8,9 @@ import "testing"
 func TestUpsert(t *testing.T) {
 	t.Run("ChatMSGS", testChatMSGSUpsert)
 
-	t.Run("Favorites", testFavoritesUpsert)
+	t.Run("Followers", testFollowersUpsert)
+
+	t.Run("Gifs", testGifsUpsert)
 
 	t.Run("HubUsers", testHubUsersUpsert)
 
@@ -17,6 +19,8 @@ func TestUpsert(t *testing.T) {
 	t.Run("SchemaMigrations", testSchemaMigrationsUpsert)
 
 	t.Run("UserFavorites", testUserFavoritesUpsert)
+
+	t.Run("UserGifs", testUserGifsUpsert)
 
 	t.Run("Users", testUsersUpsert)
 }

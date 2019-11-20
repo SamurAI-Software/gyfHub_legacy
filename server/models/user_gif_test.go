@@ -21,24 +21,24 @@ var (
 	_ = queries.Equal
 )
 
-func testChatMSGS(t *testing.T) {
+func testUserGifs(t *testing.T) {
 	t.Parallel()
 
-	query := ChatMSGS()
+	query := UserGifs()
 
 	if query.Query == nil {
 		t.Error("expected a query, got nothing")
 	}
 }
 
-func testChatMSGSDelete(t *testing.T) {
+func testUserGifsDelete(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &ChatMSG{}
-	if err = randomize.Struct(seed, o, chatMSGDBTypes, true, chatMSGColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize ChatMSG struct: %s", err)
+	o := &UserGif{}
+	if err = randomize.Struct(seed, o, userGifDBTypes, true, userGifColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize UserGif struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -54,7 +54,7 @@ func testChatMSGSDelete(t *testing.T) {
 		t.Error("should only have deleted one row, but affected:", rowsAff)
 	}
 
-	count, err := ChatMSGS().Count(ctx, tx)
+	count, err := UserGifs().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -64,14 +64,14 @@ func testChatMSGSDelete(t *testing.T) {
 	}
 }
 
-func testChatMSGSQueryDeleteAll(t *testing.T) {
+func testUserGifsQueryDeleteAll(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &ChatMSG{}
-	if err = randomize.Struct(seed, o, chatMSGDBTypes, true, chatMSGColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize ChatMSG struct: %s", err)
+	o := &UserGif{}
+	if err = randomize.Struct(seed, o, userGifDBTypes, true, userGifColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize UserGif struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -81,13 +81,13 @@ func testChatMSGSQueryDeleteAll(t *testing.T) {
 		t.Error(err)
 	}
 
-	if rowsAff, err := ChatMSGS().DeleteAll(ctx, tx); err != nil {
+	if rowsAff, err := UserGifs().DeleteAll(ctx, tx); err != nil {
 		t.Error(err)
 	} else if rowsAff != 1 {
 		t.Error("should only have deleted one row, but affected:", rowsAff)
 	}
 
-	count, err := ChatMSGS().Count(ctx, tx)
+	count, err := UserGifs().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -97,14 +97,14 @@ func testChatMSGSQueryDeleteAll(t *testing.T) {
 	}
 }
 
-func testChatMSGSSliceDeleteAll(t *testing.T) {
+func testUserGifsSliceDeleteAll(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &ChatMSG{}
-	if err = randomize.Struct(seed, o, chatMSGDBTypes, true, chatMSGColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize ChatMSG struct: %s", err)
+	o := &UserGif{}
+	if err = randomize.Struct(seed, o, userGifDBTypes, true, userGifColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize UserGif struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -114,7 +114,7 @@ func testChatMSGSSliceDeleteAll(t *testing.T) {
 		t.Error(err)
 	}
 
-	slice := ChatMSGSlice{o}
+	slice := UserGifSlice{o}
 
 	if rowsAff, err := slice.DeleteAll(ctx, tx); err != nil {
 		t.Error(err)
@@ -122,7 +122,7 @@ func testChatMSGSSliceDeleteAll(t *testing.T) {
 		t.Error("should only have deleted one row, but affected:", rowsAff)
 	}
 
-	count, err := ChatMSGS().Count(ctx, tx)
+	count, err := UserGifs().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -132,14 +132,14 @@ func testChatMSGSSliceDeleteAll(t *testing.T) {
 	}
 }
 
-func testChatMSGSExists(t *testing.T) {
+func testUserGifsExists(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &ChatMSG{}
-	if err = randomize.Struct(seed, o, chatMSGDBTypes, true, chatMSGColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize ChatMSG struct: %s", err)
+	o := &UserGif{}
+	if err = randomize.Struct(seed, o, userGifDBTypes, true, userGifColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize UserGif struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -149,23 +149,23 @@ func testChatMSGSExists(t *testing.T) {
 		t.Error(err)
 	}
 
-	e, err := ChatMSGExists(ctx, tx, o.ID)
+	e, err := UserGifExists(ctx, tx, o.ID)
 	if err != nil {
-		t.Errorf("Unable to check if ChatMSG exists: %s", err)
+		t.Errorf("Unable to check if UserGif exists: %s", err)
 	}
 	if !e {
-		t.Errorf("Expected ChatMSGExists to return true, but got false.")
+		t.Errorf("Expected UserGifExists to return true, but got false.")
 	}
 }
 
-func testChatMSGSFind(t *testing.T) {
+func testUserGifsFind(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &ChatMSG{}
-	if err = randomize.Struct(seed, o, chatMSGDBTypes, true, chatMSGColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize ChatMSG struct: %s", err)
+	o := &UserGif{}
+	if err = randomize.Struct(seed, o, userGifDBTypes, true, userGifColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize UserGif struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -175,24 +175,24 @@ func testChatMSGSFind(t *testing.T) {
 		t.Error(err)
 	}
 
-	chatMSGFound, err := FindChatMSG(ctx, tx, o.ID)
+	userGifFound, err := FindUserGif(ctx, tx, o.ID)
 	if err != nil {
 		t.Error(err)
 	}
 
-	if chatMSGFound == nil {
+	if userGifFound == nil {
 		t.Error("want a record, got nil")
 	}
 }
 
-func testChatMSGSBind(t *testing.T) {
+func testUserGifsBind(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &ChatMSG{}
-	if err = randomize.Struct(seed, o, chatMSGDBTypes, true, chatMSGColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize ChatMSG struct: %s", err)
+	o := &UserGif{}
+	if err = randomize.Struct(seed, o, userGifDBTypes, true, userGifColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize UserGif struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -202,19 +202,19 @@ func testChatMSGSBind(t *testing.T) {
 		t.Error(err)
 	}
 
-	if err = ChatMSGS().Bind(ctx, tx, o); err != nil {
+	if err = UserGifs().Bind(ctx, tx, o); err != nil {
 		t.Error(err)
 	}
 }
 
-func testChatMSGSOne(t *testing.T) {
+func testUserGifsOne(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &ChatMSG{}
-	if err = randomize.Struct(seed, o, chatMSGDBTypes, true, chatMSGColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize ChatMSG struct: %s", err)
+	o := &UserGif{}
+	if err = randomize.Struct(seed, o, userGifDBTypes, true, userGifColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize UserGif struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -224,38 +224,38 @@ func testChatMSGSOne(t *testing.T) {
 		t.Error(err)
 	}
 
-	if x, err := ChatMSGS().One(ctx, tx); err != nil {
+	if x, err := UserGifs().One(ctx, tx); err != nil {
 		t.Error(err)
 	} else if x == nil {
 		t.Error("expected to get a non nil record")
 	}
 }
 
-func testChatMSGSAll(t *testing.T) {
+func testUserGifsAll(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	chatMSGOne := &ChatMSG{}
-	chatMSGTwo := &ChatMSG{}
-	if err = randomize.Struct(seed, chatMSGOne, chatMSGDBTypes, false, chatMSGColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize ChatMSG struct: %s", err)
+	userGifOne := &UserGif{}
+	userGifTwo := &UserGif{}
+	if err = randomize.Struct(seed, userGifOne, userGifDBTypes, false, userGifColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize UserGif struct: %s", err)
 	}
-	if err = randomize.Struct(seed, chatMSGTwo, chatMSGDBTypes, false, chatMSGColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize ChatMSG struct: %s", err)
+	if err = randomize.Struct(seed, userGifTwo, userGifDBTypes, false, userGifColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize UserGif struct: %s", err)
 	}
 
 	ctx := context.Background()
 	tx := MustTx(boil.BeginTx(ctx, nil))
 	defer func() { _ = tx.Rollback() }()
-	if err = chatMSGOne.Insert(ctx, tx, boil.Infer()); err != nil {
+	if err = userGifOne.Insert(ctx, tx, boil.Infer()); err != nil {
 		t.Error(err)
 	}
-	if err = chatMSGTwo.Insert(ctx, tx, boil.Infer()); err != nil {
+	if err = userGifTwo.Insert(ctx, tx, boil.Infer()); err != nil {
 		t.Error(err)
 	}
 
-	slice, err := ChatMSGS().All(ctx, tx)
+	slice, err := UserGifs().All(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -265,31 +265,31 @@ func testChatMSGSAll(t *testing.T) {
 	}
 }
 
-func testChatMSGSCount(t *testing.T) {
+func testUserGifsCount(t *testing.T) {
 	t.Parallel()
 
 	var err error
 	seed := randomize.NewSeed()
-	chatMSGOne := &ChatMSG{}
-	chatMSGTwo := &ChatMSG{}
-	if err = randomize.Struct(seed, chatMSGOne, chatMSGDBTypes, false, chatMSGColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize ChatMSG struct: %s", err)
+	userGifOne := &UserGif{}
+	userGifTwo := &UserGif{}
+	if err = randomize.Struct(seed, userGifOne, userGifDBTypes, false, userGifColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize UserGif struct: %s", err)
 	}
-	if err = randomize.Struct(seed, chatMSGTwo, chatMSGDBTypes, false, chatMSGColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize ChatMSG struct: %s", err)
+	if err = randomize.Struct(seed, userGifTwo, userGifDBTypes, false, userGifColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize UserGif struct: %s", err)
 	}
 
 	ctx := context.Background()
 	tx := MustTx(boil.BeginTx(ctx, nil))
 	defer func() { _ = tx.Rollback() }()
-	if err = chatMSGOne.Insert(ctx, tx, boil.Infer()); err != nil {
+	if err = userGifOne.Insert(ctx, tx, boil.Infer()); err != nil {
 		t.Error(err)
 	}
-	if err = chatMSGTwo.Insert(ctx, tx, boil.Infer()); err != nil {
+	if err = userGifTwo.Insert(ctx, tx, boil.Infer()); err != nil {
 		t.Error(err)
 	}
 
-	count, err := ChatMSGS().Count(ctx, tx)
+	count, err := UserGifs().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -299,155 +299,155 @@ func testChatMSGSCount(t *testing.T) {
 	}
 }
 
-func chatMSGBeforeInsertHook(ctx context.Context, e boil.ContextExecutor, o *ChatMSG) error {
-	*o = ChatMSG{}
+func userGifBeforeInsertHook(ctx context.Context, e boil.ContextExecutor, o *UserGif) error {
+	*o = UserGif{}
 	return nil
 }
 
-func chatMSGAfterInsertHook(ctx context.Context, e boil.ContextExecutor, o *ChatMSG) error {
-	*o = ChatMSG{}
+func userGifAfterInsertHook(ctx context.Context, e boil.ContextExecutor, o *UserGif) error {
+	*o = UserGif{}
 	return nil
 }
 
-func chatMSGAfterSelectHook(ctx context.Context, e boil.ContextExecutor, o *ChatMSG) error {
-	*o = ChatMSG{}
+func userGifAfterSelectHook(ctx context.Context, e boil.ContextExecutor, o *UserGif) error {
+	*o = UserGif{}
 	return nil
 }
 
-func chatMSGBeforeUpdateHook(ctx context.Context, e boil.ContextExecutor, o *ChatMSG) error {
-	*o = ChatMSG{}
+func userGifBeforeUpdateHook(ctx context.Context, e boil.ContextExecutor, o *UserGif) error {
+	*o = UserGif{}
 	return nil
 }
 
-func chatMSGAfterUpdateHook(ctx context.Context, e boil.ContextExecutor, o *ChatMSG) error {
-	*o = ChatMSG{}
+func userGifAfterUpdateHook(ctx context.Context, e boil.ContextExecutor, o *UserGif) error {
+	*o = UserGif{}
 	return nil
 }
 
-func chatMSGBeforeDeleteHook(ctx context.Context, e boil.ContextExecutor, o *ChatMSG) error {
-	*o = ChatMSG{}
+func userGifBeforeDeleteHook(ctx context.Context, e boil.ContextExecutor, o *UserGif) error {
+	*o = UserGif{}
 	return nil
 }
 
-func chatMSGAfterDeleteHook(ctx context.Context, e boil.ContextExecutor, o *ChatMSG) error {
-	*o = ChatMSG{}
+func userGifAfterDeleteHook(ctx context.Context, e boil.ContextExecutor, o *UserGif) error {
+	*o = UserGif{}
 	return nil
 }
 
-func chatMSGBeforeUpsertHook(ctx context.Context, e boil.ContextExecutor, o *ChatMSG) error {
-	*o = ChatMSG{}
+func userGifBeforeUpsertHook(ctx context.Context, e boil.ContextExecutor, o *UserGif) error {
+	*o = UserGif{}
 	return nil
 }
 
-func chatMSGAfterUpsertHook(ctx context.Context, e boil.ContextExecutor, o *ChatMSG) error {
-	*o = ChatMSG{}
+func userGifAfterUpsertHook(ctx context.Context, e boil.ContextExecutor, o *UserGif) error {
+	*o = UserGif{}
 	return nil
 }
 
-func testChatMSGSHooks(t *testing.T) {
+func testUserGifsHooks(t *testing.T) {
 	t.Parallel()
 
 	var err error
 
 	ctx := context.Background()
-	empty := &ChatMSG{}
-	o := &ChatMSG{}
+	empty := &UserGif{}
+	o := &UserGif{}
 
 	seed := randomize.NewSeed()
-	if err = randomize.Struct(seed, o, chatMSGDBTypes, false); err != nil {
-		t.Errorf("Unable to randomize ChatMSG object: %s", err)
+	if err = randomize.Struct(seed, o, userGifDBTypes, false); err != nil {
+		t.Errorf("Unable to randomize UserGif object: %s", err)
 	}
 
-	AddChatMSGHook(boil.BeforeInsertHook, chatMSGBeforeInsertHook)
+	AddUserGifHook(boil.BeforeInsertHook, userGifBeforeInsertHook)
 	if err = o.doBeforeInsertHooks(ctx, nil); err != nil {
 		t.Errorf("Unable to execute doBeforeInsertHooks: %s", err)
 	}
 	if !reflect.DeepEqual(o, empty) {
 		t.Errorf("Expected BeforeInsertHook function to empty object, but got: %#v", o)
 	}
-	chatMSGBeforeInsertHooks = []ChatMSGHook{}
+	userGifBeforeInsertHooks = []UserGifHook{}
 
-	AddChatMSGHook(boil.AfterInsertHook, chatMSGAfterInsertHook)
+	AddUserGifHook(boil.AfterInsertHook, userGifAfterInsertHook)
 	if err = o.doAfterInsertHooks(ctx, nil); err != nil {
 		t.Errorf("Unable to execute doAfterInsertHooks: %s", err)
 	}
 	if !reflect.DeepEqual(o, empty) {
 		t.Errorf("Expected AfterInsertHook function to empty object, but got: %#v", o)
 	}
-	chatMSGAfterInsertHooks = []ChatMSGHook{}
+	userGifAfterInsertHooks = []UserGifHook{}
 
-	AddChatMSGHook(boil.AfterSelectHook, chatMSGAfterSelectHook)
+	AddUserGifHook(boil.AfterSelectHook, userGifAfterSelectHook)
 	if err = o.doAfterSelectHooks(ctx, nil); err != nil {
 		t.Errorf("Unable to execute doAfterSelectHooks: %s", err)
 	}
 	if !reflect.DeepEqual(o, empty) {
 		t.Errorf("Expected AfterSelectHook function to empty object, but got: %#v", o)
 	}
-	chatMSGAfterSelectHooks = []ChatMSGHook{}
+	userGifAfterSelectHooks = []UserGifHook{}
 
-	AddChatMSGHook(boil.BeforeUpdateHook, chatMSGBeforeUpdateHook)
+	AddUserGifHook(boil.BeforeUpdateHook, userGifBeforeUpdateHook)
 	if err = o.doBeforeUpdateHooks(ctx, nil); err != nil {
 		t.Errorf("Unable to execute doBeforeUpdateHooks: %s", err)
 	}
 	if !reflect.DeepEqual(o, empty) {
 		t.Errorf("Expected BeforeUpdateHook function to empty object, but got: %#v", o)
 	}
-	chatMSGBeforeUpdateHooks = []ChatMSGHook{}
+	userGifBeforeUpdateHooks = []UserGifHook{}
 
-	AddChatMSGHook(boil.AfterUpdateHook, chatMSGAfterUpdateHook)
+	AddUserGifHook(boil.AfterUpdateHook, userGifAfterUpdateHook)
 	if err = o.doAfterUpdateHooks(ctx, nil); err != nil {
 		t.Errorf("Unable to execute doAfterUpdateHooks: %s", err)
 	}
 	if !reflect.DeepEqual(o, empty) {
 		t.Errorf("Expected AfterUpdateHook function to empty object, but got: %#v", o)
 	}
-	chatMSGAfterUpdateHooks = []ChatMSGHook{}
+	userGifAfterUpdateHooks = []UserGifHook{}
 
-	AddChatMSGHook(boil.BeforeDeleteHook, chatMSGBeforeDeleteHook)
+	AddUserGifHook(boil.BeforeDeleteHook, userGifBeforeDeleteHook)
 	if err = o.doBeforeDeleteHooks(ctx, nil); err != nil {
 		t.Errorf("Unable to execute doBeforeDeleteHooks: %s", err)
 	}
 	if !reflect.DeepEqual(o, empty) {
 		t.Errorf("Expected BeforeDeleteHook function to empty object, but got: %#v", o)
 	}
-	chatMSGBeforeDeleteHooks = []ChatMSGHook{}
+	userGifBeforeDeleteHooks = []UserGifHook{}
 
-	AddChatMSGHook(boil.AfterDeleteHook, chatMSGAfterDeleteHook)
+	AddUserGifHook(boil.AfterDeleteHook, userGifAfterDeleteHook)
 	if err = o.doAfterDeleteHooks(ctx, nil); err != nil {
 		t.Errorf("Unable to execute doAfterDeleteHooks: %s", err)
 	}
 	if !reflect.DeepEqual(o, empty) {
 		t.Errorf("Expected AfterDeleteHook function to empty object, but got: %#v", o)
 	}
-	chatMSGAfterDeleteHooks = []ChatMSGHook{}
+	userGifAfterDeleteHooks = []UserGifHook{}
 
-	AddChatMSGHook(boil.BeforeUpsertHook, chatMSGBeforeUpsertHook)
+	AddUserGifHook(boil.BeforeUpsertHook, userGifBeforeUpsertHook)
 	if err = o.doBeforeUpsertHooks(ctx, nil); err != nil {
 		t.Errorf("Unable to execute doBeforeUpsertHooks: %s", err)
 	}
 	if !reflect.DeepEqual(o, empty) {
 		t.Errorf("Expected BeforeUpsertHook function to empty object, but got: %#v", o)
 	}
-	chatMSGBeforeUpsertHooks = []ChatMSGHook{}
+	userGifBeforeUpsertHooks = []UserGifHook{}
 
-	AddChatMSGHook(boil.AfterUpsertHook, chatMSGAfterUpsertHook)
+	AddUserGifHook(boil.AfterUpsertHook, userGifAfterUpsertHook)
 	if err = o.doAfterUpsertHooks(ctx, nil); err != nil {
 		t.Errorf("Unable to execute doAfterUpsertHooks: %s", err)
 	}
 	if !reflect.DeepEqual(o, empty) {
 		t.Errorf("Expected AfterUpsertHook function to empty object, but got: %#v", o)
 	}
-	chatMSGAfterUpsertHooks = []ChatMSGHook{}
+	userGifAfterUpsertHooks = []UserGifHook{}
 }
 
-func testChatMSGSInsert(t *testing.T) {
+func testUserGifsInsert(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &ChatMSG{}
-	if err = randomize.Struct(seed, o, chatMSGDBTypes, true, chatMSGColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize ChatMSG struct: %s", err)
+	o := &UserGif{}
+	if err = randomize.Struct(seed, o, userGifDBTypes, true, userGifColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize UserGif struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -457,7 +457,7 @@ func testChatMSGSInsert(t *testing.T) {
 		t.Error(err)
 	}
 
-	count, err := ChatMSGS().Count(ctx, tx)
+	count, err := UserGifs().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -467,24 +467,24 @@ func testChatMSGSInsert(t *testing.T) {
 	}
 }
 
-func testChatMSGSInsertWhitelist(t *testing.T) {
+func testUserGifsInsertWhitelist(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &ChatMSG{}
-	if err = randomize.Struct(seed, o, chatMSGDBTypes, true); err != nil {
-		t.Errorf("Unable to randomize ChatMSG struct: %s", err)
+	o := &UserGif{}
+	if err = randomize.Struct(seed, o, userGifDBTypes, true); err != nil {
+		t.Errorf("Unable to randomize UserGif struct: %s", err)
 	}
 
 	ctx := context.Background()
 	tx := MustTx(boil.BeginTx(ctx, nil))
 	defer func() { _ = tx.Rollback() }()
-	if err = o.Insert(ctx, tx, boil.Whitelist(chatMSGColumnsWithoutDefault...)); err != nil {
+	if err = o.Insert(ctx, tx, boil.Whitelist(userGifColumnsWithoutDefault...)); err != nil {
 		t.Error(err)
 	}
 
-	count, err := ChatMSGS().Count(ctx, tx)
+	count, err := UserGifs().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -494,17 +494,17 @@ func testChatMSGSInsertWhitelist(t *testing.T) {
 	}
 }
 
-func testChatMSGToOneGifUsingGif(t *testing.T) {
+func testUserGifToOneGifUsingGif(t *testing.T) {
 	ctx := context.Background()
 	tx := MustTx(boil.BeginTx(ctx, nil))
 	defer func() { _ = tx.Rollback() }()
 
-	var local ChatMSG
+	var local UserGif
 	var foreign Gif
 
 	seed := randomize.NewSeed()
-	if err := randomize.Struct(seed, &local, chatMSGDBTypes, false, chatMSGColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize ChatMSG struct: %s", err)
+	if err := randomize.Struct(seed, &local, userGifDBTypes, false, userGifColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize UserGif struct: %s", err)
 	}
 	if err := randomize.Struct(seed, &foreign, gifDBTypes, false, gifColumnsWithDefault...); err != nil {
 		t.Errorf("Unable to randomize Gif struct: %s", err)
@@ -528,8 +528,8 @@ func testChatMSGToOneGifUsingGif(t *testing.T) {
 		t.Errorf("want: %v, got %v", foreign.ID, check.ID)
 	}
 
-	slice := ChatMSGSlice{&local}
-	if err = local.L.LoadGif(ctx, tx, false, (*[]*ChatMSG)(&slice), nil); err != nil {
+	slice := UserGifSlice{&local}
+	if err = local.L.LoadGif(ctx, tx, false, (*[]*UserGif)(&slice), nil); err != nil {
 		t.Fatal(err)
 	}
 	if local.R.Gif == nil {
@@ -545,68 +545,17 @@ func testChatMSGToOneGifUsingGif(t *testing.T) {
 	}
 }
 
-func testChatMSGToOneHubUsingHub(t *testing.T) {
+func testUserGifToOneUserUsingUser(t *testing.T) {
 	ctx := context.Background()
 	tx := MustTx(boil.BeginTx(ctx, nil))
 	defer func() { _ = tx.Rollback() }()
 
-	var local ChatMSG
-	var foreign Hub
-
-	seed := randomize.NewSeed()
-	if err := randomize.Struct(seed, &local, chatMSGDBTypes, false, chatMSGColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize ChatMSG struct: %s", err)
-	}
-	if err := randomize.Struct(seed, &foreign, hubDBTypes, false, hubColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize Hub struct: %s", err)
-	}
-
-	if err := foreign.Insert(ctx, tx, boil.Infer()); err != nil {
-		t.Fatal(err)
-	}
-
-	local.HubID = foreign.ID
-	if err := local.Insert(ctx, tx, boil.Infer()); err != nil {
-		t.Fatal(err)
-	}
-
-	check, err := local.Hub().One(ctx, tx)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	if check.ID != foreign.ID {
-		t.Errorf("want: %v, got %v", foreign.ID, check.ID)
-	}
-
-	slice := ChatMSGSlice{&local}
-	if err = local.L.LoadHub(ctx, tx, false, (*[]*ChatMSG)(&slice), nil); err != nil {
-		t.Fatal(err)
-	}
-	if local.R.Hub == nil {
-		t.Error("struct should have been eager loaded")
-	}
-
-	local.R.Hub = nil
-	if err = local.L.LoadHub(ctx, tx, true, &local, nil); err != nil {
-		t.Fatal(err)
-	}
-	if local.R.Hub == nil {
-		t.Error("struct should have been eager loaded")
-	}
-}
-
-func testChatMSGToOneUserUsingUser(t *testing.T) {
-	ctx := context.Background()
-	tx := MustTx(boil.BeginTx(ctx, nil))
-	defer func() { _ = tx.Rollback() }()
-
-	var local ChatMSG
+	var local UserGif
 	var foreign User
 
 	seed := randomize.NewSeed()
-	if err := randomize.Struct(seed, &local, chatMSGDBTypes, false, chatMSGColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize ChatMSG struct: %s", err)
+	if err := randomize.Struct(seed, &local, userGifDBTypes, false, userGifColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize UserGif struct: %s", err)
 	}
 	if err := randomize.Struct(seed, &foreign, userDBTypes, false, userColumnsWithDefault...); err != nil {
 		t.Errorf("Unable to randomize User struct: %s", err)
@@ -630,8 +579,8 @@ func testChatMSGToOneUserUsingUser(t *testing.T) {
 		t.Errorf("want: %v, got %v", foreign.ID, check.ID)
 	}
 
-	slice := ChatMSGSlice{&local}
-	if err = local.L.LoadUser(ctx, tx, false, (*[]*ChatMSG)(&slice), nil); err != nil {
+	slice := UserGifSlice{&local}
+	if err = local.L.LoadUser(ctx, tx, false, (*[]*UserGif)(&slice), nil); err != nil {
 		t.Fatal(err)
 	}
 	if local.R.User == nil {
@@ -647,18 +596,18 @@ func testChatMSGToOneUserUsingUser(t *testing.T) {
 	}
 }
 
-func testChatMSGToOneSetOpGifUsingGif(t *testing.T) {
+func testUserGifToOneSetOpGifUsingGif(t *testing.T) {
 	var err error
 
 	ctx := context.Background()
 	tx := MustTx(boil.BeginTx(ctx, nil))
 	defer func() { _ = tx.Rollback() }()
 
-	var a ChatMSG
+	var a UserGif
 	var b, c Gif
 
 	seed := randomize.NewSeed()
-	if err = randomize.Struct(seed, &a, chatMSGDBTypes, false, strmangle.SetComplement(chatMSGPrimaryKeyColumns, chatMSGColumnsWithoutDefault)...); err != nil {
+	if err = randomize.Struct(seed, &a, userGifDBTypes, false, strmangle.SetComplement(userGifPrimaryKeyColumns, userGifColumnsWithoutDefault)...); err != nil {
 		t.Fatal(err)
 	}
 	if err = randomize.Struct(seed, &b, gifDBTypes, false, strmangle.SetComplement(gifPrimaryKeyColumns, gifColumnsWithoutDefault)...); err != nil {
@@ -685,7 +634,7 @@ func testChatMSGToOneSetOpGifUsingGif(t *testing.T) {
 			t.Error("relationship struct not set to correct value")
 		}
 
-		if x.R.ChatMSGS[0] != &a {
+		if x.R.UserGif != &a {
 			t.Error("failed to append to foreign relationship struct")
 		}
 		if a.GifID != x.ID {
@@ -704,75 +653,18 @@ func testChatMSGToOneSetOpGifUsingGif(t *testing.T) {
 		}
 	}
 }
-func testChatMSGToOneSetOpHubUsingHub(t *testing.T) {
+func testUserGifToOneSetOpUserUsingUser(t *testing.T) {
 	var err error
 
 	ctx := context.Background()
 	tx := MustTx(boil.BeginTx(ctx, nil))
 	defer func() { _ = tx.Rollback() }()
 
-	var a ChatMSG
-	var b, c Hub
-
-	seed := randomize.NewSeed()
-	if err = randomize.Struct(seed, &a, chatMSGDBTypes, false, strmangle.SetComplement(chatMSGPrimaryKeyColumns, chatMSGColumnsWithoutDefault)...); err != nil {
-		t.Fatal(err)
-	}
-	if err = randomize.Struct(seed, &b, hubDBTypes, false, strmangle.SetComplement(hubPrimaryKeyColumns, hubColumnsWithoutDefault)...); err != nil {
-		t.Fatal(err)
-	}
-	if err = randomize.Struct(seed, &c, hubDBTypes, false, strmangle.SetComplement(hubPrimaryKeyColumns, hubColumnsWithoutDefault)...); err != nil {
-		t.Fatal(err)
-	}
-
-	if err := a.Insert(ctx, tx, boil.Infer()); err != nil {
-		t.Fatal(err)
-	}
-	if err = b.Insert(ctx, tx, boil.Infer()); err != nil {
-		t.Fatal(err)
-	}
-
-	for i, x := range []*Hub{&b, &c} {
-		err = a.SetHub(ctx, tx, i != 0, x)
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		if a.R.Hub != x {
-			t.Error("relationship struct not set to correct value")
-		}
-
-		if x.R.ChatMSGS[0] != &a {
-			t.Error("failed to append to foreign relationship struct")
-		}
-		if a.HubID != x.ID {
-			t.Error("foreign key was wrong value", a.HubID)
-		}
-
-		zero := reflect.Zero(reflect.TypeOf(a.HubID))
-		reflect.Indirect(reflect.ValueOf(&a.HubID)).Set(zero)
-
-		if err = a.Reload(ctx, tx); err != nil {
-			t.Fatal("failed to reload", err)
-		}
-
-		if a.HubID != x.ID {
-			t.Error("foreign key was wrong value", a.HubID, x.ID)
-		}
-	}
-}
-func testChatMSGToOneSetOpUserUsingUser(t *testing.T) {
-	var err error
-
-	ctx := context.Background()
-	tx := MustTx(boil.BeginTx(ctx, nil))
-	defer func() { _ = tx.Rollback() }()
-
-	var a ChatMSG
+	var a UserGif
 	var b, c User
 
 	seed := randomize.NewSeed()
-	if err = randomize.Struct(seed, &a, chatMSGDBTypes, false, strmangle.SetComplement(chatMSGPrimaryKeyColumns, chatMSGColumnsWithoutDefault)...); err != nil {
+	if err = randomize.Struct(seed, &a, userGifDBTypes, false, strmangle.SetComplement(userGifPrimaryKeyColumns, userGifColumnsWithoutDefault)...); err != nil {
 		t.Fatal(err)
 	}
 	if err = randomize.Struct(seed, &b, userDBTypes, false, strmangle.SetComplement(userPrimaryKeyColumns, userColumnsWithoutDefault)...); err != nil {
@@ -799,7 +691,7 @@ func testChatMSGToOneSetOpUserUsingUser(t *testing.T) {
 			t.Error("relationship struct not set to correct value")
 		}
 
-		if x.R.ChatMSGS[0] != &a {
+		if x.R.UserGifs[0] != &a {
 			t.Error("failed to append to foreign relationship struct")
 		}
 		if a.UserID != x.ID {
@@ -819,14 +711,14 @@ func testChatMSGToOneSetOpUserUsingUser(t *testing.T) {
 	}
 }
 
-func testChatMSGSReload(t *testing.T) {
+func testUserGifsReload(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &ChatMSG{}
-	if err = randomize.Struct(seed, o, chatMSGDBTypes, true, chatMSGColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize ChatMSG struct: %s", err)
+	o := &UserGif{}
+	if err = randomize.Struct(seed, o, userGifDBTypes, true, userGifColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize UserGif struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -841,14 +733,14 @@ func testChatMSGSReload(t *testing.T) {
 	}
 }
 
-func testChatMSGSReloadAll(t *testing.T) {
+func testUserGifsReloadAll(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &ChatMSG{}
-	if err = randomize.Struct(seed, o, chatMSGDBTypes, true, chatMSGColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize ChatMSG struct: %s", err)
+	o := &UserGif{}
+	if err = randomize.Struct(seed, o, userGifDBTypes, true, userGifColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize UserGif struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -858,21 +750,21 @@ func testChatMSGSReloadAll(t *testing.T) {
 		t.Error(err)
 	}
 
-	slice := ChatMSGSlice{o}
+	slice := UserGifSlice{o}
 
 	if err = slice.ReloadAll(ctx, tx); err != nil {
 		t.Error(err)
 	}
 }
 
-func testChatMSGSSelect(t *testing.T) {
+func testUserGifsSelect(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &ChatMSG{}
-	if err = randomize.Struct(seed, o, chatMSGDBTypes, true, chatMSGColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize ChatMSG struct: %s", err)
+	o := &UserGif{}
+	if err = randomize.Struct(seed, o, userGifDBTypes, true, userGifColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize UserGif struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -882,7 +774,7 @@ func testChatMSGSSelect(t *testing.T) {
 		t.Error(err)
 	}
 
-	slice, err := ChatMSGS().All(ctx, tx)
+	slice, err := UserGifs().All(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -893,25 +785,25 @@ func testChatMSGSSelect(t *testing.T) {
 }
 
 var (
-	chatMSGDBTypes = map[string]string{`ID`: `text`, `HubID`: `text`, `GifID`: `text`, `CreateAt`: `timestamp without time zone`, `UserID`: `text`}
+	userGifDBTypes = map[string]string{`ID`: `text`, `UserID`: `text`, `GifID`: `text`}
 	_              = bytes.MinRead
 )
 
-func testChatMSGSUpdate(t *testing.T) {
+func testUserGifsUpdate(t *testing.T) {
 	t.Parallel()
 
-	if 0 == len(chatMSGPrimaryKeyColumns) {
+	if 0 == len(userGifPrimaryKeyColumns) {
 		t.Skip("Skipping table with no primary key columns")
 	}
-	if len(chatMSGAllColumns) == len(chatMSGPrimaryKeyColumns) {
+	if len(userGifAllColumns) == len(userGifPrimaryKeyColumns) {
 		t.Skip("Skipping table with only primary key columns")
 	}
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &ChatMSG{}
-	if err = randomize.Struct(seed, o, chatMSGDBTypes, true, chatMSGColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize ChatMSG struct: %s", err)
+	o := &UserGif{}
+	if err = randomize.Struct(seed, o, userGifDBTypes, true, userGifColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize UserGif struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -921,7 +813,7 @@ func testChatMSGSUpdate(t *testing.T) {
 		t.Error(err)
 	}
 
-	count, err := ChatMSGS().Count(ctx, tx)
+	count, err := UserGifs().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -930,8 +822,8 @@ func testChatMSGSUpdate(t *testing.T) {
 		t.Error("want one record, got:", count)
 	}
 
-	if err = randomize.Struct(seed, o, chatMSGDBTypes, true, chatMSGPrimaryKeyColumns...); err != nil {
-		t.Errorf("Unable to randomize ChatMSG struct: %s", err)
+	if err = randomize.Struct(seed, o, userGifDBTypes, true, userGifPrimaryKeyColumns...); err != nil {
+		t.Errorf("Unable to randomize UserGif struct: %s", err)
 	}
 
 	if rowsAff, err := o.Update(ctx, tx, boil.Infer()); err != nil {
@@ -941,18 +833,18 @@ func testChatMSGSUpdate(t *testing.T) {
 	}
 }
 
-func testChatMSGSSliceUpdateAll(t *testing.T) {
+func testUserGifsSliceUpdateAll(t *testing.T) {
 	t.Parallel()
 
-	if len(chatMSGAllColumns) == len(chatMSGPrimaryKeyColumns) {
+	if len(userGifAllColumns) == len(userGifPrimaryKeyColumns) {
 		t.Skip("Skipping table with only primary key columns")
 	}
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &ChatMSG{}
-	if err = randomize.Struct(seed, o, chatMSGDBTypes, true, chatMSGColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize ChatMSG struct: %s", err)
+	o := &UserGif{}
+	if err = randomize.Struct(seed, o, userGifDBTypes, true, userGifColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize UserGif struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -962,7 +854,7 @@ func testChatMSGSSliceUpdateAll(t *testing.T) {
 		t.Error(err)
 	}
 
-	count, err := ChatMSGS().Count(ctx, tx)
+	count, err := UserGifs().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -971,18 +863,18 @@ func testChatMSGSSliceUpdateAll(t *testing.T) {
 		t.Error("want one record, got:", count)
 	}
 
-	if err = randomize.Struct(seed, o, chatMSGDBTypes, true, chatMSGPrimaryKeyColumns...); err != nil {
-		t.Errorf("Unable to randomize ChatMSG struct: %s", err)
+	if err = randomize.Struct(seed, o, userGifDBTypes, true, userGifPrimaryKeyColumns...); err != nil {
+		t.Errorf("Unable to randomize UserGif struct: %s", err)
 	}
 
 	// Remove Primary keys and unique columns from what we plan to update
 	var fields []string
-	if strmangle.StringSliceMatch(chatMSGAllColumns, chatMSGPrimaryKeyColumns) {
-		fields = chatMSGAllColumns
+	if strmangle.StringSliceMatch(userGifAllColumns, userGifPrimaryKeyColumns) {
+		fields = userGifAllColumns
 	} else {
 		fields = strmangle.SetComplement(
-			chatMSGAllColumns,
-			chatMSGPrimaryKeyColumns,
+			userGifAllColumns,
+			userGifPrimaryKeyColumns,
 		)
 	}
 
@@ -1000,7 +892,7 @@ func testChatMSGSSliceUpdateAll(t *testing.T) {
 		}
 	}
 
-	slice := ChatMSGSlice{o}
+	slice := UserGifSlice{o}
 	if rowsAff, err := slice.UpdateAll(ctx, tx, updateMap); err != nil {
 		t.Error(err)
 	} else if rowsAff != 1 {
@@ -1008,29 +900,29 @@ func testChatMSGSSliceUpdateAll(t *testing.T) {
 	}
 }
 
-func testChatMSGSUpsert(t *testing.T) {
+func testUserGifsUpsert(t *testing.T) {
 	t.Parallel()
 
-	if len(chatMSGAllColumns) == len(chatMSGPrimaryKeyColumns) {
+	if len(userGifAllColumns) == len(userGifPrimaryKeyColumns) {
 		t.Skip("Skipping table with only primary key columns")
 	}
 
 	seed := randomize.NewSeed()
 	var err error
 	// Attempt the INSERT side of an UPSERT
-	o := ChatMSG{}
-	if err = randomize.Struct(seed, &o, chatMSGDBTypes, true); err != nil {
-		t.Errorf("Unable to randomize ChatMSG struct: %s", err)
+	o := UserGif{}
+	if err = randomize.Struct(seed, &o, userGifDBTypes, true); err != nil {
+		t.Errorf("Unable to randomize UserGif struct: %s", err)
 	}
 
 	ctx := context.Background()
 	tx := MustTx(boil.BeginTx(ctx, nil))
 	defer func() { _ = tx.Rollback() }()
 	if err = o.Upsert(ctx, tx, false, nil, boil.Infer(), boil.Infer()); err != nil {
-		t.Errorf("Unable to upsert ChatMSG: %s", err)
+		t.Errorf("Unable to upsert UserGif: %s", err)
 	}
 
-	count, err := ChatMSGS().Count(ctx, tx)
+	count, err := UserGifs().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -1039,15 +931,15 @@ func testChatMSGSUpsert(t *testing.T) {
 	}
 
 	// Attempt the UPDATE side of an UPSERT
-	if err = randomize.Struct(seed, &o, chatMSGDBTypes, false, chatMSGPrimaryKeyColumns...); err != nil {
-		t.Errorf("Unable to randomize ChatMSG struct: %s", err)
+	if err = randomize.Struct(seed, &o, userGifDBTypes, false, userGifPrimaryKeyColumns...); err != nil {
+		t.Errorf("Unable to randomize UserGif struct: %s", err)
 	}
 
 	if err = o.Upsert(ctx, tx, true, nil, boil.Infer(), boil.Infer()); err != nil {
-		t.Errorf("Unable to upsert ChatMSG: %s", err)
+		t.Errorf("Unable to upsert UserGif: %s", err)
 	}
 
-	count, err = ChatMSGS().Count(ctx, tx)
+	count, err = UserGifs().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}

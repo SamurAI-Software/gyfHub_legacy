@@ -21,24 +21,24 @@ var (
 	_ = queries.Equal
 )
 
-func testUserFavorites(t *testing.T) {
+func testFollowers(t *testing.T) {
 	t.Parallel()
 
-	query := UserFavorites()
+	query := Followers()
 
 	if query.Query == nil {
 		t.Error("expected a query, got nothing")
 	}
 }
 
-func testUserFavoritesDelete(t *testing.T) {
+func testFollowersDelete(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &UserFavorite{}
-	if err = randomize.Struct(seed, o, userFavoriteDBTypes, true, userFavoriteColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize UserFavorite struct: %s", err)
+	o := &Follower{}
+	if err = randomize.Struct(seed, o, followerDBTypes, true, followerColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Follower struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -54,7 +54,7 @@ func testUserFavoritesDelete(t *testing.T) {
 		t.Error("should only have deleted one row, but affected:", rowsAff)
 	}
 
-	count, err := UserFavorites().Count(ctx, tx)
+	count, err := Followers().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -64,14 +64,14 @@ func testUserFavoritesDelete(t *testing.T) {
 	}
 }
 
-func testUserFavoritesQueryDeleteAll(t *testing.T) {
+func testFollowersQueryDeleteAll(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &UserFavorite{}
-	if err = randomize.Struct(seed, o, userFavoriteDBTypes, true, userFavoriteColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize UserFavorite struct: %s", err)
+	o := &Follower{}
+	if err = randomize.Struct(seed, o, followerDBTypes, true, followerColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Follower struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -81,13 +81,13 @@ func testUserFavoritesQueryDeleteAll(t *testing.T) {
 		t.Error(err)
 	}
 
-	if rowsAff, err := UserFavorites().DeleteAll(ctx, tx); err != nil {
+	if rowsAff, err := Followers().DeleteAll(ctx, tx); err != nil {
 		t.Error(err)
 	} else if rowsAff != 1 {
 		t.Error("should only have deleted one row, but affected:", rowsAff)
 	}
 
-	count, err := UserFavorites().Count(ctx, tx)
+	count, err := Followers().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -97,14 +97,14 @@ func testUserFavoritesQueryDeleteAll(t *testing.T) {
 	}
 }
 
-func testUserFavoritesSliceDeleteAll(t *testing.T) {
+func testFollowersSliceDeleteAll(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &UserFavorite{}
-	if err = randomize.Struct(seed, o, userFavoriteDBTypes, true, userFavoriteColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize UserFavorite struct: %s", err)
+	o := &Follower{}
+	if err = randomize.Struct(seed, o, followerDBTypes, true, followerColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Follower struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -114,7 +114,7 @@ func testUserFavoritesSliceDeleteAll(t *testing.T) {
 		t.Error(err)
 	}
 
-	slice := UserFavoriteSlice{o}
+	slice := FollowerSlice{o}
 
 	if rowsAff, err := slice.DeleteAll(ctx, tx); err != nil {
 		t.Error(err)
@@ -122,7 +122,7 @@ func testUserFavoritesSliceDeleteAll(t *testing.T) {
 		t.Error("should only have deleted one row, but affected:", rowsAff)
 	}
 
-	count, err := UserFavorites().Count(ctx, tx)
+	count, err := Followers().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -132,14 +132,14 @@ func testUserFavoritesSliceDeleteAll(t *testing.T) {
 	}
 }
 
-func testUserFavoritesExists(t *testing.T) {
+func testFollowersExists(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &UserFavorite{}
-	if err = randomize.Struct(seed, o, userFavoriteDBTypes, true, userFavoriteColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize UserFavorite struct: %s", err)
+	o := &Follower{}
+	if err = randomize.Struct(seed, o, followerDBTypes, true, followerColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Follower struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -149,23 +149,23 @@ func testUserFavoritesExists(t *testing.T) {
 		t.Error(err)
 	}
 
-	e, err := UserFavoriteExists(ctx, tx, o.ID)
+	e, err := FollowerExists(ctx, tx, o.ID)
 	if err != nil {
-		t.Errorf("Unable to check if UserFavorite exists: %s", err)
+		t.Errorf("Unable to check if Follower exists: %s", err)
 	}
 	if !e {
-		t.Errorf("Expected UserFavoriteExists to return true, but got false.")
+		t.Errorf("Expected FollowerExists to return true, but got false.")
 	}
 }
 
-func testUserFavoritesFind(t *testing.T) {
+func testFollowersFind(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &UserFavorite{}
-	if err = randomize.Struct(seed, o, userFavoriteDBTypes, true, userFavoriteColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize UserFavorite struct: %s", err)
+	o := &Follower{}
+	if err = randomize.Struct(seed, o, followerDBTypes, true, followerColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Follower struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -175,24 +175,24 @@ func testUserFavoritesFind(t *testing.T) {
 		t.Error(err)
 	}
 
-	userFavoriteFound, err := FindUserFavorite(ctx, tx, o.ID)
+	followerFound, err := FindFollower(ctx, tx, o.ID)
 	if err != nil {
 		t.Error(err)
 	}
 
-	if userFavoriteFound == nil {
+	if followerFound == nil {
 		t.Error("want a record, got nil")
 	}
 }
 
-func testUserFavoritesBind(t *testing.T) {
+func testFollowersBind(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &UserFavorite{}
-	if err = randomize.Struct(seed, o, userFavoriteDBTypes, true, userFavoriteColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize UserFavorite struct: %s", err)
+	o := &Follower{}
+	if err = randomize.Struct(seed, o, followerDBTypes, true, followerColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Follower struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -202,19 +202,19 @@ func testUserFavoritesBind(t *testing.T) {
 		t.Error(err)
 	}
 
-	if err = UserFavorites().Bind(ctx, tx, o); err != nil {
+	if err = Followers().Bind(ctx, tx, o); err != nil {
 		t.Error(err)
 	}
 }
 
-func testUserFavoritesOne(t *testing.T) {
+func testFollowersOne(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &UserFavorite{}
-	if err = randomize.Struct(seed, o, userFavoriteDBTypes, true, userFavoriteColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize UserFavorite struct: %s", err)
+	o := &Follower{}
+	if err = randomize.Struct(seed, o, followerDBTypes, true, followerColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Follower struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -224,38 +224,38 @@ func testUserFavoritesOne(t *testing.T) {
 		t.Error(err)
 	}
 
-	if x, err := UserFavorites().One(ctx, tx); err != nil {
+	if x, err := Followers().One(ctx, tx); err != nil {
 		t.Error(err)
 	} else if x == nil {
 		t.Error("expected to get a non nil record")
 	}
 }
 
-func testUserFavoritesAll(t *testing.T) {
+func testFollowersAll(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	userFavoriteOne := &UserFavorite{}
-	userFavoriteTwo := &UserFavorite{}
-	if err = randomize.Struct(seed, userFavoriteOne, userFavoriteDBTypes, false, userFavoriteColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize UserFavorite struct: %s", err)
+	followerOne := &Follower{}
+	followerTwo := &Follower{}
+	if err = randomize.Struct(seed, followerOne, followerDBTypes, false, followerColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Follower struct: %s", err)
 	}
-	if err = randomize.Struct(seed, userFavoriteTwo, userFavoriteDBTypes, false, userFavoriteColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize UserFavorite struct: %s", err)
+	if err = randomize.Struct(seed, followerTwo, followerDBTypes, false, followerColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Follower struct: %s", err)
 	}
 
 	ctx := context.Background()
 	tx := MustTx(boil.BeginTx(ctx, nil))
 	defer func() { _ = tx.Rollback() }()
-	if err = userFavoriteOne.Insert(ctx, tx, boil.Infer()); err != nil {
+	if err = followerOne.Insert(ctx, tx, boil.Infer()); err != nil {
 		t.Error(err)
 	}
-	if err = userFavoriteTwo.Insert(ctx, tx, boil.Infer()); err != nil {
+	if err = followerTwo.Insert(ctx, tx, boil.Infer()); err != nil {
 		t.Error(err)
 	}
 
-	slice, err := UserFavorites().All(ctx, tx)
+	slice, err := Followers().All(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -265,31 +265,31 @@ func testUserFavoritesAll(t *testing.T) {
 	}
 }
 
-func testUserFavoritesCount(t *testing.T) {
+func testFollowersCount(t *testing.T) {
 	t.Parallel()
 
 	var err error
 	seed := randomize.NewSeed()
-	userFavoriteOne := &UserFavorite{}
-	userFavoriteTwo := &UserFavorite{}
-	if err = randomize.Struct(seed, userFavoriteOne, userFavoriteDBTypes, false, userFavoriteColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize UserFavorite struct: %s", err)
+	followerOne := &Follower{}
+	followerTwo := &Follower{}
+	if err = randomize.Struct(seed, followerOne, followerDBTypes, false, followerColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Follower struct: %s", err)
 	}
-	if err = randomize.Struct(seed, userFavoriteTwo, userFavoriteDBTypes, false, userFavoriteColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize UserFavorite struct: %s", err)
+	if err = randomize.Struct(seed, followerTwo, followerDBTypes, false, followerColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Follower struct: %s", err)
 	}
 
 	ctx := context.Background()
 	tx := MustTx(boil.BeginTx(ctx, nil))
 	defer func() { _ = tx.Rollback() }()
-	if err = userFavoriteOne.Insert(ctx, tx, boil.Infer()); err != nil {
+	if err = followerOne.Insert(ctx, tx, boil.Infer()); err != nil {
 		t.Error(err)
 	}
-	if err = userFavoriteTwo.Insert(ctx, tx, boil.Infer()); err != nil {
+	if err = followerTwo.Insert(ctx, tx, boil.Infer()); err != nil {
 		t.Error(err)
 	}
 
-	count, err := UserFavorites().Count(ctx, tx)
+	count, err := Followers().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -299,155 +299,155 @@ func testUserFavoritesCount(t *testing.T) {
 	}
 }
 
-func userFavoriteBeforeInsertHook(ctx context.Context, e boil.ContextExecutor, o *UserFavorite) error {
-	*o = UserFavorite{}
+func followerBeforeInsertHook(ctx context.Context, e boil.ContextExecutor, o *Follower) error {
+	*o = Follower{}
 	return nil
 }
 
-func userFavoriteAfterInsertHook(ctx context.Context, e boil.ContextExecutor, o *UserFavorite) error {
-	*o = UserFavorite{}
+func followerAfterInsertHook(ctx context.Context, e boil.ContextExecutor, o *Follower) error {
+	*o = Follower{}
 	return nil
 }
 
-func userFavoriteAfterSelectHook(ctx context.Context, e boil.ContextExecutor, o *UserFavorite) error {
-	*o = UserFavorite{}
+func followerAfterSelectHook(ctx context.Context, e boil.ContextExecutor, o *Follower) error {
+	*o = Follower{}
 	return nil
 }
 
-func userFavoriteBeforeUpdateHook(ctx context.Context, e boil.ContextExecutor, o *UserFavorite) error {
-	*o = UserFavorite{}
+func followerBeforeUpdateHook(ctx context.Context, e boil.ContextExecutor, o *Follower) error {
+	*o = Follower{}
 	return nil
 }
 
-func userFavoriteAfterUpdateHook(ctx context.Context, e boil.ContextExecutor, o *UserFavorite) error {
-	*o = UserFavorite{}
+func followerAfterUpdateHook(ctx context.Context, e boil.ContextExecutor, o *Follower) error {
+	*o = Follower{}
 	return nil
 }
 
-func userFavoriteBeforeDeleteHook(ctx context.Context, e boil.ContextExecutor, o *UserFavorite) error {
-	*o = UserFavorite{}
+func followerBeforeDeleteHook(ctx context.Context, e boil.ContextExecutor, o *Follower) error {
+	*o = Follower{}
 	return nil
 }
 
-func userFavoriteAfterDeleteHook(ctx context.Context, e boil.ContextExecutor, o *UserFavorite) error {
-	*o = UserFavorite{}
+func followerAfterDeleteHook(ctx context.Context, e boil.ContextExecutor, o *Follower) error {
+	*o = Follower{}
 	return nil
 }
 
-func userFavoriteBeforeUpsertHook(ctx context.Context, e boil.ContextExecutor, o *UserFavorite) error {
-	*o = UserFavorite{}
+func followerBeforeUpsertHook(ctx context.Context, e boil.ContextExecutor, o *Follower) error {
+	*o = Follower{}
 	return nil
 }
 
-func userFavoriteAfterUpsertHook(ctx context.Context, e boil.ContextExecutor, o *UserFavorite) error {
-	*o = UserFavorite{}
+func followerAfterUpsertHook(ctx context.Context, e boil.ContextExecutor, o *Follower) error {
+	*o = Follower{}
 	return nil
 }
 
-func testUserFavoritesHooks(t *testing.T) {
+func testFollowersHooks(t *testing.T) {
 	t.Parallel()
 
 	var err error
 
 	ctx := context.Background()
-	empty := &UserFavorite{}
-	o := &UserFavorite{}
+	empty := &Follower{}
+	o := &Follower{}
 
 	seed := randomize.NewSeed()
-	if err = randomize.Struct(seed, o, userFavoriteDBTypes, false); err != nil {
-		t.Errorf("Unable to randomize UserFavorite object: %s", err)
+	if err = randomize.Struct(seed, o, followerDBTypes, false); err != nil {
+		t.Errorf("Unable to randomize Follower object: %s", err)
 	}
 
-	AddUserFavoriteHook(boil.BeforeInsertHook, userFavoriteBeforeInsertHook)
+	AddFollowerHook(boil.BeforeInsertHook, followerBeforeInsertHook)
 	if err = o.doBeforeInsertHooks(ctx, nil); err != nil {
 		t.Errorf("Unable to execute doBeforeInsertHooks: %s", err)
 	}
 	if !reflect.DeepEqual(o, empty) {
 		t.Errorf("Expected BeforeInsertHook function to empty object, but got: %#v", o)
 	}
-	userFavoriteBeforeInsertHooks = []UserFavoriteHook{}
+	followerBeforeInsertHooks = []FollowerHook{}
 
-	AddUserFavoriteHook(boil.AfterInsertHook, userFavoriteAfterInsertHook)
+	AddFollowerHook(boil.AfterInsertHook, followerAfterInsertHook)
 	if err = o.doAfterInsertHooks(ctx, nil); err != nil {
 		t.Errorf("Unable to execute doAfterInsertHooks: %s", err)
 	}
 	if !reflect.DeepEqual(o, empty) {
 		t.Errorf("Expected AfterInsertHook function to empty object, but got: %#v", o)
 	}
-	userFavoriteAfterInsertHooks = []UserFavoriteHook{}
+	followerAfterInsertHooks = []FollowerHook{}
 
-	AddUserFavoriteHook(boil.AfterSelectHook, userFavoriteAfterSelectHook)
+	AddFollowerHook(boil.AfterSelectHook, followerAfterSelectHook)
 	if err = o.doAfterSelectHooks(ctx, nil); err != nil {
 		t.Errorf("Unable to execute doAfterSelectHooks: %s", err)
 	}
 	if !reflect.DeepEqual(o, empty) {
 		t.Errorf("Expected AfterSelectHook function to empty object, but got: %#v", o)
 	}
-	userFavoriteAfterSelectHooks = []UserFavoriteHook{}
+	followerAfterSelectHooks = []FollowerHook{}
 
-	AddUserFavoriteHook(boil.BeforeUpdateHook, userFavoriteBeforeUpdateHook)
+	AddFollowerHook(boil.BeforeUpdateHook, followerBeforeUpdateHook)
 	if err = o.doBeforeUpdateHooks(ctx, nil); err != nil {
 		t.Errorf("Unable to execute doBeforeUpdateHooks: %s", err)
 	}
 	if !reflect.DeepEqual(o, empty) {
 		t.Errorf("Expected BeforeUpdateHook function to empty object, but got: %#v", o)
 	}
-	userFavoriteBeforeUpdateHooks = []UserFavoriteHook{}
+	followerBeforeUpdateHooks = []FollowerHook{}
 
-	AddUserFavoriteHook(boil.AfterUpdateHook, userFavoriteAfterUpdateHook)
+	AddFollowerHook(boil.AfterUpdateHook, followerAfterUpdateHook)
 	if err = o.doAfterUpdateHooks(ctx, nil); err != nil {
 		t.Errorf("Unable to execute doAfterUpdateHooks: %s", err)
 	}
 	if !reflect.DeepEqual(o, empty) {
 		t.Errorf("Expected AfterUpdateHook function to empty object, but got: %#v", o)
 	}
-	userFavoriteAfterUpdateHooks = []UserFavoriteHook{}
+	followerAfterUpdateHooks = []FollowerHook{}
 
-	AddUserFavoriteHook(boil.BeforeDeleteHook, userFavoriteBeforeDeleteHook)
+	AddFollowerHook(boil.BeforeDeleteHook, followerBeforeDeleteHook)
 	if err = o.doBeforeDeleteHooks(ctx, nil); err != nil {
 		t.Errorf("Unable to execute doBeforeDeleteHooks: %s", err)
 	}
 	if !reflect.DeepEqual(o, empty) {
 		t.Errorf("Expected BeforeDeleteHook function to empty object, but got: %#v", o)
 	}
-	userFavoriteBeforeDeleteHooks = []UserFavoriteHook{}
+	followerBeforeDeleteHooks = []FollowerHook{}
 
-	AddUserFavoriteHook(boil.AfterDeleteHook, userFavoriteAfterDeleteHook)
+	AddFollowerHook(boil.AfterDeleteHook, followerAfterDeleteHook)
 	if err = o.doAfterDeleteHooks(ctx, nil); err != nil {
 		t.Errorf("Unable to execute doAfterDeleteHooks: %s", err)
 	}
 	if !reflect.DeepEqual(o, empty) {
 		t.Errorf("Expected AfterDeleteHook function to empty object, but got: %#v", o)
 	}
-	userFavoriteAfterDeleteHooks = []UserFavoriteHook{}
+	followerAfterDeleteHooks = []FollowerHook{}
 
-	AddUserFavoriteHook(boil.BeforeUpsertHook, userFavoriteBeforeUpsertHook)
+	AddFollowerHook(boil.BeforeUpsertHook, followerBeforeUpsertHook)
 	if err = o.doBeforeUpsertHooks(ctx, nil); err != nil {
 		t.Errorf("Unable to execute doBeforeUpsertHooks: %s", err)
 	}
 	if !reflect.DeepEqual(o, empty) {
 		t.Errorf("Expected BeforeUpsertHook function to empty object, but got: %#v", o)
 	}
-	userFavoriteBeforeUpsertHooks = []UserFavoriteHook{}
+	followerBeforeUpsertHooks = []FollowerHook{}
 
-	AddUserFavoriteHook(boil.AfterUpsertHook, userFavoriteAfterUpsertHook)
+	AddFollowerHook(boil.AfterUpsertHook, followerAfterUpsertHook)
 	if err = o.doAfterUpsertHooks(ctx, nil); err != nil {
 		t.Errorf("Unable to execute doAfterUpsertHooks: %s", err)
 	}
 	if !reflect.DeepEqual(o, empty) {
 		t.Errorf("Expected AfterUpsertHook function to empty object, but got: %#v", o)
 	}
-	userFavoriteAfterUpsertHooks = []UserFavoriteHook{}
+	followerAfterUpsertHooks = []FollowerHook{}
 }
 
-func testUserFavoritesInsert(t *testing.T) {
+func testFollowersInsert(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &UserFavorite{}
-	if err = randomize.Struct(seed, o, userFavoriteDBTypes, true, userFavoriteColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize UserFavorite struct: %s", err)
+	o := &Follower{}
+	if err = randomize.Struct(seed, o, followerDBTypes, true, followerColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Follower struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -457,7 +457,7 @@ func testUserFavoritesInsert(t *testing.T) {
 		t.Error(err)
 	}
 
-	count, err := UserFavorites().Count(ctx, tx)
+	count, err := Followers().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -467,24 +467,24 @@ func testUserFavoritesInsert(t *testing.T) {
 	}
 }
 
-func testUserFavoritesInsertWhitelist(t *testing.T) {
+func testFollowersInsertWhitelist(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &UserFavorite{}
-	if err = randomize.Struct(seed, o, userFavoriteDBTypes, true); err != nil {
-		t.Errorf("Unable to randomize UserFavorite struct: %s", err)
+	o := &Follower{}
+	if err = randomize.Struct(seed, o, followerDBTypes, true); err != nil {
+		t.Errorf("Unable to randomize Follower struct: %s", err)
 	}
 
 	ctx := context.Background()
 	tx := MustTx(boil.BeginTx(ctx, nil))
 	defer func() { _ = tx.Rollback() }()
-	if err = o.Insert(ctx, tx, boil.Whitelist(userFavoriteColumnsWithoutDefault...)); err != nil {
+	if err = o.Insert(ctx, tx, boil.Whitelist(followerColumnsWithoutDefault...)); err != nil {
 		t.Error(err)
 	}
 
-	count, err := UserFavorites().Count(ctx, tx)
+	count, err := Followers().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -494,32 +494,32 @@ func testUserFavoritesInsertWhitelist(t *testing.T) {
 	}
 }
 
-func testUserFavoriteToOneGifUsingGif(t *testing.T) {
+func testFollowerToOneUserUsingFollower(t *testing.T) {
 	ctx := context.Background()
 	tx := MustTx(boil.BeginTx(ctx, nil))
 	defer func() { _ = tx.Rollback() }()
 
-	var local UserFavorite
-	var foreign Gif
+	var local Follower
+	var foreign User
 
 	seed := randomize.NewSeed()
-	if err := randomize.Struct(seed, &local, userFavoriteDBTypes, false, userFavoriteColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize UserFavorite struct: %s", err)
+	if err := randomize.Struct(seed, &local, followerDBTypes, false, followerColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Follower struct: %s", err)
 	}
-	if err := randomize.Struct(seed, &foreign, gifDBTypes, false, gifColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize Gif struct: %s", err)
+	if err := randomize.Struct(seed, &foreign, userDBTypes, false, userColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize User struct: %s", err)
 	}
 
 	if err := foreign.Insert(ctx, tx, boil.Infer()); err != nil {
 		t.Fatal(err)
 	}
 
-	local.GifID = foreign.ID
+	local.FollowerID = foreign.ID
 	if err := local.Insert(ctx, tx, boil.Infer()); err != nil {
 		t.Fatal(err)
 	}
 
-	check, err := local.Gif().One(ctx, tx)
+	check, err := local.Follower().One(ctx, tx)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -528,34 +528,34 @@ func testUserFavoriteToOneGifUsingGif(t *testing.T) {
 		t.Errorf("want: %v, got %v", foreign.ID, check.ID)
 	}
 
-	slice := UserFavoriteSlice{&local}
-	if err = local.L.LoadGif(ctx, tx, false, (*[]*UserFavorite)(&slice), nil); err != nil {
+	slice := FollowerSlice{&local}
+	if err = local.L.LoadFollower(ctx, tx, false, (*[]*Follower)(&slice), nil); err != nil {
 		t.Fatal(err)
 	}
-	if local.R.Gif == nil {
+	if local.R.Follower == nil {
 		t.Error("struct should have been eager loaded")
 	}
 
-	local.R.Gif = nil
-	if err = local.L.LoadGif(ctx, tx, true, &local, nil); err != nil {
+	local.R.Follower = nil
+	if err = local.L.LoadFollower(ctx, tx, true, &local, nil); err != nil {
 		t.Fatal(err)
 	}
-	if local.R.Gif == nil {
+	if local.R.Follower == nil {
 		t.Error("struct should have been eager loaded")
 	}
 }
 
-func testUserFavoriteToOneUserUsingUser(t *testing.T) {
+func testFollowerToOneUserUsingUser(t *testing.T) {
 	ctx := context.Background()
 	tx := MustTx(boil.BeginTx(ctx, nil))
 	defer func() { _ = tx.Rollback() }()
 
-	var local UserFavorite
+	var local Follower
 	var foreign User
 
 	seed := randomize.NewSeed()
-	if err := randomize.Struct(seed, &local, userFavoriteDBTypes, false, userFavoriteColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize UserFavorite struct: %s", err)
+	if err := randomize.Struct(seed, &local, followerDBTypes, false, followerColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Follower struct: %s", err)
 	}
 	if err := randomize.Struct(seed, &foreign, userDBTypes, false, userColumnsWithDefault...); err != nil {
 		t.Errorf("Unable to randomize User struct: %s", err)
@@ -579,8 +579,8 @@ func testUserFavoriteToOneUserUsingUser(t *testing.T) {
 		t.Errorf("want: %v, got %v", foreign.ID, check.ID)
 	}
 
-	slice := UserFavoriteSlice{&local}
-	if err = local.L.LoadUser(ctx, tx, false, (*[]*UserFavorite)(&slice), nil); err != nil {
+	slice := FollowerSlice{&local}
+	if err = local.L.LoadUser(ctx, tx, false, (*[]*Follower)(&slice), nil); err != nil {
 		t.Fatal(err)
 	}
 	if local.R.User == nil {
@@ -596,24 +596,24 @@ func testUserFavoriteToOneUserUsingUser(t *testing.T) {
 	}
 }
 
-func testUserFavoriteToOneSetOpGifUsingGif(t *testing.T) {
+func testFollowerToOneSetOpUserUsingFollower(t *testing.T) {
 	var err error
 
 	ctx := context.Background()
 	tx := MustTx(boil.BeginTx(ctx, nil))
 	defer func() { _ = tx.Rollback() }()
 
-	var a UserFavorite
-	var b, c Gif
+	var a Follower
+	var b, c User
 
 	seed := randomize.NewSeed()
-	if err = randomize.Struct(seed, &a, userFavoriteDBTypes, false, strmangle.SetComplement(userFavoritePrimaryKeyColumns, userFavoriteColumnsWithoutDefault)...); err != nil {
+	if err = randomize.Struct(seed, &a, followerDBTypes, false, strmangle.SetComplement(followerPrimaryKeyColumns, followerColumnsWithoutDefault)...); err != nil {
 		t.Fatal(err)
 	}
-	if err = randomize.Struct(seed, &b, gifDBTypes, false, strmangle.SetComplement(gifPrimaryKeyColumns, gifColumnsWithoutDefault)...); err != nil {
+	if err = randomize.Struct(seed, &b, userDBTypes, false, strmangle.SetComplement(userPrimaryKeyColumns, userColumnsWithoutDefault)...); err != nil {
 		t.Fatal(err)
 	}
-	if err = randomize.Struct(seed, &c, gifDBTypes, false, strmangle.SetComplement(gifPrimaryKeyColumns, gifColumnsWithoutDefault)...); err != nil {
+	if err = randomize.Struct(seed, &c, userDBTypes, false, strmangle.SetComplement(userPrimaryKeyColumns, userColumnsWithoutDefault)...); err != nil {
 		t.Fatal(err)
 	}
 
@@ -624,47 +624,47 @@ func testUserFavoriteToOneSetOpGifUsingGif(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	for i, x := range []*Gif{&b, &c} {
-		err = a.SetGif(ctx, tx, i != 0, x)
+	for i, x := range []*User{&b, &c} {
+		err = a.SetFollower(ctx, tx, i != 0, x)
 		if err != nil {
 			t.Fatal(err)
 		}
 
-		if a.R.Gif != x {
+		if a.R.Follower != x {
 			t.Error("relationship struct not set to correct value")
 		}
 
-		if x.R.UserFavorites[0] != &a {
+		if x.R.FollowerFollowers[0] != &a {
 			t.Error("failed to append to foreign relationship struct")
 		}
-		if a.GifID != x.ID {
-			t.Error("foreign key was wrong value", a.GifID)
+		if a.FollowerID != x.ID {
+			t.Error("foreign key was wrong value", a.FollowerID)
 		}
 
-		zero := reflect.Zero(reflect.TypeOf(a.GifID))
-		reflect.Indirect(reflect.ValueOf(&a.GifID)).Set(zero)
+		zero := reflect.Zero(reflect.TypeOf(a.FollowerID))
+		reflect.Indirect(reflect.ValueOf(&a.FollowerID)).Set(zero)
 
 		if err = a.Reload(ctx, tx); err != nil {
 			t.Fatal("failed to reload", err)
 		}
 
-		if a.GifID != x.ID {
-			t.Error("foreign key was wrong value", a.GifID, x.ID)
+		if a.FollowerID != x.ID {
+			t.Error("foreign key was wrong value", a.FollowerID, x.ID)
 		}
 	}
 }
-func testUserFavoriteToOneSetOpUserUsingUser(t *testing.T) {
+func testFollowerToOneSetOpUserUsingUser(t *testing.T) {
 	var err error
 
 	ctx := context.Background()
 	tx := MustTx(boil.BeginTx(ctx, nil))
 	defer func() { _ = tx.Rollback() }()
 
-	var a UserFavorite
+	var a Follower
 	var b, c User
 
 	seed := randomize.NewSeed()
-	if err = randomize.Struct(seed, &a, userFavoriteDBTypes, false, strmangle.SetComplement(userFavoritePrimaryKeyColumns, userFavoriteColumnsWithoutDefault)...); err != nil {
+	if err = randomize.Struct(seed, &a, followerDBTypes, false, strmangle.SetComplement(followerPrimaryKeyColumns, followerColumnsWithoutDefault)...); err != nil {
 		t.Fatal(err)
 	}
 	if err = randomize.Struct(seed, &b, userDBTypes, false, strmangle.SetComplement(userPrimaryKeyColumns, userColumnsWithoutDefault)...); err != nil {
@@ -691,7 +691,7 @@ func testUserFavoriteToOneSetOpUserUsingUser(t *testing.T) {
 			t.Error("relationship struct not set to correct value")
 		}
 
-		if x.R.UserFavorites[0] != &a {
+		if x.R.Followers[0] != &a {
 			t.Error("failed to append to foreign relationship struct")
 		}
 		if a.UserID != x.ID {
@@ -711,14 +711,14 @@ func testUserFavoriteToOneSetOpUserUsingUser(t *testing.T) {
 	}
 }
 
-func testUserFavoritesReload(t *testing.T) {
+func testFollowersReload(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &UserFavorite{}
-	if err = randomize.Struct(seed, o, userFavoriteDBTypes, true, userFavoriteColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize UserFavorite struct: %s", err)
+	o := &Follower{}
+	if err = randomize.Struct(seed, o, followerDBTypes, true, followerColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Follower struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -733,14 +733,14 @@ func testUserFavoritesReload(t *testing.T) {
 	}
 }
 
-func testUserFavoritesReloadAll(t *testing.T) {
+func testFollowersReloadAll(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &UserFavorite{}
-	if err = randomize.Struct(seed, o, userFavoriteDBTypes, true, userFavoriteColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize UserFavorite struct: %s", err)
+	o := &Follower{}
+	if err = randomize.Struct(seed, o, followerDBTypes, true, followerColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Follower struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -750,21 +750,21 @@ func testUserFavoritesReloadAll(t *testing.T) {
 		t.Error(err)
 	}
 
-	slice := UserFavoriteSlice{o}
+	slice := FollowerSlice{o}
 
 	if err = slice.ReloadAll(ctx, tx); err != nil {
 		t.Error(err)
 	}
 }
 
-func testUserFavoritesSelect(t *testing.T) {
+func testFollowersSelect(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &UserFavorite{}
-	if err = randomize.Struct(seed, o, userFavoriteDBTypes, true, userFavoriteColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize UserFavorite struct: %s", err)
+	o := &Follower{}
+	if err = randomize.Struct(seed, o, followerDBTypes, true, followerColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Follower struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -774,7 +774,7 @@ func testUserFavoritesSelect(t *testing.T) {
 		t.Error(err)
 	}
 
-	slice, err := UserFavorites().All(ctx, tx)
+	slice, err := Followers().All(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -785,25 +785,25 @@ func testUserFavoritesSelect(t *testing.T) {
 }
 
 var (
-	userFavoriteDBTypes = map[string]string{`ID`: `text`, `UserID`: `text`, `GifID`: `text`}
-	_                   = bytes.MinRead
+	followerDBTypes = map[string]string{`ID`: `text`, `UserID`: `text`, `FollowerID`: `text`}
+	_               = bytes.MinRead
 )
 
-func testUserFavoritesUpdate(t *testing.T) {
+func testFollowersUpdate(t *testing.T) {
 	t.Parallel()
 
-	if 0 == len(userFavoritePrimaryKeyColumns) {
+	if 0 == len(followerPrimaryKeyColumns) {
 		t.Skip("Skipping table with no primary key columns")
 	}
-	if len(userFavoriteAllColumns) == len(userFavoritePrimaryKeyColumns) {
+	if len(followerAllColumns) == len(followerPrimaryKeyColumns) {
 		t.Skip("Skipping table with only primary key columns")
 	}
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &UserFavorite{}
-	if err = randomize.Struct(seed, o, userFavoriteDBTypes, true, userFavoriteColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize UserFavorite struct: %s", err)
+	o := &Follower{}
+	if err = randomize.Struct(seed, o, followerDBTypes, true, followerColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Follower struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -813,7 +813,7 @@ func testUserFavoritesUpdate(t *testing.T) {
 		t.Error(err)
 	}
 
-	count, err := UserFavorites().Count(ctx, tx)
+	count, err := Followers().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -822,8 +822,8 @@ func testUserFavoritesUpdate(t *testing.T) {
 		t.Error("want one record, got:", count)
 	}
 
-	if err = randomize.Struct(seed, o, userFavoriteDBTypes, true, userFavoritePrimaryKeyColumns...); err != nil {
-		t.Errorf("Unable to randomize UserFavorite struct: %s", err)
+	if err = randomize.Struct(seed, o, followerDBTypes, true, followerPrimaryKeyColumns...); err != nil {
+		t.Errorf("Unable to randomize Follower struct: %s", err)
 	}
 
 	if rowsAff, err := o.Update(ctx, tx, boil.Infer()); err != nil {
@@ -833,18 +833,18 @@ func testUserFavoritesUpdate(t *testing.T) {
 	}
 }
 
-func testUserFavoritesSliceUpdateAll(t *testing.T) {
+func testFollowersSliceUpdateAll(t *testing.T) {
 	t.Parallel()
 
-	if len(userFavoriteAllColumns) == len(userFavoritePrimaryKeyColumns) {
+	if len(followerAllColumns) == len(followerPrimaryKeyColumns) {
 		t.Skip("Skipping table with only primary key columns")
 	}
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &UserFavorite{}
-	if err = randomize.Struct(seed, o, userFavoriteDBTypes, true, userFavoriteColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize UserFavorite struct: %s", err)
+	o := &Follower{}
+	if err = randomize.Struct(seed, o, followerDBTypes, true, followerColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Follower struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -854,7 +854,7 @@ func testUserFavoritesSliceUpdateAll(t *testing.T) {
 		t.Error(err)
 	}
 
-	count, err := UserFavorites().Count(ctx, tx)
+	count, err := Followers().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -863,18 +863,18 @@ func testUserFavoritesSliceUpdateAll(t *testing.T) {
 		t.Error("want one record, got:", count)
 	}
 
-	if err = randomize.Struct(seed, o, userFavoriteDBTypes, true, userFavoritePrimaryKeyColumns...); err != nil {
-		t.Errorf("Unable to randomize UserFavorite struct: %s", err)
+	if err = randomize.Struct(seed, o, followerDBTypes, true, followerPrimaryKeyColumns...); err != nil {
+		t.Errorf("Unable to randomize Follower struct: %s", err)
 	}
 
 	// Remove Primary keys and unique columns from what we plan to update
 	var fields []string
-	if strmangle.StringSliceMatch(userFavoriteAllColumns, userFavoritePrimaryKeyColumns) {
-		fields = userFavoriteAllColumns
+	if strmangle.StringSliceMatch(followerAllColumns, followerPrimaryKeyColumns) {
+		fields = followerAllColumns
 	} else {
 		fields = strmangle.SetComplement(
-			userFavoriteAllColumns,
-			userFavoritePrimaryKeyColumns,
+			followerAllColumns,
+			followerPrimaryKeyColumns,
 		)
 	}
 
@@ -892,7 +892,7 @@ func testUserFavoritesSliceUpdateAll(t *testing.T) {
 		}
 	}
 
-	slice := UserFavoriteSlice{o}
+	slice := FollowerSlice{o}
 	if rowsAff, err := slice.UpdateAll(ctx, tx, updateMap); err != nil {
 		t.Error(err)
 	} else if rowsAff != 1 {
@@ -900,29 +900,29 @@ func testUserFavoritesSliceUpdateAll(t *testing.T) {
 	}
 }
 
-func testUserFavoritesUpsert(t *testing.T) {
+func testFollowersUpsert(t *testing.T) {
 	t.Parallel()
 
-	if len(userFavoriteAllColumns) == len(userFavoritePrimaryKeyColumns) {
+	if len(followerAllColumns) == len(followerPrimaryKeyColumns) {
 		t.Skip("Skipping table with only primary key columns")
 	}
 
 	seed := randomize.NewSeed()
 	var err error
 	// Attempt the INSERT side of an UPSERT
-	o := UserFavorite{}
-	if err = randomize.Struct(seed, &o, userFavoriteDBTypes, true); err != nil {
-		t.Errorf("Unable to randomize UserFavorite struct: %s", err)
+	o := Follower{}
+	if err = randomize.Struct(seed, &o, followerDBTypes, true); err != nil {
+		t.Errorf("Unable to randomize Follower struct: %s", err)
 	}
 
 	ctx := context.Background()
 	tx := MustTx(boil.BeginTx(ctx, nil))
 	defer func() { _ = tx.Rollback() }()
 	if err = o.Upsert(ctx, tx, false, nil, boil.Infer(), boil.Infer()); err != nil {
-		t.Errorf("Unable to upsert UserFavorite: %s", err)
+		t.Errorf("Unable to upsert Follower: %s", err)
 	}
 
-	count, err := UserFavorites().Count(ctx, tx)
+	count, err := Followers().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -931,15 +931,15 @@ func testUserFavoritesUpsert(t *testing.T) {
 	}
 
 	// Attempt the UPDATE side of an UPSERT
-	if err = randomize.Struct(seed, &o, userFavoriteDBTypes, false, userFavoritePrimaryKeyColumns...); err != nil {
-		t.Errorf("Unable to randomize UserFavorite struct: %s", err)
+	if err = randomize.Struct(seed, &o, followerDBTypes, false, followerPrimaryKeyColumns...); err != nil {
+		t.Errorf("Unable to randomize Follower struct: %s", err)
 	}
 
 	if err = o.Upsert(ctx, tx, true, nil, boil.Infer(), boil.Infer()); err != nil {
-		t.Errorf("Unable to upsert UserFavorite: %s", err)
+		t.Errorf("Unable to upsert Follower: %s", err)
 	}
 
-	count, err = UserFavorites().Count(ctx, tx)
+	count, err = Followers().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
