@@ -5,18 +5,22 @@ package models
 
 var TableNames = struct {
 	ChatMSG          string
-	Favorites        string
+	Followers        string
+	Gifs             string
 	HubUser          string
 	Hubs             string
 	SchemaMigrations string
 	UserFavorite     string
+	UserGif          string
 	Users            string
 }{
 	ChatMSG:          "chat_msg",
-	Favorites:        "favorites",
+	Followers:        "followers",
+	Gifs:             "gifs",
 	HubUser:          "hub_user",
 	Hubs:             "hubs",
 	SchemaMigrations: "schema_migrations",
 	UserFavorite:     "user_favorite",
+	UserGif:          "user_gif",
 	Users:            "users",
 }

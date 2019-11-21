@@ -24,74 +24,94 @@ import (
 
 // User is an object representing the database table.
 type User struct {
-	ID           string     `boil:"id" json:"id" toml:"id" yaml:"id"`
-	Email        string     `boil:"email" json:"email" toml:"email" yaml:"email"`
-	PasswordHash []byte     `boil:"password_hash" json:"password_hash" toml:"password_hash" yaml:"password_hash"`
-	Username     string     `boil:"username" json:"username" toml:"username" yaml:"username"`
-	Avatar       null.Bytes `boil:"avatar" json:"avatar,omitempty" toml:"avatar" yaml:"avatar,omitempty"`
+	ID             string     `boil:"id" json:"id" toml:"id" yaml:"id"`
+	Email          string     `boil:"email" json:"email" toml:"email" yaml:"email"`
+	PasswordHash   []byte     `boil:"password_hash" json:"password_hash" toml:"password_hash" yaml:"password_hash"`
+	Username       string     `boil:"username" json:"username" toml:"username" yaml:"username"`
+	Mobile         string     `boil:"mobile" json:"mobile" toml:"mobile" yaml:"mobile"`
+	VerifyToken    string     `boil:"verify_token" json:"verify_token" toml:"verify_token" yaml:"verify_token"`
+	ResetPassToken string     `boil:"reset_pass_token" json:"reset_pass_token" toml:"reset_pass_token" yaml:"reset_pass_token"`
+	Verified       bool       `boil:"verified" json:"verified" toml:"verified" yaml:"verified"`
+	Avatar         null.Bytes `boil:"avatar" json:"avatar,omitempty" toml:"avatar" yaml:"avatar,omitempty"`
 
 	R *userR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L userL  `boil:"-" json:"-" toml:"-" yaml:"-"`
 }
 
 var UserColumns = struct {
-	ID           string
-	Email        string
-	PasswordHash string
-	Username     string
-	Avatar       string
+	ID             string
+	Email          string
+	PasswordHash   string
+	Username       string
+	Mobile         string
+	VerifyToken    string
+	ResetPassToken string
+	Verified       string
+	Avatar         string
 }{
-	ID:           "id",
-	Email:        "email",
-	PasswordHash: "password_hash",
-	Username:     "username",
-	Avatar:       "avatar",
+	ID:             "id",
+	Email:          "email",
+	PasswordHash:   "password_hash",
+	Username:       "username",
+	Mobile:         "mobile",
+	VerifyToken:    "verify_token",
+	ResetPassToken: "reset_pass_token",
+	Verified:       "verified",
+	Avatar:         "avatar",
 }
 
 // Generated where
 
-type whereHelper__byte struct{ field string }
-
-func (w whereHelper__byte) EQ(x []byte) qm.QueryMod  { return qmhelper.Where(w.field, qmhelper.EQ, x) }
-func (w whereHelper__byte) NEQ(x []byte) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.NEQ, x) }
-func (w whereHelper__byte) LT(x []byte) qm.QueryMod  { return qmhelper.Where(w.field, qmhelper.LT, x) }
-func (w whereHelper__byte) LTE(x []byte) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.LTE, x) }
-func (w whereHelper__byte) GT(x []byte) qm.QueryMod  { return qmhelper.Where(w.field, qmhelper.GT, x) }
-func (w whereHelper__byte) GTE(x []byte) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.GTE, x) }
-
 var UserWhere = struct {
-	ID           whereHelperstring
-	Email        whereHelperstring
-	PasswordHash whereHelper__byte
-	Username     whereHelperstring
-	Avatar       whereHelpernull_Bytes
+	ID             whereHelperstring
+	Email          whereHelperstring
+	PasswordHash   whereHelper__byte
+	Username       whereHelperstring
+	Mobile         whereHelperstring
+	VerifyToken    whereHelperstring
+	ResetPassToken whereHelperstring
+	Verified       whereHelperbool
+	Avatar         whereHelpernull_Bytes
 }{
-	ID:           whereHelperstring{field: "\"users\".\"id\""},
-	Email:        whereHelperstring{field: "\"users\".\"email\""},
-	PasswordHash: whereHelper__byte{field: "\"users\".\"password_hash\""},
-	Username:     whereHelperstring{field: "\"users\".\"username\""},
-	Avatar:       whereHelpernull_Bytes{field: "\"users\".\"avatar\""},
+	ID:             whereHelperstring{field: "\"users\".\"id\""},
+	Email:          whereHelperstring{field: "\"users\".\"email\""},
+	PasswordHash:   whereHelper__byte{field: "\"users\".\"password_hash\""},
+	Username:       whereHelperstring{field: "\"users\".\"username\""},
+	Mobile:         whereHelperstring{field: "\"users\".\"mobile\""},
+	VerifyToken:    whereHelperstring{field: "\"users\".\"verify_token\""},
+	ResetPassToken: whereHelperstring{field: "\"users\".\"reset_pass_token\""},
+	Verified:       whereHelperbool{field: "\"users\".\"verified\""},
+	Avatar:         whereHelpernull_Bytes{field: "\"users\".\"avatar\""},
 }
 
 // UserRels is where relationship names are stored.
 var UserRels = struct {
-	ChatMSGS      string
-	HubUsers      string
-	Hubs          string
-	UserFavorites string
+	ChatMSGS          string
+	FollowerFollowers string
+	Followers         string
+	HubUsers          string
+	Hubs              string
+	UserFavorites     string
+	UserGifs          string
 }{
-	ChatMSGS:      "ChatMSGS",
-	HubUsers:      "HubUsers",
-	Hubs:          "Hubs",
-	UserFavorites: "UserFavorites",
+	ChatMSGS:          "ChatMSGS",
+	FollowerFollowers: "FollowerFollowers",
+	Followers:         "Followers",
+	HubUsers:          "HubUsers",
+	Hubs:              "Hubs",
+	UserFavorites:     "UserFavorites",
+	UserGifs:          "UserGifs",
 }
 
 // userR is where relationships are stored.
 type userR struct {
-	ChatMSGS      ChatMSGSlice
-	HubUsers      HubUserSlice
-	Hubs          HubSlice
-	UserFavorites UserFavoriteSlice
+	ChatMSGS          ChatMSGSlice
+	FollowerFollowers FollowerSlice
+	Followers         FollowerSlice
+	HubUsers          HubUserSlice
+	Hubs              HubSlice
+	UserFavorites     UserFavoriteSlice
+	UserGifs          UserGifSlice
 }
 
 // NewStruct creates a new relationship struct
@@ -103,8 +123,8 @@ func (*userR) NewStruct() *userR {
 type userL struct{}
 
 var (
-	userAllColumns            = []string{"id", "email", "password_hash", "username", "avatar"}
-	userColumnsWithoutDefault = []string{"id", "email", "password_hash", "username", "avatar"}
+	userAllColumns            = []string{"id", "email", "password_hash", "username", "mobile", "verify_token", "reset_pass_token", "verified", "avatar"}
+	userColumnsWithoutDefault = []string{"id", "email", "password_hash", "username", "mobile", "verify_token", "reset_pass_token", "verified", "avatar"}
 	userColumnsWithDefault    = []string{}
 	userPrimaryKeyColumns     = []string{"id"}
 )
@@ -405,6 +425,48 @@ func (o *User) ChatMSGS(mods ...qm.QueryMod) chatMSGQuery {
 	return query
 }
 
+// FollowerFollowers retrieves all the follower's Followers with an executor via follower_id column.
+func (o *User) FollowerFollowers(mods ...qm.QueryMod) followerQuery {
+	var queryMods []qm.QueryMod
+	if len(mods) != 0 {
+		queryMods = append(queryMods, mods...)
+	}
+
+	queryMods = append(queryMods,
+		qm.Where("\"followers\".\"follower_id\"=?", o.ID),
+	)
+
+	query := Followers(queryMods...)
+	queries.SetFrom(query.Query, "\"followers\"")
+
+	if len(queries.GetSelect(query.Query)) == 0 {
+		queries.SetSelect(query.Query, []string{"\"followers\".*"})
+	}
+
+	return query
+}
+
+// Followers retrieves all the follower's Followers with an executor.
+func (o *User) Followers(mods ...qm.QueryMod) followerQuery {
+	var queryMods []qm.QueryMod
+	if len(mods) != 0 {
+		queryMods = append(queryMods, mods...)
+	}
+
+	queryMods = append(queryMods,
+		qm.Where("\"followers\".\"user_id\"=?", o.ID),
+	)
+
+	query := Followers(queryMods...)
+	queries.SetFrom(query.Query, "\"followers\"")
+
+	if len(queries.GetSelect(query.Query)) == 0 {
+		queries.SetSelect(query.Query, []string{"\"followers\".*"})
+	}
+
+	return query
+}
+
 // HubUsers retrieves all the hub_user's HubUsers with an executor.
 func (o *User) HubUsers(mods ...qm.QueryMod) hubUserQuery {
 	var queryMods []qm.QueryMod
@@ -463,6 +525,27 @@ func (o *User) UserFavorites(mods ...qm.QueryMod) userFavoriteQuery {
 
 	if len(queries.GetSelect(query.Query)) == 0 {
 		queries.SetSelect(query.Query, []string{"\"user_favorite\".*"})
+	}
+
+	return query
+}
+
+// UserGifs retrieves all the user_gif's UserGifs with an executor.
+func (o *User) UserGifs(mods ...qm.QueryMod) userGifQuery {
+	var queryMods []qm.QueryMod
+	if len(mods) != 0 {
+		queryMods = append(queryMods, mods...)
+	}
+
+	queryMods = append(queryMods,
+		qm.Where("\"user_gif\".\"user_id\"=?", o.ID),
+	)
+
+	query := UserGifs(queryMods...)
+	queries.SetFrom(query.Query, "\"user_gif\"")
+
+	if len(queries.GetSelect(query.Query)) == 0 {
+		queries.SetSelect(query.Query, []string{"\"user_gif\".*"})
 	}
 
 	return query
@@ -553,6 +636,196 @@ func (userL) LoadChatMSGS(ctx context.Context, e boil.ContextExecutor, singular 
 				local.R.ChatMSGS = append(local.R.ChatMSGS, foreign)
 				if foreign.R == nil {
 					foreign.R = &chatMSGR{}
+				}
+				foreign.R.User = local
+				break
+			}
+		}
+	}
+
+	return nil
+}
+
+// LoadFollowerFollowers allows an eager lookup of values, cached into the
+// loaded structs of the objects. This is for a 1-M or N-M relationship.
+func (userL) LoadFollowerFollowers(ctx context.Context, e boil.ContextExecutor, singular bool, maybeUser interface{}, mods queries.Applicator) error {
+	var slice []*User
+	var object *User
+
+	if singular {
+		object = maybeUser.(*User)
+	} else {
+		slice = *maybeUser.(*[]*User)
+	}
+
+	args := make([]interface{}, 0, 1)
+	if singular {
+		if object.R == nil {
+			object.R = &userR{}
+		}
+		args = append(args, object.ID)
+	} else {
+	Outer:
+		for _, obj := range slice {
+			if obj.R == nil {
+				obj.R = &userR{}
+			}
+
+			for _, a := range args {
+				if a == obj.ID {
+					continue Outer
+				}
+			}
+
+			args = append(args, obj.ID)
+		}
+	}
+
+	if len(args) == 0 {
+		return nil
+	}
+
+	query := NewQuery(qm.From(`followers`), qm.WhereIn(`followers.follower_id in ?`, args...))
+	if mods != nil {
+		mods.Apply(query)
+	}
+
+	results, err := query.QueryContext(ctx, e)
+	if err != nil {
+		return errors.Wrap(err, "failed to eager load followers")
+	}
+
+	var resultSlice []*Follower
+	if err = queries.Bind(results, &resultSlice); err != nil {
+		return errors.Wrap(err, "failed to bind eager loaded slice followers")
+	}
+
+	if err = results.Close(); err != nil {
+		return errors.Wrap(err, "failed to close results in eager load on followers")
+	}
+	if err = results.Err(); err != nil {
+		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for followers")
+	}
+
+	if len(followerAfterSelectHooks) != 0 {
+		for _, obj := range resultSlice {
+			if err := obj.doAfterSelectHooks(ctx, e); err != nil {
+				return err
+			}
+		}
+	}
+	if singular {
+		object.R.FollowerFollowers = resultSlice
+		for _, foreign := range resultSlice {
+			if foreign.R == nil {
+				foreign.R = &followerR{}
+			}
+			foreign.R.Follower = object
+		}
+		return nil
+	}
+
+	for _, foreign := range resultSlice {
+		for _, local := range slice {
+			if local.ID == foreign.FollowerID {
+				local.R.FollowerFollowers = append(local.R.FollowerFollowers, foreign)
+				if foreign.R == nil {
+					foreign.R = &followerR{}
+				}
+				foreign.R.Follower = local
+				break
+			}
+		}
+	}
+
+	return nil
+}
+
+// LoadFollowers allows an eager lookup of values, cached into the
+// loaded structs of the objects. This is for a 1-M or N-M relationship.
+func (userL) LoadFollowers(ctx context.Context, e boil.ContextExecutor, singular bool, maybeUser interface{}, mods queries.Applicator) error {
+	var slice []*User
+	var object *User
+
+	if singular {
+		object = maybeUser.(*User)
+	} else {
+		slice = *maybeUser.(*[]*User)
+	}
+
+	args := make([]interface{}, 0, 1)
+	if singular {
+		if object.R == nil {
+			object.R = &userR{}
+		}
+		args = append(args, object.ID)
+	} else {
+	Outer:
+		for _, obj := range slice {
+			if obj.R == nil {
+				obj.R = &userR{}
+			}
+
+			for _, a := range args {
+				if a == obj.ID {
+					continue Outer
+				}
+			}
+
+			args = append(args, obj.ID)
+		}
+	}
+
+	if len(args) == 0 {
+		return nil
+	}
+
+	query := NewQuery(qm.From(`followers`), qm.WhereIn(`followers.user_id in ?`, args...))
+	if mods != nil {
+		mods.Apply(query)
+	}
+
+	results, err := query.QueryContext(ctx, e)
+	if err != nil {
+		return errors.Wrap(err, "failed to eager load followers")
+	}
+
+	var resultSlice []*Follower
+	if err = queries.Bind(results, &resultSlice); err != nil {
+		return errors.Wrap(err, "failed to bind eager loaded slice followers")
+	}
+
+	if err = results.Close(); err != nil {
+		return errors.Wrap(err, "failed to close results in eager load on followers")
+	}
+	if err = results.Err(); err != nil {
+		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for followers")
+	}
+
+	if len(followerAfterSelectHooks) != 0 {
+		for _, obj := range resultSlice {
+			if err := obj.doAfterSelectHooks(ctx, e); err != nil {
+				return err
+			}
+		}
+	}
+	if singular {
+		object.R.Followers = resultSlice
+		for _, foreign := range resultSlice {
+			if foreign.R == nil {
+				foreign.R = &followerR{}
+			}
+			foreign.R.User = object
+		}
+		return nil
+	}
+
+	for _, foreign := range resultSlice {
+		for _, local := range slice {
+			if local.ID == foreign.UserID {
+				local.R.Followers = append(local.R.Followers, foreign)
+				if foreign.R == nil {
+					foreign.R = &followerR{}
 				}
 				foreign.R.User = local
 				break
@@ -848,6 +1121,101 @@ func (userL) LoadUserFavorites(ctx context.Context, e boil.ContextExecutor, sing
 	return nil
 }
 
+// LoadUserGifs allows an eager lookup of values, cached into the
+// loaded structs of the objects. This is for a 1-M or N-M relationship.
+func (userL) LoadUserGifs(ctx context.Context, e boil.ContextExecutor, singular bool, maybeUser interface{}, mods queries.Applicator) error {
+	var slice []*User
+	var object *User
+
+	if singular {
+		object = maybeUser.(*User)
+	} else {
+		slice = *maybeUser.(*[]*User)
+	}
+
+	args := make([]interface{}, 0, 1)
+	if singular {
+		if object.R == nil {
+			object.R = &userR{}
+		}
+		args = append(args, object.ID)
+	} else {
+	Outer:
+		for _, obj := range slice {
+			if obj.R == nil {
+				obj.R = &userR{}
+			}
+
+			for _, a := range args {
+				if a == obj.ID {
+					continue Outer
+				}
+			}
+
+			args = append(args, obj.ID)
+		}
+	}
+
+	if len(args) == 0 {
+		return nil
+	}
+
+	query := NewQuery(qm.From(`user_gif`), qm.WhereIn(`user_gif.user_id in ?`, args...))
+	if mods != nil {
+		mods.Apply(query)
+	}
+
+	results, err := query.QueryContext(ctx, e)
+	if err != nil {
+		return errors.Wrap(err, "failed to eager load user_gif")
+	}
+
+	var resultSlice []*UserGif
+	if err = queries.Bind(results, &resultSlice); err != nil {
+		return errors.Wrap(err, "failed to bind eager loaded slice user_gif")
+	}
+
+	if err = results.Close(); err != nil {
+		return errors.Wrap(err, "failed to close results in eager load on user_gif")
+	}
+	if err = results.Err(); err != nil {
+		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for user_gif")
+	}
+
+	if len(userGifAfterSelectHooks) != 0 {
+		for _, obj := range resultSlice {
+			if err := obj.doAfterSelectHooks(ctx, e); err != nil {
+				return err
+			}
+		}
+	}
+	if singular {
+		object.R.UserGifs = resultSlice
+		for _, foreign := range resultSlice {
+			if foreign.R == nil {
+				foreign.R = &userGifR{}
+			}
+			foreign.R.User = object
+		}
+		return nil
+	}
+
+	for _, foreign := range resultSlice {
+		for _, local := range slice {
+			if local.ID == foreign.UserID {
+				local.R.UserGifs = append(local.R.UserGifs, foreign)
+				if foreign.R == nil {
+					foreign.R = &userGifR{}
+				}
+				foreign.R.User = local
+				break
+			}
+		}
+	}
+
+	return nil
+}
+
 // AddChatMSGS adds the given related objects to the existing relationships
 // of the user, optionally inserting them as new records.
 // Appends related to o.R.ChatMSGS.
@@ -892,6 +1260,112 @@ func (o *User) AddChatMSGS(ctx context.Context, exec boil.ContextExecutor, inser
 	for _, rel := range related {
 		if rel.R == nil {
 			rel.R = &chatMSGR{
+				User: o,
+			}
+		} else {
+			rel.R.User = o
+		}
+	}
+	return nil
+}
+
+// AddFollowerFollowers adds the given related objects to the existing relationships
+// of the user, optionally inserting them as new records.
+// Appends related to o.R.FollowerFollowers.
+// Sets related.R.Follower appropriately.
+func (o *User) AddFollowerFollowers(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*Follower) error {
+	var err error
+	for _, rel := range related {
+		if insert {
+			rel.FollowerID = o.ID
+			if err = rel.Insert(ctx, exec, boil.Infer()); err != nil {
+				return errors.Wrap(err, "failed to insert into foreign table")
+			}
+		} else {
+			updateQuery := fmt.Sprintf(
+				"UPDATE \"followers\" SET %s WHERE %s",
+				strmangle.SetParamNames("\"", "\"", 1, []string{"follower_id"}),
+				strmangle.WhereClause("\"", "\"", 2, followerPrimaryKeyColumns),
+			)
+			values := []interface{}{o.ID, rel.ID}
+
+			if boil.IsDebug(ctx) {
+				writer := boil.DebugWriterFrom(ctx)
+				fmt.Fprintln(writer, updateQuery)
+				fmt.Fprintln(writer, values)
+			}
+			if _, err = exec.ExecContext(ctx, updateQuery, values...); err != nil {
+				return errors.Wrap(err, "failed to update foreign table")
+			}
+
+			rel.FollowerID = o.ID
+		}
+	}
+
+	if o.R == nil {
+		o.R = &userR{
+			FollowerFollowers: related,
+		}
+	} else {
+		o.R.FollowerFollowers = append(o.R.FollowerFollowers, related...)
+	}
+
+	for _, rel := range related {
+		if rel.R == nil {
+			rel.R = &followerR{
+				Follower: o,
+			}
+		} else {
+			rel.R.Follower = o
+		}
+	}
+	return nil
+}
+
+// AddFollowers adds the given related objects to the existing relationships
+// of the user, optionally inserting them as new records.
+// Appends related to o.R.Followers.
+// Sets related.R.User appropriately.
+func (o *User) AddFollowers(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*Follower) error {
+	var err error
+	for _, rel := range related {
+		if insert {
+			rel.UserID = o.ID
+			if err = rel.Insert(ctx, exec, boil.Infer()); err != nil {
+				return errors.Wrap(err, "failed to insert into foreign table")
+			}
+		} else {
+			updateQuery := fmt.Sprintf(
+				"UPDATE \"followers\" SET %s WHERE %s",
+				strmangle.SetParamNames("\"", "\"", 1, []string{"user_id"}),
+				strmangle.WhereClause("\"", "\"", 2, followerPrimaryKeyColumns),
+			)
+			values := []interface{}{o.ID, rel.ID}
+
+			if boil.IsDebug(ctx) {
+				writer := boil.DebugWriterFrom(ctx)
+				fmt.Fprintln(writer, updateQuery)
+				fmt.Fprintln(writer, values)
+			}
+			if _, err = exec.ExecContext(ctx, updateQuery, values...); err != nil {
+				return errors.Wrap(err, "failed to update foreign table")
+			}
+
+			rel.UserID = o.ID
+		}
+	}
+
+	if o.R == nil {
+		o.R = &userR{
+			Followers: related,
+		}
+	} else {
+		o.R.Followers = append(o.R.Followers, related...)
+	}
+
+	for _, rel := range related {
+		if rel.R == nil {
+			rel.R = &followerR{
 				User: o,
 			}
 		} else {
@@ -1051,6 +1525,59 @@ func (o *User) AddUserFavorites(ctx context.Context, exec boil.ContextExecutor, 
 	for _, rel := range related {
 		if rel.R == nil {
 			rel.R = &userFavoriteR{
+				User: o,
+			}
+		} else {
+			rel.R.User = o
+		}
+	}
+	return nil
+}
+
+// AddUserGifs adds the given related objects to the existing relationships
+// of the user, optionally inserting them as new records.
+// Appends related to o.R.UserGifs.
+// Sets related.R.User appropriately.
+func (o *User) AddUserGifs(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*UserGif) error {
+	var err error
+	for _, rel := range related {
+		if insert {
+			rel.UserID = o.ID
+			if err = rel.Insert(ctx, exec, boil.Infer()); err != nil {
+				return errors.Wrap(err, "failed to insert into foreign table")
+			}
+		} else {
+			updateQuery := fmt.Sprintf(
+				"UPDATE \"user_gif\" SET %s WHERE %s",
+				strmangle.SetParamNames("\"", "\"", 1, []string{"user_id"}),
+				strmangle.WhereClause("\"", "\"", 2, userGifPrimaryKeyColumns),
+			)
+			values := []interface{}{o.ID, rel.ID}
+
+			if boil.IsDebug(ctx) {
+				writer := boil.DebugWriterFrom(ctx)
+				fmt.Fprintln(writer, updateQuery)
+				fmt.Fprintln(writer, values)
+			}
+			if _, err = exec.ExecContext(ctx, updateQuery, values...); err != nil {
+				return errors.Wrap(err, "failed to update foreign table")
+			}
+
+			rel.UserID = o.ID
+		}
+	}
+
+	if o.R == nil {
+		o.R = &userR{
+			UserGifs: related,
+		}
+	} else {
+		o.R.UserGifs = append(o.R.UserGifs, related...)
+	}
+
+	for _, rel := range related {
+		if rel.R == nil {
+			rel.R = &userGifR{
 				User: o,
 			}
 		} else {
