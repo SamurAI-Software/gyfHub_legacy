@@ -58,14 +58,13 @@ func main() {
 
 	defer conn.Close()
 
-
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = defaultPort
 	}
 
 	http.Handle("/", handler.Playground("GraphQL playground", "/query"))
-	http.Handle("/query", handler.GraphQL(grapql.NewExecutableSchema(grapql.Config{Resolvers: &grapql.Resolver{}})))
+	http.Handle("/query", handler.GraphQL(grapql.NewExecutableSchema(grapql.New(conn))))
 
 	log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
 	err = http.ListenAndServe(*ServerPort, nil)

@@ -3,9 +3,34 @@ package grapql
 import (
 	"context"
 	"time"
+
+	"github.com/99designs/gqlgen/graphql"
+	"github.com/jmoiron/sqlx"
 ) // THIS CODE IS A STARTING POINT ONLY. IT WILL NOT BE UPDATED WITH SCHEMA CHANGES.
 
-type Resolver struct{}
+type Resolver struct {
+	DB *sqlx.DB
+}
+
+func New(db *sqlx.DB) Config {
+	return Config{
+		Resolvers: &Resolver{
+			DB: db,
+		},
+		Directives: DirectiveRoot{
+			User: func(ctx context.Context, obj interface{}, next graphql.Resolver, userID string) (res interface{}, err error) {
+				return next(context.WithValue(ctx, "userID", userID))
+			},
+		},
+	}
+}
+
+func getUserID(ctx context.Context) string {
+	if userID, ok := ctx.Value("userID").(string); ok {
+		return userID
+	}
+	return ""
+}
 
 func (r *Resolver) Follower() FollowerResolver {
 	return &followerResolver{r}
