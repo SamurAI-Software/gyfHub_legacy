@@ -3,6 +3,14 @@ type SuccessMsg {
   errmsg: String!
 }
 
+type User {
+  id: ID!
+  email: String!
+  mobile: String!
+  avatar: String!
+  username: String!
+}
+
 type Gif {
   id: ID!
   gif: String!
@@ -12,11 +20,11 @@ type Hub {
   id: ID!
   name: String!
   logo: String!
-  owner: String!
   hubers: Int!
   status: Boolean!
   close: Boolean!
   latestActive: Time!
+  user: User!
 }
 
 type Message {
@@ -24,18 +32,18 @@ type Message {
   gifID: String!
   gif: String!
   create_at: Time!
-  userID: String!
-  userName: String!
-  userAvatar: String!
+  user: User!
 }
 
 type Follower {
   id: ID!
-  email: String!
-  mobile: String!
-  avatar: String!
-  username: String!
+  user: User!
   isfollowing: Boolean!
+}
+
+type Category {
+  id: ID!
+  name: String!
 }
 
 type Profile {
@@ -43,7 +51,7 @@ type Profile {
   mobile: String!
   username: String!
   avatar: String!
-  categories: [String!]
+  categories: [Category!]
 }
 
 type Query {
@@ -85,3 +93,5 @@ type Subscription {
 }
 
 scalar Time
+
+directive @user(userID: String!) on SUBSCRIPTION
