@@ -18,6 +18,8 @@ func TestUpsert(t *testing.T) {
 
 	t.Run("SchemaMigrations", testSchemaMigrationsUpsert)
 
+	t.Run("UserCategories", testUserCategoriesUpsert)
+
 	t.Run("UserFavorites", testUserFavoritesUpsert)
 
 	t.Run("UserGifs", testUserGifsUpsert)
