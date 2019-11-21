@@ -40,7 +40,6 @@ type ResolverRoot interface {
 	Hub() HubResolver
 	Message() MessageResolver
 	Mutation() MutationResolver
-	Profile() ProfileResolver
 	Query() QueryResolver
 	Subscription() SubscriptionResolver
 }
@@ -50,14 +49,8 @@ type DirectiveRoot struct {
 }
 
 type ComplexityRoot struct {
-	Category struct {
-		ID   func(childComplexity int) int
-		Name func(childComplexity int) int
-	}
-
 	Follower struct {
-		ID          func(childComplexity int) int
-		IsFollowing func(childComplexity int) int
+		Isfollowing func(childComplexity int) int
 		User        func(childComplexity int) int
 	}
 
@@ -92,12 +85,12 @@ type ComplexityRoot struct {
 		ChangeLogo       func(childComplexity int, uid string, logo string) int
 		ChangePass       func(childComplexity int, uid string, oldPass string, newPass string) int
 		CreateHub        func(childComplexity int, uid string, hubName string, status bool) int
-		FavoriteGif      func(childComplexity int, uid string, gifID string, category string) int
+		FavoriteGif      func(childComplexity int, uid string, gifData string, category string) int
 		MoveGif          func(childComplexity int, uid string, currCat string, distCat string, gifID []string) int
 		RmCustGif        func(childComplexity int, uid string, gifID string) int
 		RmFavoriteGif    func(childComplexity int, uid string, gifID string) int
 		ToggleClosingHub func(childComplexity int, uid string, hubID string) int
-		ToggleFollower   func(childComplexity int, uid string, followerID string) int
+		ToggleFollower   func(childComplexity int, uid string, followerName string) int
 		ToggleHubStatus  func(childComplexity int, uid string, hubID string) int
 	}
 
@@ -126,15 +119,9 @@ type ComplexityRoot struct {
 		ChatGifAdded func(childComplexity int, hubID string) int
 	}
 
-	SuccessMsg struct {
-		Errmsg  func(childComplexity int) int
-		Success func(childComplexity int) int
-	}
-
 	User struct {
 		Avatar   func(childComplexity int) int
 		Email    func(childComplexity int) int
-		ID       func(childComplexity int) int
 		Mobile   func(childComplexity int) int
 		Username func(childComplexity int) int
 	}
@@ -151,21 +138,18 @@ type MessageResolver interface {
 }
 type MutationResolver interface {
 	MoveGif(ctx context.Context, uid string, currCat string, distCat string, gifID []string) ([]*Gif, error)
-	ToggleFollower(ctx context.Context, uid string, followerID string) ([]*Follower, error)
-	ChangeAvatar(ctx context.Context, uid string, avatar string) (*Gif, error)
-	ChangePass(ctx context.Context, uid string, oldPass string, newPass string) (*SuccessMsg, error)
+	ToggleFollower(ctx context.Context, uid string, followerName string) ([]*Follower, error)
+	ChangeAvatar(ctx context.Context, uid string, avatar string) (bool, error)
+	ChangePass(ctx context.Context, uid string, oldPass string, newPass string) (bool, error)
 	AddGif(ctx context.Context, uid string, gifData string) ([]*Gif, error)
 	RmCustGif(ctx context.Context, uid string, gifID string) ([]*Gif, error)
 	RmFavoriteGif(ctx context.Context, uid string, gifID string) ([]*Gif, error)
-	FavoriteGif(ctx context.Context, uid string, gifID string, category string) (*SuccessMsg, error)
+	FavoriteGif(ctx context.Context, uid string, gifData string, category string) ([]*Gif, error)
 	CreateHub(ctx context.Context, uid string, hubName string, status bool) ([]*Hub, error)
-	ChangeLogo(ctx context.Context, uid string, logo string) (*SuccessMsg, error)
-	ToggleClosingHub(ctx context.Context, uid string, hubID string) (*SuccessMsg, error)
-	ToggleHubStatus(ctx context.Context, uid string, hubID string) (*SuccessMsg, error)
+	ChangeLogo(ctx context.Context, uid string, logo string) (bool, error)
+	ToggleClosingHub(ctx context.Context, uid string, hubID string) (bool, error)
+	ToggleHubStatus(ctx context.Context, uid string, hubID string) (bool, error)
 	AddChatGif(ctx context.Context, uid string, gifData string, hubID string) (*Message, error)
-}
-type ProfileResolver interface {
-	Categories(ctx context.Context, obj *Profile) ([]*Category, error)
 }
 type QueryResolver interface {
 	GetUserProfile(ctx context.Context, uid string) (*Profile, error)
@@ -198,33 +182,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 	_ = ec
 	switch typeName + "." + field {
 
-	case "Category.id":
-		if e.complexity.Category.ID == nil {
-			break
-		}
-
-		return e.complexity.Category.ID(childComplexity), true
-
-	case "Category.name":
-		if e.complexity.Category.Name == nil {
-			break
-		}
-
-		return e.complexity.Category.Name(childComplexity), true
-
-	case "Follower.id":
-		if e.complexity.Follower.ID == nil {
-			break
-		}
-
-		return e.complexity.Follower.ID(childComplexity), true
-
 	case "Follower.isfollowing":
-		if e.complexity.Follower.IsFollowing == nil {
+		if e.complexity.Follower.Isfollowing == nil {
 			break
 		}
 
-		return e.complexity.Follower.IsFollowing(childComplexity), true
+		return e.complexity.Follower.Isfollowing(childComplexity), true
 
 	case "Follower.user":
 		if e.complexity.Follower.User == nil {
@@ -348,7 +311,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.AddChatGif(childComplexity, args["uid"].(string), args["gif_data"].(string), args["hubID"].(string)), true
+		return e.complexity.Mutation.AddChatGif(childComplexity, args["uid"].(string), args["gifData"].(string), args["hubID"].(string)), true
 
 	case "Mutation.addGif":
 		if e.complexity.Mutation.AddGif == nil {
@@ -420,7 +383,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.FavoriteGif(childComplexity, args["uid"].(string), args["gifID"].(string), args["category"].(string)), true
+		return e.complexity.Mutation.FavoriteGif(childComplexity, args["uid"].(string), args["gifData"].(string), args["category"].(string)), true
 
 	case "Mutation.moveGif":
 		if e.complexity.Mutation.MoveGif == nil {
@@ -480,7 +443,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.ToggleFollower(childComplexity, args["uid"].(string), args["followerID"].(string)), true
+		return e.complexity.Mutation.ToggleFollower(childComplexity, args["uid"].(string), args["followerName"].(string)), true
 
 	case "Mutation.toggleHubStatus":
 		if e.complexity.Mutation.ToggleHubStatus == nil {
@@ -661,20 +624,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Subscription.ChatGifAdded(childComplexity, args["hubID"].(string)), true
 
-	case "SuccessMsg.errmsg":
-		if e.complexity.SuccessMsg.Errmsg == nil {
-			break
-		}
-
-		return e.complexity.SuccessMsg.Errmsg(childComplexity), true
-
-	case "SuccessMsg.success":
-		if e.complexity.SuccessMsg.Success == nil {
-			break
-		}
-
-		return e.complexity.SuccessMsg.Success(childComplexity), true
-
 	case "User.avatar":
 		if e.complexity.User.Avatar == nil {
 			break
@@ -688,13 +637,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.User.Email(childComplexity), true
-
-	case "User.id":
-		if e.complexity.User.ID == nil {
-			break
-		}
-
-		return e.complexity.User.ID(childComplexity), true
 
 	case "User.mobile":
 		if e.complexity.User.Mobile == nil {
@@ -803,13 +745,7 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 }
 
 var parsedSchema = gqlparser.MustLoadSchema(
-	&ast.Source{Name: "schema.graphql", Input: `type SuccessMsg {
-  success: Boolean!
-  errmsg: String!
-}
-
-type User {
-  id: ID!
+	&ast.Source{Name: "schema.graphql", Input: `type User {
   email: String!
   mobile: String!
   avatar: String!
@@ -841,14 +777,8 @@ type Message {
 }
 
 type Follower {
-  id: ID!
   user: User!
   isfollowing: Boolean!
-}
-
-type Category {
-  id: ID!
-  name: String!
 }
 
 type Profile {
@@ -856,7 +786,7 @@ type Profile {
   mobile: String!
   username: String!
   avatar: String!
-  categories: [Category!]
+  categories: [String!]
 }
 
 type Query {
@@ -879,18 +809,18 @@ type Mutation {
     distCat: String!
     gifID: [String!]!
   ): [Gif!]
-  toggleFollower(uid: String!, followerID: String!): [Follower!]
-  changeAvatar(uid: String!, avatar: String!): Gif!
-  changePass(uid: String!, oldPass: String!, newPass: String!): SuccessMsg!
+  toggleFollower(uid: String!, followerName: String!): [Follower!]
+  changeAvatar(uid: String!, avatar: String!): Boolean!
+  changePass(uid: String!, oldPass: String!, newPass: String!): Boolean!
   addGif(uid: String!, gifData: String!): [Gif!]!
   rmCustGif(uid: String!, gifID: String!): [Gif!]
   rmFavoriteGif(uid: String!, gifID: String!): [Gif!]
-  favoriteGif(uid: String!, gifID: String!, category: String!): SuccessMsg!
+  favoriteGif(uid: String!, gifData: String!, category: String!): [Gif!]!
   createHub(uid: String!, hubName: String!, status: Boolean!): [Hub!]!
-  changeLogo(uid: String!, logo: String!): SuccessMsg!
-  toggleClosingHub(uid: String!, hubID: String!): SuccessMsg!
-  toggleHubStatus(uid: String!, hubID: String!): SuccessMsg!
-  addChatGif(uid: String!, gif_data: String!, hubID: String!): Message!
+  changeLogo(uid: String!, logo: String!): Boolean!
+  toggleClosingHub(uid: String!, hubID: String!): Boolean!
+  toggleHubStatus(uid: String!, hubID: String!): Boolean!
+  addChatGif(uid: String!, gifData: String!, hubID: String!): Message!
 }
 
 type Subscription {
@@ -933,13 +863,13 @@ func (ec *executionContext) field_Mutation_addChatGif_args(ctx context.Context, 
 	}
 	args["uid"] = arg0
 	var arg1 string
-	if tmp, ok := rawArgs["gif_data"]; ok {
+	if tmp, ok := rawArgs["gifData"]; ok {
 		arg1, err = ec.unmarshalNString2string(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["gif_data"] = arg1
+	args["gifData"] = arg1
 	var arg2 string
 	if tmp, ok := rawArgs["hubID"]; ok {
 		arg2, err = ec.unmarshalNString2string(ctx, tmp)
@@ -1089,13 +1019,13 @@ func (ec *executionContext) field_Mutation_favoriteGif_args(ctx context.Context,
 	}
 	args["uid"] = arg0
 	var arg1 string
-	if tmp, ok := rawArgs["gifID"]; ok {
+	if tmp, ok := rawArgs["gifData"]; ok {
 		arg1, err = ec.unmarshalNString2string(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["gifID"] = arg1
+	args["gifData"] = arg1
 	var arg2 string
 	if tmp, ok := rawArgs["category"]; ok {
 		arg2, err = ec.unmarshalNString2string(ctx, tmp)
@@ -1223,13 +1153,13 @@ func (ec *executionContext) field_Mutation_toggleFollower_args(ctx context.Conte
 	}
 	args["uid"] = arg0
 	var arg1 string
-	if tmp, ok := rawArgs["followerID"]; ok {
+	if tmp, ok := rawArgs["followerName"]; ok {
 		arg1, err = ec.unmarshalNString2string(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["followerID"] = arg1
+	args["followerName"] = arg1
 	return args, nil
 }
 
@@ -1512,117 +1442,6 @@ func (ec *executionContext) _subscriptionMiddleware(ctx context.Context, obj *as
 
 // region    **************************** field.gotpl *****************************
 
-func (ec *executionContext) _Category_id(ctx context.Context, field graphql.CollectedField, obj *Category) (ret graphql.Marshaler) {
-	ctx = ec.Tracer.StartFieldExecution(ctx, field)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-		ec.Tracer.EndFieldExecution(ctx)
-	}()
-	rctx := &graphql.ResolverContext{
-		Object:   "Category",
-		Field:    field,
-		Args:     nil,
-		IsMethod: false,
-	}
-	ctx = graphql.WithResolverContext(ctx, rctx)
-	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.ID, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !ec.HasError(rctx) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	rctx.Result = res
-	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalNID2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Category_name(ctx context.Context, field graphql.CollectedField, obj *Category) (ret graphql.Marshaler) {
-	ctx = ec.Tracer.StartFieldExecution(ctx, field)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-		ec.Tracer.EndFieldExecution(ctx)
-	}()
-	rctx := &graphql.ResolverContext{
-		Object:   "Category",
-		Field:    field,
-		Args:     nil,
-		IsMethod: false,
-	}
-	ctx = graphql.WithResolverContext(ctx, rctx)
-	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Name, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !ec.HasError(rctx) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	rctx.Result = res
-	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Follower_id(ctx context.Context, field graphql.CollectedField, obj *Follower) (ret graphql.Marshaler) {
-	ctx = ec.Tracer.StartFieldExecution(ctx, field)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-		ec.Tracer.EndFieldExecution(ctx)
-	}()
-	rctx := &graphql.ResolverContext{
-		Object:   "Follower",
-		Field:    field,
-		Args:     nil,
-		IsMethod: false,
-	}
-	ctx = graphql.WithResolverContext(ctx, rctx)
-	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.ID, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !ec.HasError(rctx) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	rctx.Result = res
-	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalNID2string(ctx, field.Selections, res)
-}
-
 func (ec *executionContext) _Follower_user(ctx context.Context, field graphql.CollectedField, obj *Follower) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
@@ -1679,7 +1498,7 @@ func (ec *executionContext) _Follower_isfollowing(ctx context.Context, field gra
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.IsFollowing, nil
+		return obj.Isfollowing, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2319,7 +2138,7 @@ func (ec *executionContext) _Mutation_toggleFollower(ctx context.Context, field 
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().ToggleFollower(rctx, args["uid"].(string), args["followerID"].(string))
+		return ec.resolvers.Mutation().ToggleFollower(rctx, args["uid"].(string), args["followerName"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2372,10 +2191,10 @@ func (ec *executionContext) _Mutation_changeAvatar(ctx context.Context, field gr
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*Gif)
+	res := resTmp.(bool)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalNGif2ᚖgithubᚗcomᚋSamurAIᚑSoftwareᚋgyfHubᚋgrapqlᚐGif(ctx, field.Selections, res)
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_changePass(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2416,10 +2235,10 @@ func (ec *executionContext) _Mutation_changePass(ctx context.Context, field grap
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*SuccessMsg)
+	res := resTmp.(bool)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalNSuccessMsg2ᚖgithubᚗcomᚋSamurAIᚑSoftwareᚋgyfHubᚋgrapqlᚐSuccessMsg(ctx, field.Selections, res)
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_addGif(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2574,7 +2393,7 @@ func (ec *executionContext) _Mutation_favoriteGif(ctx context.Context, field gra
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().FavoriteGif(rctx, args["uid"].(string), args["gifID"].(string), args["category"].(string))
+		return ec.resolvers.Mutation().FavoriteGif(rctx, args["uid"].(string), args["gifData"].(string), args["category"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2586,10 +2405,10 @@ func (ec *executionContext) _Mutation_favoriteGif(ctx context.Context, field gra
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*SuccessMsg)
+	res := resTmp.([]*Gif)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalNSuccessMsg2ᚖgithubᚗcomᚋSamurAIᚑSoftwareᚋgyfHubᚋgrapqlᚐSuccessMsg(ctx, field.Selections, res)
+	return ec.marshalNGif2ᚕᚖgithubᚗcomᚋSamurAIᚑSoftwareᚋgyfHubᚋgrapqlᚐGif(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_createHub(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2674,10 +2493,10 @@ func (ec *executionContext) _Mutation_changeLogo(ctx context.Context, field grap
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*SuccessMsg)
+	res := resTmp.(bool)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalNSuccessMsg2ᚖgithubᚗcomᚋSamurAIᚑSoftwareᚋgyfHubᚋgrapqlᚐSuccessMsg(ctx, field.Selections, res)
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_toggleClosingHub(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2718,10 +2537,10 @@ func (ec *executionContext) _Mutation_toggleClosingHub(ctx context.Context, fiel
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*SuccessMsg)
+	res := resTmp.(bool)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalNSuccessMsg2ᚖgithubᚗcomᚋSamurAIᚑSoftwareᚋgyfHubᚋgrapqlᚐSuccessMsg(ctx, field.Selections, res)
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_toggleHubStatus(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2762,10 +2581,10 @@ func (ec *executionContext) _Mutation_toggleHubStatus(ctx context.Context, field
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*SuccessMsg)
+	res := resTmp.(bool)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalNSuccessMsg2ᚖgithubᚗcomᚋSamurAIᚑSoftwareᚋgyfHubᚋgrapqlᚐSuccessMsg(ctx, field.Selections, res)
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_addChatGif(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2794,7 +2613,7 @@ func (ec *executionContext) _Mutation_addChatGif(ctx context.Context, field grap
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().AddChatGif(rctx, args["uid"].(string), args["gif_data"].(string), args["hubID"].(string))
+		return ec.resolvers.Mutation().AddChatGif(rctx, args["uid"].(string), args["gifData"].(string), args["hubID"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2973,13 +2792,13 @@ func (ec *executionContext) _Profile_categories(ctx context.Context, field graph
 		Object:   "Profile",
 		Field:    field,
 		Args:     nil,
-		IsMethod: true,
+		IsMethod: false,
 	}
 	ctx = graphql.WithResolverContext(ctx, rctx)
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Profile().Categories(rctx, obj)
+		return obj.Categories, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2988,10 +2807,10 @@ func (ec *executionContext) _Profile_categories(ctx context.Context, field graph
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.([]*Category)
+	res := resTmp.([]string)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalOCategory2ᚕᚖgithubᚗcomᚋSamurAIᚑSoftwareᚋgyfHubᚋgrapqlᚐCategory(ctx, field.Selections, res)
+	return ec.marshalOString2ᚕstring(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_getUserProfile(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -3539,117 +3358,6 @@ func (ec *executionContext) _Subscription_chatGifAdded(ctx context.Context, fiel
 			w.Write([]byte{'}'})
 		})
 	}
-}
-
-func (ec *executionContext) _SuccessMsg_success(ctx context.Context, field graphql.CollectedField, obj *SuccessMsg) (ret graphql.Marshaler) {
-	ctx = ec.Tracer.StartFieldExecution(ctx, field)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-		ec.Tracer.EndFieldExecution(ctx)
-	}()
-	rctx := &graphql.ResolverContext{
-		Object:   "SuccessMsg",
-		Field:    field,
-		Args:     nil,
-		IsMethod: false,
-	}
-	ctx = graphql.WithResolverContext(ctx, rctx)
-	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Success, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !ec.HasError(rctx) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(bool)
-	rctx.Result = res
-	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _SuccessMsg_errmsg(ctx context.Context, field graphql.CollectedField, obj *SuccessMsg) (ret graphql.Marshaler) {
-	ctx = ec.Tracer.StartFieldExecution(ctx, field)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-		ec.Tracer.EndFieldExecution(ctx)
-	}()
-	rctx := &graphql.ResolverContext{
-		Object:   "SuccessMsg",
-		Field:    field,
-		Args:     nil,
-		IsMethod: false,
-	}
-	ctx = graphql.WithResolverContext(ctx, rctx)
-	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Errmsg, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !ec.HasError(rctx) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	rctx.Result = res
-	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _User_id(ctx context.Context, field graphql.CollectedField, obj *User) (ret graphql.Marshaler) {
-	ctx = ec.Tracer.StartFieldExecution(ctx, field)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-		ec.Tracer.EndFieldExecution(ctx)
-	}()
-	rctx := &graphql.ResolverContext{
-		Object:   "User",
-		Field:    field,
-		Args:     nil,
-		IsMethod: false,
-	}
-	ctx = graphql.WithResolverContext(ctx, rctx)
-	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.ID, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !ec.HasError(rctx) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	rctx.Result = res
-	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalNID2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _User_email(ctx context.Context, field graphql.CollectedField, obj *User) (ret graphql.Marshaler) {
@@ -4959,38 +4667,6 @@ func (ec *executionContext) ___Type_ofType(ctx context.Context, field graphql.Co
 
 // region    **************************** object.gotpl ****************************
 
-var categoryImplementors = []string{"Category"}
-
-func (ec *executionContext) _Category(ctx context.Context, sel ast.SelectionSet, obj *Category) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.RequestContext, sel, categoryImplementors)
-
-	out := graphql.NewFieldSet(fields)
-	var invalids uint32
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("Category")
-		case "id":
-			out.Values[i] = ec._Category_id(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		case "name":
-			out.Values[i] = ec._Category_name(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch()
-	if invalids > 0 {
-		return graphql.Null
-	}
-	return out
-}
-
 var followerImplementors = []string{"Follower"}
 
 func (ec *executionContext) _Follower(ctx context.Context, sel ast.SelectionSet, obj *Follower) graphql.Marshaler {
@@ -5002,11 +4678,6 @@ func (ec *executionContext) _Follower(ctx context.Context, sel ast.SelectionSet,
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Follower")
-		case "id":
-			out.Values[i] = ec._Follower_id(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
-			}
 		case "user":
 			field := field
 			out.Concurrently(i, func() (res graphql.Marshaler) {
@@ -5289,34 +4960,25 @@ func (ec *executionContext) _Profile(ctx context.Context, sel ast.SelectionSet, 
 		case "email":
 			out.Values[i] = ec._Profile_email(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				invalids++
 			}
 		case "mobile":
 			out.Values[i] = ec._Profile_mobile(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				invalids++
 			}
 		case "username":
 			out.Values[i] = ec._Profile_username(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				invalids++
 			}
 		case "avatar":
 			out.Values[i] = ec._Profile_avatar(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				invalids++
 			}
 		case "categories":
-			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Profile_categories(ctx, field, obj)
-				return res
-			})
+			out.Values[i] = ec._Profile_categories(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -5497,38 +5159,6 @@ func (ec *executionContext) _Subscription(ctx context.Context, sel ast.Selection
 	}
 }
 
-var successMsgImplementors = []string{"SuccessMsg"}
-
-func (ec *executionContext) _SuccessMsg(ctx context.Context, sel ast.SelectionSet, obj *SuccessMsg) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.RequestContext, sel, successMsgImplementors)
-
-	out := graphql.NewFieldSet(fields)
-	var invalids uint32
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("SuccessMsg")
-		case "success":
-			out.Values[i] = ec._SuccessMsg_success(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		case "errmsg":
-			out.Values[i] = ec._SuccessMsg_errmsg(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch()
-	if invalids > 0 {
-		return graphql.Null
-	}
-	return out
-}
-
 var userImplementors = []string{"User"}
 
 func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj *User) graphql.Marshaler {
@@ -5540,11 +5170,6 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("User")
-		case "id":
-			out.Values[i] = ec._User_id(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
 		case "email":
 			out.Values[i] = ec._User_email(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -5835,20 +5460,6 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 	return res
 }
 
-func (ec *executionContext) marshalNCategory2githubᚗcomᚋSamurAIᚑSoftwareᚋgyfHubᚋgrapqlᚐCategory(ctx context.Context, sel ast.SelectionSet, v Category) graphql.Marshaler {
-	return ec._Category(ctx, sel, &v)
-}
-
-func (ec *executionContext) marshalNCategory2ᚖgithubᚗcomᚋSamurAIᚑSoftwareᚋgyfHubᚋgrapqlᚐCategory(ctx context.Context, sel ast.SelectionSet, v *Category) graphql.Marshaler {
-	if v == nil {
-		if !ec.HasError(graphql.GetResolverContext(ctx)) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	return ec._Category(ctx, sel, v)
-}
-
 func (ec *executionContext) marshalNFollower2githubᚗcomᚋSamurAIᚑSoftwareᚋgyfHubᚋgrapqlᚐFollower(ctx context.Context, sel ast.SelectionSet, v Follower) graphql.Marshaler {
 	return ec._Follower(ctx, sel, &v)
 }
@@ -6099,20 +5710,6 @@ func (ec *executionContext) marshalNString2ᚕstring(ctx context.Context, sel as
 	}
 
 	return ret
-}
-
-func (ec *executionContext) marshalNSuccessMsg2githubᚗcomᚋSamurAIᚑSoftwareᚋgyfHubᚋgrapqlᚐSuccessMsg(ctx context.Context, sel ast.SelectionSet, v SuccessMsg) graphql.Marshaler {
-	return ec._SuccessMsg(ctx, sel, &v)
-}
-
-func (ec *executionContext) marshalNSuccessMsg2ᚖgithubᚗcomᚋSamurAIᚑSoftwareᚋgyfHubᚋgrapqlᚐSuccessMsg(ctx context.Context, sel ast.SelectionSet, v *SuccessMsg) graphql.Marshaler {
-	if v == nil {
-		if !ec.HasError(graphql.GetResolverContext(ctx)) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	return ec._SuccessMsg(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNTime2timeᚐTime(ctx context.Context, v interface{}) (time.Time, error) {
@@ -6392,46 +5989,6 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	return ec.marshalOBoolean2bool(ctx, sel, *v)
 }
 
-func (ec *executionContext) marshalOCategory2ᚕᚖgithubᚗcomᚋSamurAIᚑSoftwareᚋgyfHubᚋgrapqlᚐCategory(ctx context.Context, sel ast.SelectionSet, v []*Category) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		rctx := &graphql.ResolverContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithResolverContext(ctx, rctx)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalNCategory2ᚖgithubᚗcomᚋSamurAIᚑSoftwareᚋgyfHubᚋgrapqlᚐCategory(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-	return ret
-}
-
 func (ec *executionContext) marshalOFollower2ᚕᚖgithubᚗcomᚋSamurAIᚑSoftwareᚋgyfHubᚋgrapqlᚐFollower(ctx context.Context, sel ast.SelectionSet, v []*Follower) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
@@ -6598,6 +6155,38 @@ func (ec *executionContext) unmarshalOString2string(ctx context.Context, v inter
 
 func (ec *executionContext) marshalOString2string(ctx context.Context, sel ast.SelectionSet, v string) graphql.Marshaler {
 	return graphql.MarshalString(v)
+}
+
+func (ec *executionContext) unmarshalOString2ᚕstring(ctx context.Context, v interface{}) ([]string, error) {
+	var vSlice []interface{}
+	if v != nil {
+		if tmp1, ok := v.([]interface{}); ok {
+			vSlice = tmp1
+		} else {
+			vSlice = []interface{}{v}
+		}
+	}
+	var err error
+	res := make([]string, len(vSlice))
+	for i := range vSlice {
+		res[i], err = ec.unmarshalNString2string(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalOString2ᚕstring(ctx context.Context, sel ast.SelectionSet, v []string) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	for i := range v {
+		ret[i] = ec.marshalNString2string(ctx, sel, v[i])
+	}
+
+	return ret
 }
 
 func (ec *executionContext) unmarshalOString2ᚖstring(ctx context.Context, v interface{}) (*string, error) {

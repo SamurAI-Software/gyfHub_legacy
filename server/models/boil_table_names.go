@@ -10,6 +10,7 @@ var TableNames = struct {
 	HubUser          string
 	Hubs             string
 	SchemaMigrations string
+	UserCategory     string
 	UserFavorite     string
 	UserGif          string
 	Users            string
@@ -20,6 +21,7 @@ var TableNames = struct {
 	HubUser:          "hub_user",
 	Hubs:             "hubs",
 	SchemaMigrations: "schema_migrations",
+	UserCategory:     "user_category",
 	UserFavorite:     "user_favorite",
 	UserGif:          "user_gif",
 	Users:            "users",

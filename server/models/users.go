@@ -14,7 +14,6 @@ import (
 	"time"
 
 	"github.com/friendsofgo/errors"
-	"github.com/volatiletech/null"
 	"github.com/volatiletech/sqlboiler/boil"
 	"github.com/volatiletech/sqlboiler/queries"
 	"github.com/volatiletech/sqlboiler/queries/qm"
@@ -24,15 +23,15 @@ import (
 
 // User is an object representing the database table.
 type User struct {
-	ID             string     `boil:"id" json:"id" toml:"id" yaml:"id"`
-	Email          string     `boil:"email" json:"email" toml:"email" yaml:"email"`
-	PasswordHash   []byte     `boil:"password_hash" json:"password_hash" toml:"password_hash" yaml:"password_hash"`
-	Username       string     `boil:"username" json:"username" toml:"username" yaml:"username"`
-	Mobile         string     `boil:"mobile" json:"mobile" toml:"mobile" yaml:"mobile"`
-	VerifyToken    string     `boil:"verify_token" json:"verify_token" toml:"verify_token" yaml:"verify_token"`
-	ResetPassToken string     `boil:"reset_pass_token" json:"reset_pass_token" toml:"reset_pass_token" yaml:"reset_pass_token"`
-	Verified       bool       `boil:"verified" json:"verified" toml:"verified" yaml:"verified"`
-	Avatar         null.Bytes `boil:"avatar" json:"avatar,omitempty" toml:"avatar" yaml:"avatar,omitempty"`
+	ID             string `boil:"id" json:"id" toml:"id" yaml:"id"`
+	Email          string `boil:"email" json:"email" toml:"email" yaml:"email"`
+	PasswordHash   []byte `boil:"password_hash" json:"password_hash" toml:"password_hash" yaml:"password_hash"`
+	Username       string `boil:"username" json:"username" toml:"username" yaml:"username"`
+	Mobile         string `boil:"mobile" json:"mobile" toml:"mobile" yaml:"mobile"`
+	VerifyToken    string `boil:"verify_token" json:"verify_token" toml:"verify_token" yaml:"verify_token"`
+	ResetPassToken string `boil:"reset_pass_token" json:"reset_pass_token" toml:"reset_pass_token" yaml:"reset_pass_token"`
+	Verified       bool   `boil:"verified" json:"verified" toml:"verified" yaml:"verified"`
+	Avatar         []byte `boil:"avatar" json:"avatar" toml:"avatar" yaml:"avatar"`
 
 	R *userR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L userL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -71,7 +70,7 @@ var UserWhere = struct {
 	VerifyToken    whereHelperstring
 	ResetPassToken whereHelperstring
 	Verified       whereHelperbool
-	Avatar         whereHelpernull_Bytes
+	Avatar         whereHelper__byte
 }{
 	ID:             whereHelperstring{field: "\"users\".\"id\""},
 	Email:          whereHelperstring{field: "\"users\".\"email\""},
@@ -81,7 +80,7 @@ var UserWhere = struct {
 	VerifyToken:    whereHelperstring{field: "\"users\".\"verify_token\""},
 	ResetPassToken: whereHelperstring{field: "\"users\".\"reset_pass_token\""},
 	Verified:       whereHelperbool{field: "\"users\".\"verified\""},
-	Avatar:         whereHelpernull_Bytes{field: "\"users\".\"avatar\""},
+	Avatar:         whereHelper__byte{field: "\"users\".\"avatar\""},
 }
 
 // UserRels is where relationship names are stored.
@@ -91,6 +90,7 @@ var UserRels = struct {
 	Followers         string
 	HubUsers          string
 	Hubs              string
+	UserCategories    string
 	UserFavorites     string
 	UserGifs          string
 }{
@@ -99,6 +99,7 @@ var UserRels = struct {
 	Followers:         "Followers",
 	HubUsers:          "HubUsers",
 	Hubs:              "Hubs",
+	UserCategories:    "UserCategories",
 	UserFavorites:     "UserFavorites",
 	UserGifs:          "UserGifs",
 }
@@ -110,6 +111,7 @@ type userR struct {
 	Followers         FollowerSlice
 	HubUsers          HubUserSlice
 	Hubs              HubSlice
+	UserCategories    UserCategorySlice
 	UserFavorites     UserFavoriteSlice
 	UserGifs          UserGifSlice
 }
@@ -504,6 +506,27 @@ func (o *User) Hubs(mods ...qm.QueryMod) hubQuery {
 
 	if len(queries.GetSelect(query.Query)) == 0 {
 		queries.SetSelect(query.Query, []string{"\"hubs\".*"})
+	}
+
+	return query
+}
+
+// UserCategories retrieves all the user_category's UserCategories with an executor.
+func (o *User) UserCategories(mods ...qm.QueryMod) userCategoryQuery {
+	var queryMods []qm.QueryMod
+	if len(mods) != 0 {
+		queryMods = append(queryMods, mods...)
+	}
+
+	queryMods = append(queryMods,
+		qm.Where("\"user_category\".\"user_id\"=?", o.ID),
+	)
+
+	query := UserCategories(queryMods...)
+	queries.SetFrom(query.Query, "\"user_category\"")
+
+	if len(queries.GetSelect(query.Query)) == 0 {
+		queries.SetSelect(query.Query, []string{"\"user_category\".*"})
 	}
 
 	return query
@@ -1026,6 +1049,101 @@ func (userL) LoadHubs(ctx context.Context, e boil.ContextExecutor, singular bool
 	return nil
 }
 
+// LoadUserCategories allows an eager lookup of values, cached into the
+// loaded structs of the objects. This is for a 1-M or N-M relationship.
+func (userL) LoadUserCategories(ctx context.Context, e boil.ContextExecutor, singular bool, maybeUser interface{}, mods queries.Applicator) error {
+	var slice []*User
+	var object *User
+
+	if singular {
+		object = maybeUser.(*User)
+	} else {
+		slice = *maybeUser.(*[]*User)
+	}
+
+	args := make([]interface{}, 0, 1)
+	if singular {
+		if object.R == nil {
+			object.R = &userR{}
+		}
+		args = append(args, object.ID)
+	} else {
+	Outer:
+		for _, obj := range slice {
+			if obj.R == nil {
+				obj.R = &userR{}
+			}
+
+			for _, a := range args {
+				if a == obj.ID {
+					continue Outer
+				}
+			}
+
+			args = append(args, obj.ID)
+		}
+	}
+
+	if len(args) == 0 {
+		return nil
+	}
+
+	query := NewQuery(qm.From(`user_category`), qm.WhereIn(`user_category.user_id in ?`, args...))
+	if mods != nil {
+		mods.Apply(query)
+	}
+
+	results, err := query.QueryContext(ctx, e)
+	if err != nil {
+		return errors.Wrap(err, "failed to eager load user_category")
+	}
+
+	var resultSlice []*UserCategory
+	if err = queries.Bind(results, &resultSlice); err != nil {
+		return errors.Wrap(err, "failed to bind eager loaded slice user_category")
+	}
+
+	if err = results.Close(); err != nil {
+		return errors.Wrap(err, "failed to close results in eager load on user_category")
+	}
+	if err = results.Err(); err != nil {
+		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for user_category")
+	}
+
+	if len(userCategoryAfterSelectHooks) != 0 {
+		for _, obj := range resultSlice {
+			if err := obj.doAfterSelectHooks(ctx, e); err != nil {
+				return err
+			}
+		}
+	}
+	if singular {
+		object.R.UserCategories = resultSlice
+		for _, foreign := range resultSlice {
+			if foreign.R == nil {
+				foreign.R = &userCategoryR{}
+			}
+			foreign.R.User = object
+		}
+		return nil
+	}
+
+	for _, foreign := range resultSlice {
+		for _, local := range slice {
+			if local.ID == foreign.UserID {
+				local.R.UserCategories = append(local.R.UserCategories, foreign)
+				if foreign.R == nil {
+					foreign.R = &userCategoryR{}
+				}
+				foreign.R.User = local
+				break
+			}
+		}
+	}
+
+	return nil
+}
+
 // LoadUserFavorites allows an eager lookup of values, cached into the
 // loaded structs of the objects. This is for a 1-M or N-M relationship.
 func (userL) LoadUserFavorites(ctx context.Context, e boil.ContextExecutor, singular bool, maybeUser interface{}, mods queries.Applicator) error {
@@ -1472,6 +1590,59 @@ func (o *User) AddHubs(ctx context.Context, exec boil.ContextExecutor, insert bo
 	for _, rel := range related {
 		if rel.R == nil {
 			rel.R = &hubR{
+				User: o,
+			}
+		} else {
+			rel.R.User = o
+		}
+	}
+	return nil
+}
+
+// AddUserCategories adds the given related objects to the existing relationships
+// of the user, optionally inserting them as new records.
+// Appends related to o.R.UserCategories.
+// Sets related.R.User appropriately.
+func (o *User) AddUserCategories(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*UserCategory) error {
+	var err error
+	for _, rel := range related {
+		if insert {
+			rel.UserID = o.ID
+			if err = rel.Insert(ctx, exec, boil.Infer()); err != nil {
+				return errors.Wrap(err, "failed to insert into foreign table")
+			}
+		} else {
+			updateQuery := fmt.Sprintf(
+				"UPDATE \"user_category\" SET %s WHERE %s",
+				strmangle.SetParamNames("\"", "\"", 1, []string{"user_id"}),
+				strmangle.WhereClause("\"", "\"", 2, userCategoryPrimaryKeyColumns),
+			)
+			values := []interface{}{o.ID, rel.ID}
+
+			if boil.IsDebug(ctx) {
+				writer := boil.DebugWriterFrom(ctx)
+				fmt.Fprintln(writer, updateQuery)
+				fmt.Fprintln(writer, values)
+			}
+			if _, err = exec.ExecContext(ctx, updateQuery, values...); err != nil {
+				return errors.Wrap(err, "failed to update foreign table")
+			}
+
+			rel.UserID = o.ID
+		}
+	}
+
+	if o.R == nil {
+		o.R = &userR{
+			UserCategories: related,
+		}
+	} else {
+		o.R.UserCategories = append(o.R.UserCategories, related...)
+	}
+
+	for _, rel := range related {
+		if rel.R == nil {
+			rel.R = &userCategoryR{
 				User: o,
 			}
 		} else {

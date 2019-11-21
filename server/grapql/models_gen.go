@@ -2,23 +2,20 @@
 
 package grapql
 
-type Category struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
-}
-
 type Gif struct {
 	ID  string `json:"id"`
 	Gif string `json:"gif"`
 }
 
-type SuccessMsg struct {
-	Success bool   `json:"success"`
-	Errmsg  string `json:"errmsg"`
+type Profile struct {
+	Email      string   `json:"email"`
+	Mobile     string   `json:"mobile"`
+	Username   string   `json:"username"`
+	Avatar     string   `json:"avatar"`
+	Categories []string `json:"categories"`
 }
 
 type User struct {
-	ID       string `json:"id"`
 	Email    string `json:"email"`
 	Mobile   string `json:"mobile"`
 	Avatar   string `json:"avatar"`

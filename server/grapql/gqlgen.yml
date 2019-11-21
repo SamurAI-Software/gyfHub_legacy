@@ -15,8 +15,6 @@ resolver:
 autobind: []
 
 models:
-  Profile:
-    model: github.com/SamurAI-Software/gyfHub/grapql.Profile
   Hub:
     model: github.com/SamurAI-Software/gyfHub/grapql.Hub
   Message:

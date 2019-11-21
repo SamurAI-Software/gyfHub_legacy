@@ -1,14 +1,8 @@
 package grapql
 
-import "time"
-
-type Profile struct {
-	Email    string
-	Username string
-	Mobile   string
-	Avatar   string
-	UserID   string
-}
+import (
+	"time"
+)
 
 type Hub struct {
 	ID           string
@@ -18,7 +12,7 @@ type Hub struct {
 	Status       bool
 	Close        bool
 	LatestActive time.Time
-	UserID       string
+	Username     string
 }
 
 type Message struct {
@@ -26,11 +20,10 @@ type Message struct {
 	GifID    string
 	Gif      string
 	CreateAt time.Time
-	UserID   string
+	Username string
 }
 
 type Follower struct {
-	ID          string
-	IsFollowing bool
-	UserID      string
+	Username    string
+	Isfollowing bool
 }
