@@ -17,6 +17,15 @@ CREATE TABLE gifs
     gif_data BYTEA NOT NULL
 );
 
+CREATE TABLE user_category
+(
+    id TEXT PRIMARY KEY NOT NULL,
+    user_id TEXT NOT NULL,
+    category TEXT NOT NULL,
+
+    FOREIGN KEY (user_id) REFERENCES users (id)
+);
+
 CREATE TABLE hubs
 (
     id TEXT PRIMARY KEY NOT NULL,
@@ -53,6 +62,7 @@ CREATE TABLE user_favorite
     id TEXT PRIMARY KEY NOT NULL,
     user_id TEXT NOT NULL,
     gif_id TEXT NOT NULL,
+    category TEXT NOT NULL,
 
     FOREIGN KEY (user_id) REFERENCES users (id),
     FOREIGN KEY (gif_id) REFERENCES gifs (id)
