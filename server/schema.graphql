@@ -1,0 +1,87 @@
+type SuccessMsg {
+  success: Boolean!
+  errmsg: String!
+}
+
+type Gif {
+  id: ID!
+  gif: String!
+}
+
+type Hub {
+  id: ID!
+  name: String!
+  logo: String!
+  owner: String!
+  hubers: Int!
+  status: Boolean!
+  close: Boolean!
+  latestActive: Time!
+}
+
+type Message {
+  id: ID!
+  gifID: String!
+  gif: String!
+  create_at: Time!
+  userID: String!
+  userName: String!
+  userAvatar: String!
+}
+
+type Follower {
+  id: ID!
+  email: String!
+  mobile: String!
+  avatar: String!
+  username: String!
+  isfollowing: Boolean!
+}
+
+type Profile {
+  email: String!
+  mobile: String!
+  username: String!
+  avatar: String!
+  categories: [String!]
+}
+
+type Query {
+  getUserProfile(uid: String!): Profile!
+  getUserCategory(uid: String!, cat: String!): [Gif!]
+  getUserFollower(uid: String!): [Follower!]
+  getFollowerUser(uid: String!): [Follower!]
+  getUserHub(uid: String!): [Hub!]
+  getCustGif(uid: String!): [Gif!]
+  getGlobalHubs(search: String!): [Hub!]
+  getOtherUser(userID: String!): Follower!
+  firstLoadChatHub(hubID: String!): [Message!]
+  loadMoreChat(hubID: String!, createAt: Time!): [Message!]!
+}
+
+type Mutation {
+  moveGif(
+    uid: String!
+    currCat: String!
+    distCat: String!
+    gifID: [String!]!
+  ): [Gif!]
+  toggleFollower(uid: String!, followerID: String!): [Follower!]
+  changeAvatar(uid: String!, avatar: String!): Gif!
+  changePass(uid: String!, oldPass: String!, newPass: String!): SuccessMsg!
+  addGif(uid: String!, gifData: String!): [Gif!]!
+  rmCustGif(uid: String!, gifID: String!): [Gif!]
+  rmFavoriteGif(uid: String!, gifID: String!): [Gif!]
+  favoriteGif(uid: String!, gifID: String!, category: String!): SuccessMsg!
+  createHub(uid: String!, hubName: String!, status: Boolean!): [Hub!]!
+  changeLogo(uid: String!, logo: String!): SuccessMsg!
+  toggleClosingHub(uid: String!, hubID: String!): SuccessMsg!
+  toggleHubStatus(uid: String!, hubID: String!): SuccessMsg!
+  addChatGif(uid: String!, gif_data: String!, hubID: String!): Message!
+}
+
+type Subscription {
+  chatGifAdded(hubID: String!): Message!
+}
+
+scalar Time
