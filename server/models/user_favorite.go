@@ -23,34 +23,39 @@ import (
 
 // UserFavorite is an object representing the database table.
 type UserFavorite struct {
-	ID     string `boil:"id" json:"id" toml:"id" yaml:"id"`
-	UserID string `boil:"user_id" json:"user_id" toml:"user_id" yaml:"user_id"`
-	GifID  string `boil:"gif_id" json:"gif_id" toml:"gif_id" yaml:"gif_id"`
+	ID       string `boil:"id" json:"id" toml:"id" yaml:"id"`
+	UserID   string `boil:"user_id" json:"user_id" toml:"user_id" yaml:"user_id"`
+	GifID    string `boil:"gif_id" json:"gif_id" toml:"gif_id" yaml:"gif_id"`
+	Category string `boil:"category" json:"category" toml:"category" yaml:"category"`
 
 	R *userFavoriteR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L userFavoriteL  `boil:"-" json:"-" toml:"-" yaml:"-"`
 }
 
 var UserFavoriteColumns = struct {
-	ID     string
-	UserID string
-	GifID  string
+	ID       string
+	UserID   string
+	GifID    string
+	Category string
 }{
-	ID:     "id",
-	UserID: "user_id",
-	GifID:  "gif_id",
+	ID:       "id",
+	UserID:   "user_id",
+	GifID:    "gif_id",
+	Category: "category",
 }
 
 // Generated where
 
 var UserFavoriteWhere = struct {
-	ID     whereHelperstring
-	UserID whereHelperstring
-	GifID  whereHelperstring
+	ID       whereHelperstring
+	UserID   whereHelperstring
+	GifID    whereHelperstring
+	Category whereHelperstring
 }{
-	ID:     whereHelperstring{field: "\"user_favorite\".\"id\""},
-	UserID: whereHelperstring{field: "\"user_favorite\".\"user_id\""},
-	GifID:  whereHelperstring{field: "\"user_favorite\".\"gif_id\""},
+	ID:       whereHelperstring{field: "\"user_favorite\".\"id\""},
+	UserID:   whereHelperstring{field: "\"user_favorite\".\"user_id\""},
+	GifID:    whereHelperstring{field: "\"user_favorite\".\"gif_id\""},
+	Category: whereHelperstring{field: "\"user_favorite\".\"category\""},
 }
 
 // UserFavoriteRels is where relationship names are stored.
@@ -77,8 +82,8 @@ func (*userFavoriteR) NewStruct() *userFavoriteR {
 type userFavoriteL struct{}
 
 var (
-	userFavoriteAllColumns            = []string{"id", "user_id", "gif_id"}
-	userFavoriteColumnsWithoutDefault = []string{"id", "user_id", "gif_id"}
+	userFavoriteAllColumns            = []string{"id", "user_id", "gif_id", "category"}
+	userFavoriteColumnsWithoutDefault = []string{"id", "user_id", "gif_id", "category"}
 	userFavoriteColumnsWithDefault    = []string{}
 	userFavoritePrimaryKeyColumns     = []string{"id"}
 )
