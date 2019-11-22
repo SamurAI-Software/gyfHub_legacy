@@ -1,0 +1,23 @@
+# .gqlgen.yml example
+#
+# Refer to https://gqlgen.com/config/
+# for detailed .gqlgen.yml documentation.
+
+schema:
+  - schema.graphql
+exec:
+  filename: generated.go
+model:
+  filename: models_gen.go
+resolver:
+  filename: resolver.go
+  type: Resolver
+autobind: []
+
+models:
+  Hub:
+    model: github.com/SamurAI-Software/gyfHub/grapql.Hub
+  Message:
+    model: github.com/SamurAI-Software/gyfHub/grapql.Message
+  Follower:
+    model: github.com/SamurAI-Software/gyfHub/grapql.Follower

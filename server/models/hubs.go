@@ -14,7 +14,6 @@ import (
 	"time"
 
 	"github.com/friendsofgo/errors"
-	"github.com/volatiletech/null"
 	"github.com/volatiletech/sqlboiler/boil"
 	"github.com/volatiletech/sqlboiler/queries"
 	"github.com/volatiletech/sqlboiler/queries/qm"
@@ -24,11 +23,11 @@ import (
 
 // Hub is an object representing the database table.
 type Hub struct {
-	ID        string     `boil:"id" json:"id" toml:"id" yaml:"id"`
-	Logo      null.Bytes `boil:"logo" json:"logo,omitempty" toml:"logo" yaml:"logo,omitempty"`
-	UserID    string     `boil:"user_id" json:"user_id" toml:"user_id" yaml:"user_id"`
-	IsPrivate bool       `boil:"is_private" json:"is_private" toml:"is_private" yaml:"is_private"`
-	IsClose   bool       `boil:"is_close" json:"is_close" toml:"is_close" yaml:"is_close"`
+	ID        string `boil:"id" json:"id" toml:"id" yaml:"id"`
+	Logo      []byte `boil:"logo" json:"logo" toml:"logo" yaml:"logo"`
+	UserID    string `boil:"user_id" json:"user_id" toml:"user_id" yaml:"user_id"`
+	IsPrivate bool   `boil:"is_private" json:"is_private" toml:"is_private" yaml:"is_private"`
+	IsClose   bool   `boil:"is_close" json:"is_close" toml:"is_close" yaml:"is_close"`
 
 	R *hubR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L hubL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -50,29 +49,6 @@ var HubColumns = struct {
 
 // Generated where
 
-type whereHelpernull_Bytes struct{ field string }
-
-func (w whereHelpernull_Bytes) EQ(x null.Bytes) qm.QueryMod {
-	return qmhelper.WhereNullEQ(w.field, false, x)
-}
-func (w whereHelpernull_Bytes) NEQ(x null.Bytes) qm.QueryMod {
-	return qmhelper.WhereNullEQ(w.field, true, x)
-}
-func (w whereHelpernull_Bytes) IsNull() qm.QueryMod    { return qmhelper.WhereIsNull(w.field) }
-func (w whereHelpernull_Bytes) IsNotNull() qm.QueryMod { return qmhelper.WhereIsNotNull(w.field) }
-func (w whereHelpernull_Bytes) LT(x null.Bytes) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.LT, x)
-}
-func (w whereHelpernull_Bytes) LTE(x null.Bytes) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.LTE, x)
-}
-func (w whereHelpernull_Bytes) GT(x null.Bytes) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.GT, x)
-}
-func (w whereHelpernull_Bytes) GTE(x null.Bytes) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.GTE, x)
-}
-
 type whereHelperbool struct{ field string }
 
 func (w whereHelperbool) EQ(x bool) qm.QueryMod  { return qmhelper.Where(w.field, qmhelper.EQ, x) }
@@ -84,13 +60,13 @@ func (w whereHelperbool) GTE(x bool) qm.QueryMod { return qmhelper.Where(w.field
 
 var HubWhere = struct {
 	ID        whereHelperstring
-	Logo      whereHelpernull_Bytes
+	Logo      whereHelper__byte
 	UserID    whereHelperstring
 	IsPrivate whereHelperbool
 	IsClose   whereHelperbool
 }{
 	ID:        whereHelperstring{field: "\"hubs\".\"id\""},
-	Logo:      whereHelpernull_Bytes{field: "\"hubs\".\"logo\""},
+	Logo:      whereHelper__byte{field: "\"hubs\".\"logo\""},
 	UserID:    whereHelperstring{field: "\"hubs\".\"user_id\""},
 	IsPrivate: whereHelperbool{field: "\"hubs\".\"is_private\""},
 	IsClose:   whereHelperbool{field: "\"hubs\".\"is_close\""},

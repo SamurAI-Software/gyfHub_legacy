@@ -8,7 +8,7 @@ CREATE TABLE users
     verify_token TEXT UNIQUE NOT NULL,
     reset_pass_token TEXT UNIQUE NOT NULL,
     verified BOOLEAN NOT NULL,
-    avatar BYTEA
+    avatar BYTEA NOT NULL
 );
 
 CREATE TABLE gifs
@@ -29,7 +29,7 @@ CREATE TABLE user_category
 CREATE TABLE hubs
 (
     id TEXT PRIMARY KEY NOT NULL,
-    logo BYTEA,
+    logo BYTEA NOT NULL,
     user_id TEXT NOT NULL,
     is_private BOOLEAN NOT NULL,
     is_close BOOLEAN NOT NULL,
@@ -73,7 +73,7 @@ CREATE TABLE chat_msg
     id TEXT PRIMARY KEY NOT NULL,
     hub_id TEXT NOT NULL,
     gif_id TEXT NOT NULL,
-    create_at TIMESTAMP,
+    create_at TIMESTAMP NOT NULL,
     user_id TEXT NOT NULL,
 
     FOREIGN KEY (hub_id) REFERENCES hubs (id),

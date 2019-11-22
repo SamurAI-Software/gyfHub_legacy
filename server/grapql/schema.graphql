@@ -1,0 +1,87 @@
+type User {
+  email: String!
+  mobile: String!
+  avatar: String!
+  username: String!
+}
+
+type Gif {
+  id: ID!
+  gif: String!
+}
+
+type Hub {
+  id: ID!
+  logo: String!
+  hubers: Int!
+  status: Boolean!
+  close: Boolean!
+  latestActive: Time!
+  user: User!
+}
+
+type Message {
+  id: ID!
+  gifID: String!
+  gif: String!
+  create_at: Time!
+  user: User!
+}
+
+type Follower {
+  user: User!
+  isfollowing: Boolean!
+}
+
+type Profile {
+  email: String!
+  mobile: String!
+  username: String!
+  avatar: String!
+  categories: [String!]
+}
+
+type Query {
+  getUserProfile(uid: String!): Profile!
+  getUserCategory(uid: String!, cat: String!): [Gif!]
+  getUserFollower(uid: String!): [Follower!]
+  getFollowerUser(uid: String!): [Follower!]
+  getUserHub(uid: String!): [Hub!]
+  getCustGif(uid: String!): [Gif!]
+  getGlobalHubs(search: String!): [Hub!]
+  getOtherUser(userID: String!): Follower!
+  enterHub(userID: String!, hubID: String!): [Message!]
+  loadMoreChat(userID: String!, hubID: String!, createAt: Time!): [Message!]!
+}
+
+type Mutation {
+  moveGif(
+    uid: String!
+    currCat: String!
+    distCat: String!
+    gifID: [String!]!
+  ): [Gif!]
+  toggleFollower(uid: String!, followerName: String!): [Follower!]
+  changeAvatar(uid: String!, avatar: String!): Boolean!
+  changePass(uid: String!, oldPass: String!, newPass: String!): Boolean!
+  addGif(uid: String!, gifData: String!): [Gif!]!
+  rmCustGif(uid: String!, gifID: String!): [Gif!]
+  rmFavoriteGif(uid: String!, gifID: String!): [Gif!]
+  favoriteGif(uid: String!, gifData: String!, category: String!): [Gif!]!
+  createHub(uid: String!, hubName: String!, status: Boolean!): [Hub!]!
+  addJoinedHub(uid: String!, hubName: String!): [Hub!]!
+  exitJoinedHub(uid: String!, hubName: String!): [Hub!]!
+  permitHubers(huberName: String!, hubName: String!): Boolean!
+  changeLogo(uid: String!, logo: String!): Boolean!
+  toggleClosingHub(uid: String!, hubID: String!): Boolean!
+  toggleHubStatus(uid: String!, hubID: String!): Boolean!
+  addChatGif(uid: String!, gifData: String!, hubID: String!): Message!
+}
+
+type Subscription {
+  chatGifAdded(hubID: String!): Message!
+}
+
+scalar Time
+
+directive @user(userID: String!) on SUBSCRIPTION
