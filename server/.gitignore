@@ -2,3 +2,4 @@
 .env
 sqlboiler.toml
 backup
+gyfHub
