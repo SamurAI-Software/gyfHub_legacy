@@ -65,7 +65,6 @@ type ComplexityRoot struct {
 		ID           func(childComplexity int) int
 		LatestActive func(childComplexity int) int
 		Logo         func(childComplexity int) int
-		Name         func(childComplexity int) int
 		Status       func(childComplexity int) int
 		User         func(childComplexity int) int
 	}
@@ -81,12 +80,15 @@ type ComplexityRoot struct {
 	Mutation struct {
 		AddChatGif       func(childComplexity int, uid string, gifData string, hubID string) int
 		AddGif           func(childComplexity int, uid string, gifData string) int
+		AddJoinedHub     func(childComplexity int, uid string, hubName string) int
 		ChangeAvatar     func(childComplexity int, uid string, avatar string) int
 		ChangeLogo       func(childComplexity int, uid string, logo string) int
 		ChangePass       func(childComplexity int, uid string, oldPass string, newPass string) int
 		CreateHub        func(childComplexity int, uid string, hubName string, status bool) int
+		ExitJoinedHub    func(childComplexity int, uid string, hubName string) int
 		FavoriteGif      func(childComplexity int, uid string, gifData string, category string) int
 		MoveGif          func(childComplexity int, uid string, currCat string, distCat string, gifID []string) int
+		PermitHubers     func(childComplexity int, huberName string, hubName string) int
 		RmCustGif        func(childComplexity int, uid string, gifID string) int
 		RmFavoriteGif    func(childComplexity int, uid string, gifID string) int
 		ToggleClosingHub func(childComplexity int, uid string, hubID string) int
@@ -103,16 +105,16 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		FirstLoadChatHub func(childComplexity int, hubID string) int
-		GetCustGif       func(childComplexity int, uid string) int
-		GetFollowerUser  func(childComplexity int, uid string) int
-		GetGlobalHubs    func(childComplexity int, search string) int
-		GetOtherUser     func(childComplexity int, userID string) int
-		GetUserCategory  func(childComplexity int, uid string, cat string) int
-		GetUserFollower  func(childComplexity int, uid string) int
-		GetUserHub       func(childComplexity int, uid string) int
-		GetUserProfile   func(childComplexity int, uid string) int
-		LoadMoreChat     func(childComplexity int, hubID string, createAt time.Time) int
+		EnterHub        func(childComplexity int, userID string, hubID string) int
+		GetCustGif      func(childComplexity int, uid string) int
+		GetFollowerUser func(childComplexity int, uid string) int
+		GetGlobalHubs   func(childComplexity int, search string) int
+		GetOtherUser    func(childComplexity int, userID string) int
+		GetUserCategory func(childComplexity int, uid string, cat string) int
+		GetUserFollower func(childComplexity int, uid string) int
+		GetUserHub      func(childComplexity int, uid string) int
+		GetUserProfile  func(childComplexity int, uid string) int
+		LoadMoreChat    func(childComplexity int, userID string, hubID string, createAt time.Time) int
 	}
 
 	Subscription struct {
@@ -146,6 +148,9 @@ type MutationResolver interface {
 	RmFavoriteGif(ctx context.Context, uid string, gifID string) ([]*Gif, error)
 	FavoriteGif(ctx context.Context, uid string, gifData string, category string) ([]*Gif, error)
 	CreateHub(ctx context.Context, uid string, hubName string, status bool) ([]*Hub, error)
+	AddJoinedHub(ctx context.Context, uid string, hubName string) ([]*Hub, error)
+	ExitJoinedHub(ctx context.Context, uid string, hubName string) ([]*Hub, error)
+	PermitHubers(ctx context.Context, huberName string, hubName string) (bool, error)
 	ChangeLogo(ctx context.Context, uid string, logo string) (bool, error)
 	ToggleClosingHub(ctx context.Context, uid string, hubID string) (bool, error)
 	ToggleHubStatus(ctx context.Context, uid string, hubID string) (bool, error)
@@ -160,8 +165,8 @@ type QueryResolver interface {
 	GetCustGif(ctx context.Context, uid string) ([]*Gif, error)
 	GetGlobalHubs(ctx context.Context, search string) ([]*Hub, error)
 	GetOtherUser(ctx context.Context, userID string) (*Follower, error)
-	FirstLoadChatHub(ctx context.Context, hubID string) ([]*Message, error)
-	LoadMoreChat(ctx context.Context, hubID string, createAt time.Time) ([]*Message, error)
+	EnterHub(ctx context.Context, userID string, hubID string) ([]*Message, error)
+	LoadMoreChat(ctx context.Context, userID string, hubID string, createAt time.Time) ([]*Message, error)
 }
 type SubscriptionResolver interface {
 	ChatGifAdded(ctx context.Context, hubID string) (<-chan *Message, error)
@@ -245,13 +250,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Hub.Logo(childComplexity), true
 
-	case "Hub.name":
-		if e.complexity.Hub.Name == nil {
-			break
-		}
-
-		return e.complexity.Hub.Name(childComplexity), true
-
 	case "Hub.status":
 		if e.complexity.Hub.Status == nil {
 			break
@@ -325,6 +323,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.AddGif(childComplexity, args["uid"].(string), args["gifData"].(string)), true
 
+	case "Mutation.addJoinedHub":
+		if e.complexity.Mutation.AddJoinedHub == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_addJoinedHub_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.AddJoinedHub(childComplexity, args["uid"].(string), args["hubName"].(string)), true
+
 	case "Mutation.changeAvatar":
 		if e.complexity.Mutation.ChangeAvatar == nil {
 			break
@@ -373,6 +383,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.CreateHub(childComplexity, args["uid"].(string), args["hubName"].(string), args["status"].(bool)), true
 
+	case "Mutation.exitJoinedHub":
+		if e.complexity.Mutation.ExitJoinedHub == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_exitJoinedHub_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.ExitJoinedHub(childComplexity, args["uid"].(string), args["hubName"].(string)), true
+
 	case "Mutation.favoriteGif":
 		if e.complexity.Mutation.FavoriteGif == nil {
 			break
@@ -396,6 +418,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.MoveGif(childComplexity, args["uid"].(string), args["currCat"].(string), args["distCat"].(string), args["gifID"].([]string)), true
+
+	case "Mutation.permitHubers":
+		if e.complexity.Mutation.PermitHubers == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_permitHubers_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.PermitHubers(childComplexity, args["huberName"].(string), args["hubName"].(string)), true
 
 	case "Mutation.rmCustGif":
 		if e.complexity.Mutation.RmCustGif == nil {
@@ -492,17 +526,17 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Profile.Username(childComplexity), true
 
-	case "Query.firstLoadChatHub":
-		if e.complexity.Query.FirstLoadChatHub == nil {
+	case "Query.enterHub":
+		if e.complexity.Query.EnterHub == nil {
 			break
 		}
 
-		args, err := ec.field_Query_firstLoadChatHub_args(context.TODO(), rawArgs)
+		args, err := ec.field_Query_enterHub_args(context.TODO(), rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.Query.FirstLoadChatHub(childComplexity, args["hubID"].(string)), true
+		return e.complexity.Query.EnterHub(childComplexity, args["userID"].(string), args["hubID"].(string)), true
 
 	case "Query.getCustGif":
 		if e.complexity.Query.GetCustGif == nil {
@@ -610,7 +644,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.LoadMoreChat(childComplexity, args["hubID"].(string), args["createAt"].(time.Time)), true
+		return e.complexity.Query.LoadMoreChat(childComplexity, args["userID"].(string), args["hubID"].(string), args["createAt"].(time.Time)), true
 
 	case "Subscription.chatGifAdded":
 		if e.complexity.Subscription.ChatGifAdded == nil {
@@ -759,7 +793,6 @@ type Gif {
 
 type Hub {
   id: ID!
-  name: String!
   logo: String!
   hubers: Int!
   status: Boolean!
@@ -798,8 +831,8 @@ type Query {
   getCustGif(uid: String!): [Gif!]
   getGlobalHubs(search: String!): [Hub!]
   getOtherUser(userID: String!): Follower!
-  firstLoadChatHub(hubID: String!): [Message!]
-  loadMoreChat(hubID: String!, createAt: Time!): [Message!]!
+  enterHub(userID: String!, hubID: String!): [Message!]
+  loadMoreChat(userID: String!, hubID: String!, createAt: Time!): [Message!]!
 }
 
 type Mutation {
@@ -817,6 +850,9 @@ type Mutation {
   rmFavoriteGif(uid: String!, gifID: String!): [Gif!]
   favoriteGif(uid: String!, gifData: String!, category: String!): [Gif!]!
   createHub(uid: String!, hubName: String!, status: Boolean!): [Hub!]!
+  addJoinedHub(uid: String!, hubName: String!): [Hub!]!
+  exitJoinedHub(uid: String!, hubName: String!): [Hub!]!
+  permitHubers(huberName: String!, hubName: String!): Boolean!
   changeLogo(uid: String!, logo: String!): Boolean!
   toggleClosingHub(uid: String!, hubID: String!): Boolean!
   toggleHubStatus(uid: String!, hubID: String!): Boolean!
@@ -900,6 +936,28 @@ func (ec *executionContext) field_Mutation_addGif_args(ctx context.Context, rawA
 		}
 	}
 	args["gifData"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_addJoinedHub_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["uid"]; ok {
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["uid"] = arg0
+	var arg1 string
+	if tmp, ok := rawArgs["hubName"]; ok {
+		arg1, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["hubName"] = arg1
 	return args, nil
 }
 
@@ -1007,6 +1065,28 @@ func (ec *executionContext) field_Mutation_createHub_args(ctx context.Context, r
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_exitJoinedHub_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["uid"]; ok {
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["uid"] = arg0
+	var arg1 string
+	if tmp, ok := rawArgs["hubName"]; ok {
+		arg1, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["hubName"] = arg1
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_favoriteGif_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -1072,6 +1152,28 @@ func (ec *executionContext) field_Mutation_moveGif_args(ctx context.Context, raw
 		}
 	}
 	args["gifID"] = arg3
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_permitHubers_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["huberName"]; ok {
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["huberName"] = arg0
+	var arg1 string
+	if tmp, ok := rawArgs["hubName"]; ok {
+		arg1, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["hubName"] = arg1
 	return args, nil
 }
 
@@ -1199,17 +1301,25 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 	return args, nil
 }
 
-func (ec *executionContext) field_Query_firstLoadChatHub_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Query_enterHub_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 string
-	if tmp, ok := rawArgs["hubID"]; ok {
+	if tmp, ok := rawArgs["userID"]; ok {
 		arg0, err = ec.unmarshalNString2string(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["hubID"] = arg0
+	args["userID"] = arg0
+	var arg1 string
+	if tmp, ok := rawArgs["hubID"]; ok {
+		arg1, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["hubID"] = arg1
 	return args, nil
 }
 
@@ -1337,21 +1447,29 @@ func (ec *executionContext) field_Query_loadMoreChat_args(ctx context.Context, r
 	var err error
 	args := map[string]interface{}{}
 	var arg0 string
-	if tmp, ok := rawArgs["hubID"]; ok {
+	if tmp, ok := rawArgs["userID"]; ok {
 		arg0, err = ec.unmarshalNString2string(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["hubID"] = arg0
-	var arg1 time.Time
-	if tmp, ok := rawArgs["createAt"]; ok {
-		arg1, err = ec.unmarshalNTime2timeᚐTime(ctx, tmp)
+	args["userID"] = arg0
+	var arg1 string
+	if tmp, ok := rawArgs["hubID"]; ok {
+		arg1, err = ec.unmarshalNString2string(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["createAt"] = arg1
+	args["hubID"] = arg1
+	var arg2 time.Time
+	if tmp, ok := rawArgs["createAt"]; ok {
+		arg2, err = ec.unmarshalNTime2timeᚐTime(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["createAt"] = arg2
 	return args, nil
 }
 
@@ -1625,43 +1743,6 @@ func (ec *executionContext) _Hub_id(ctx context.Context, field graphql.Collected
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
 	return ec.marshalNID2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Hub_name(ctx context.Context, field graphql.CollectedField, obj *Hub) (ret graphql.Marshaler) {
-	ctx = ec.Tracer.StartFieldExecution(ctx, field)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-		ec.Tracer.EndFieldExecution(ctx)
-	}()
-	rctx := &graphql.ResolverContext{
-		Object:   "Hub",
-		Field:    field,
-		Args:     nil,
-		IsMethod: false,
-	}
-	ctx = graphql.WithResolverContext(ctx, rctx)
-	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Name, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !ec.HasError(rctx) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	rctx.Result = res
-	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Hub_logo(ctx context.Context, field graphql.CollectedField, obj *Hub) (ret graphql.Marshaler) {
@@ -2455,6 +2536,138 @@ func (ec *executionContext) _Mutation_createHub(ctx context.Context, field graph
 	return ec.marshalNHub2ᚕᚖgithubᚗcomᚋSamurAIᚑSoftwareᚋgyfHubᚋgrapqlᚐHub(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Mutation_addJoinedHub(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "Mutation",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_addJoinedHub_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	rctx.Args = args
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().AddJoinedHub(rctx, args["uid"].(string), args["hubName"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*Hub)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNHub2ᚕᚖgithubᚗcomᚋSamurAIᚑSoftwareᚋgyfHubᚋgrapqlᚐHub(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_exitJoinedHub(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "Mutation",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_exitJoinedHub_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	rctx.Args = args
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().ExitJoinedHub(rctx, args["uid"].(string), args["hubName"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*Hub)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNHub2ᚕᚖgithubᚗcomᚋSamurAIᚑSoftwareᚋgyfHubᚋgrapqlᚐHub(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_permitHubers(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "Mutation",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_permitHubers_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	rctx.Args = args
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().PermitHubers(rctx, args["huberName"].(string), args["hubName"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Mutation_changeLogo(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
@@ -3147,7 +3360,7 @@ func (ec *executionContext) _Query_getOtherUser(ctx context.Context, field graph
 	return ec.marshalNFollower2ᚖgithubᚗcomᚋSamurAIᚑSoftwareᚋgyfHubᚋgrapqlᚐFollower(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Query_firstLoadChatHub(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+func (ec *executionContext) _Query_enterHub(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
 		if r := recover(); r != nil {
@@ -3164,7 +3377,7 @@ func (ec *executionContext) _Query_firstLoadChatHub(ctx context.Context, field g
 	}
 	ctx = graphql.WithResolverContext(ctx, rctx)
 	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Query_firstLoadChatHub_args(ctx, rawArgs)
+	args, err := ec.field_Query_enterHub_args(ctx, rawArgs)
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
@@ -3173,7 +3386,7 @@ func (ec *executionContext) _Query_firstLoadChatHub(ctx context.Context, field g
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().FirstLoadChatHub(rctx, args["hubID"].(string))
+		return ec.resolvers.Query().EnterHub(rctx, args["userID"].(string), args["hubID"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3214,7 +3427,7 @@ func (ec *executionContext) _Query_loadMoreChat(ctx context.Context, field graph
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().LoadMoreChat(rctx, args["hubID"].(string), args["createAt"].(time.Time))
+		return ec.resolvers.Query().LoadMoreChat(rctx, args["userID"].(string), args["hubID"].(string), args["createAt"].(time.Time))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -4756,11 +4969,6 @@ func (ec *executionContext) _Hub(ctx context.Context, sel ast.SelectionSet, obj 
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
-		case "name":
-			out.Values[i] = ec._Hub_name(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
-			}
 		case "logo":
 			out.Values[i] = ec._Hub_logo(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -4912,6 +5120,21 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			}
 		case "createHub":
 			out.Values[i] = ec._Mutation_createHub(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "addJoinedHub":
+			out.Values[i] = ec._Mutation_addJoinedHub(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "exitJoinedHub":
+			out.Values[i] = ec._Mutation_exitJoinedHub(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "permitHubers":
+			out.Values[i] = ec._Mutation_permitHubers(ctx, field)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -5099,7 +5322,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}
 				return res
 			})
-		case "firstLoadChatHub":
+		case "enterHub":
 			field := field
 			out.Concurrently(i, func() (res graphql.Marshaler) {
 				defer func() {
@@ -5107,7 +5330,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Query_firstLoadChatHub(ctx, field)
+				res = ec._Query_enterHub(ctx, field)
 				return res
 			})
 		case "loadMoreChat":

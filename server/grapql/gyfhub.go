@@ -6,7 +6,6 @@ import (
 
 type Hub struct {
 	ID           string
-	Name         string
 	Logo         string
 	Hubers       int
 	Status       bool
