@@ -14,7 +14,6 @@ import (
 	"time"
 
 	"github.com/friendsofgo/errors"
-	"github.com/volatiletech/null"
 	"github.com/volatiletech/sqlboiler/boil"
 	"github.com/volatiletech/sqlboiler/queries"
 	"github.com/volatiletech/sqlboiler/queries/qm"
@@ -27,7 +26,7 @@ type ChatMSG struct {
 	ID       string    `boil:"id" json:"id" toml:"id" yaml:"id"`
 	HubID    string    `boil:"hub_id" json:"hub_id" toml:"hub_id" yaml:"hub_id"`
 	GifID    string    `boil:"gif_id" json:"gif_id" toml:"gif_id" yaml:"gif_id"`
-	CreateAt null.Time `boil:"create_at" json:"create_at,omitempty" toml:"create_at" yaml:"create_at,omitempty"`
+	CreateAt time.Time `boil:"create_at" json:"create_at" toml:"create_at" yaml:"create_at"`
 	UserID   string    `boil:"user_id" json:"user_id" toml:"user_id" yaml:"user_id"`
 
 	R *chatMSGR `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -66,26 +65,24 @@ func (w whereHelperstring) IN(slice []string) qm.QueryMod {
 	return qm.WhereIn(fmt.Sprintf("%s IN ?", w.field), values...)
 }
 
-type whereHelpernull_Time struct{ field string }
+type whereHelpertime_Time struct{ field string }
 
-func (w whereHelpernull_Time) EQ(x null.Time) qm.QueryMod {
-	return qmhelper.WhereNullEQ(w.field, false, x)
+func (w whereHelpertime_Time) EQ(x time.Time) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.EQ, x)
 }
-func (w whereHelpernull_Time) NEQ(x null.Time) qm.QueryMod {
-	return qmhelper.WhereNullEQ(w.field, true, x)
+func (w whereHelpertime_Time) NEQ(x time.Time) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.NEQ, x)
 }
-func (w whereHelpernull_Time) IsNull() qm.QueryMod    { return qmhelper.WhereIsNull(w.field) }
-func (w whereHelpernull_Time) IsNotNull() qm.QueryMod { return qmhelper.WhereIsNotNull(w.field) }
-func (w whereHelpernull_Time) LT(x null.Time) qm.QueryMod {
+func (w whereHelpertime_Time) LT(x time.Time) qm.QueryMod {
 	return qmhelper.Where(w.field, qmhelper.LT, x)
 }
-func (w whereHelpernull_Time) LTE(x null.Time) qm.QueryMod {
+func (w whereHelpertime_Time) LTE(x time.Time) qm.QueryMod {
 	return qmhelper.Where(w.field, qmhelper.LTE, x)
 }
-func (w whereHelpernull_Time) GT(x null.Time) qm.QueryMod {
+func (w whereHelpertime_Time) GT(x time.Time) qm.QueryMod {
 	return qmhelper.Where(w.field, qmhelper.GT, x)
 }
-func (w whereHelpernull_Time) GTE(x null.Time) qm.QueryMod {
+func (w whereHelpertime_Time) GTE(x time.Time) qm.QueryMod {
 	return qmhelper.Where(w.field, qmhelper.GTE, x)
 }
 
@@ -93,13 +90,13 @@ var ChatMSGWhere = struct {
 	ID       whereHelperstring
 	HubID    whereHelperstring
 	GifID    whereHelperstring
-	CreateAt whereHelpernull_Time
+	CreateAt whereHelpertime_Time
 	UserID   whereHelperstring
 }{
 	ID:       whereHelperstring{field: "\"chat_msg\".\"id\""},
 	HubID:    whereHelperstring{field: "\"chat_msg\".\"hub_id\""},
 	GifID:    whereHelperstring{field: "\"chat_msg\".\"gif_id\""},
-	CreateAt: whereHelpernull_Time{field: "\"chat_msg\".\"create_at\""},
+	CreateAt: whereHelpertime_Time{field: "\"chat_msg\".\"create_at\""},
 	UserID:   whereHelperstring{field: "\"chat_msg\".\"user_id\""},
 }
 

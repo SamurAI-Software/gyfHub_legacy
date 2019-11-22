@@ -1,17 +1,23 @@
 package main
 
 import (
-	"flag"
-	"fmt"
 	"log"
 	"net/http"
 	"os"
+
+	"flag"
+	"fmt"
 	"strconv"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
+
+	"github.com/99designs/gqlgen/handler"
+	grapql "github.com/SamurAI-Software/gyfHub/grapql"
 )
+
+const defaultPort = "8080"
 
 func main() {
 	if err := godotenv.Load(); err != nil {
@@ -26,14 +32,6 @@ func main() {
 	serverPort := os.Getenv("SERVER-PORT")
 	intDbPort, err := strconv.Atoi(dbPort)
 
-	// fmt.Println(dbPort,
-	// 	dBHost,
-	// 	dBUser,
-	// 	dBPass,
-	// 	dBName,
-	// 	serverPort,
-	// 	intDbPort)
-
 	DBPort := flag.Int("db-port", intDbPort, "DBPort")
 	DBHost := flag.String("db-host", dBHost, "DBHost")
 	DBUser := flag.String("db-user", dBUser, "DBUser")
@@ -43,7 +41,6 @@ func main() {
 
 	flag.Parse()
 
-	// connect to db
 	dbInfo := fmt.Sprintf("host=%s port=%d user=%s "+
 		"password=%s dbname=%s sslmode=disable",
 		*DBHost, *DBPort, *DBUser, *DBPass, *DBName)
@@ -62,9 +59,17 @@ func main() {
 
 	defer conn.Close()
 
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = defaultPort
+	}
+
+	http.Handle("/", handler.Playground("GraphQL playground", "/query"))
+	http.Handle("/query", handler.GraphQL(grapql.NewExecutableSchema(grapql.New(conn))))
+
+	log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
 	err = http.ListenAndServe(*ServerPort, nil)
 	if err != nil {
 		fmt.Printf("SEVER FAILED TO START, MESSAGE: %s", err.Error())
 	}
-
 }

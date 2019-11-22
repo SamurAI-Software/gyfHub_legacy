@@ -14,7 +14,6 @@ import (
 	"time"
 
 	"github.com/friendsofgo/errors"
-	"github.com/volatiletech/null"
 	"github.com/volatiletech/sqlboiler/boil"
 	"github.com/volatiletech/sqlboiler/queries"
 	"github.com/volatiletech/sqlboiler/queries/qm"
@@ -24,15 +23,15 @@ import (
 
 // User is an object representing the database table.
 type User struct {
-	ID             string     `boil:"id" json:"id" toml:"id" yaml:"id"`
-	Email          string     `boil:"email" json:"email" toml:"email" yaml:"email"`
-	PasswordHash   []byte     `boil:"password_hash" json:"password_hash" toml:"password_hash" yaml:"password_hash"`
-	Username       string     `boil:"username" json:"username" toml:"username" yaml:"username"`
-	Mobile         string     `boil:"mobile" json:"mobile" toml:"mobile" yaml:"mobile"`
-	VerifyToken    string     `boil:"verify_token" json:"verify_token" toml:"verify_token" yaml:"verify_token"`
-	ResetPassToken string     `boil:"reset_pass_token" json:"reset_pass_token" toml:"reset_pass_token" yaml:"reset_pass_token"`
-	Verified       bool       `boil:"verified" json:"verified" toml:"verified" yaml:"verified"`
-	Avatar         null.Bytes `boil:"avatar" json:"avatar,omitempty" toml:"avatar" yaml:"avatar,omitempty"`
+	ID             string `boil:"id" json:"id" toml:"id" yaml:"id"`
+	Email          string `boil:"email" json:"email" toml:"email" yaml:"email"`
+	PasswordHash   []byte `boil:"password_hash" json:"password_hash" toml:"password_hash" yaml:"password_hash"`
+	Username       string `boil:"username" json:"username" toml:"username" yaml:"username"`
+	Mobile         string `boil:"mobile" json:"mobile" toml:"mobile" yaml:"mobile"`
+	VerifyToken    string `boil:"verify_token" json:"verify_token" toml:"verify_token" yaml:"verify_token"`
+	ResetPassToken string `boil:"reset_pass_token" json:"reset_pass_token" toml:"reset_pass_token" yaml:"reset_pass_token"`
+	Verified       bool   `boil:"verified" json:"verified" toml:"verified" yaml:"verified"`
+	Avatar         []byte `boil:"avatar" json:"avatar" toml:"avatar" yaml:"avatar"`
 
 	R *userR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L userL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -71,7 +70,7 @@ var UserWhere = struct {
 	VerifyToken    whereHelperstring
 	ResetPassToken whereHelperstring
 	Verified       whereHelperbool
-	Avatar         whereHelpernull_Bytes
+	Avatar         whereHelper__byte
 }{
 	ID:             whereHelperstring{field: "\"users\".\"id\""},
 	Email:          whereHelperstring{field: "\"users\".\"email\""},
@@ -81,7 +80,7 @@ var UserWhere = struct {
 	VerifyToken:    whereHelperstring{field: "\"users\".\"verify_token\""},
 	ResetPassToken: whereHelperstring{field: "\"users\".\"reset_pass_token\""},
 	Verified:       whereHelperbool{field: "\"users\".\"verified\""},
-	Avatar:         whereHelpernull_Bytes{field: "\"users\".\"avatar\""},
+	Avatar:         whereHelper__byte{field: "\"users\".\"avatar\""},
 }
 
 // UserRels is where relationship names are stored.
