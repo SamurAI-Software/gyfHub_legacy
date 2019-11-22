@@ -2,7 +2,7 @@ package grapql
 
 import (
 	context "context"
-	"crypto/sha256"
+	"crypto/sha1"
 	"fmt"
 	"time"
 
@@ -208,12 +208,12 @@ func (r *mutationResolver) ChangePass(ctx context.Context, uid string, oldPass s
 		return false, err
 	}
 
-	passwordHash, err := bcrypt.GenerateFromPassword([]byte(newPass), bcrypt.DefaultCost)
+	newPasswordHash, err := bcrypt.GenerateFromPassword([]byte(newPass), bcrypt.DefaultCost)
 	if err != nil {
 		return false, err
 	}
 
-	find.PasswordHash = passwordHash
+	find.PasswordHash = newPasswordHash
 	_, err = find.Update(context.Background(), r.DB, boil.Whitelist(models.UserColumns.PasswordHash))
 	if err != nil {
 		fmt.Println(err)
@@ -224,9 +224,9 @@ func (r *mutationResolver) ChangePass(ctx context.Context, uid string, oldPass s
 }
 
 func ImageToID(img string) string {
-	h := sha256.New()
+	h := sha1.New()
 	h.Write([]byte(img))
-	return string(h.Sum(nil))
+	return fmt.Sprintf("%x", h.Sum(nil))
 }
 
 func (r *mutationResolver) AddGif(ctx context.Context, uid string, gifData string) ([]*Gif, error) {
@@ -479,12 +479,12 @@ func (r *mutationResolver) CreateHub(ctx context.Context, uid string, hubName st
 			return nil, err
 		}
 		t := time.Now()
-		latestMsg, err := hub.ChatMSGS(qm.Where("create_at < ?", t), qm.Limit(1)).One(context.Background(), r.DB)
-		if err != nil {
-			fmt.Println(err)
-			return nil, err
-		}
-		h := &Hub{ID: hub.ID, Logo: string(hub.Logo), Hubers: int(hubers), Status: hub.IsPrivate, Close: hub.IsClose, LatestActive: latestMsg.CreateAt, Username: owner.Username}
+		// latestMsg, err := hub.ChatMSGS(qm.Where("create_at < ?", t), qm.Limit(1)).One(context.Background(), r.DB)
+		// if err != nil {
+		// 	fmt.Println(err)
+		// 	return nil, err
+		// }
+		h := &Hub{ID: hub.ID, Logo: string(hub.Logo), Hubers: int(hubers), Status: hub.IsPrivate, Close: hub.IsClose, LatestActive: t, Username: owner.Username}
 		passback = append(passback, h)
 	}
 	return passback, nil

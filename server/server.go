@@ -12,6 +12,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
+	"golang.org/x/crypto/bcrypt"
 
 	"github.com/99designs/gqlgen/handler"
 	grapql "github.com/SamurAI-Software/gyfHub/grapql"
@@ -86,14 +87,19 @@ type DBdriver struct {
 }
 
 func (d *DBdriver) InsertUserHandler(w http.ResponseWriter, r *http.Request) {
+	PasswordHash, err := bcrypt.GenerateFromPassword([]byte("123"), bcrypt.DefaultCost)
+	if err != nil {
+		fmt.Println("new")
+	}
+
 	d.DB.NamedExec(`INSERT INTO users (id, email,password_hash,username,mobile,verify_token,reset_pass_token,verified,avatar) VALUES ( :ID, :Email, :PasswordHash, :Username, :Mobile, :VerifyToken, :ResetPassToken, :Verified, :Avatar)`, map[string]interface{}{
-		"ID":             "2",
-		"Email":          "abc@mail.com",
-		"PasswordHash":   []byte("abc"),
-		"Username":       "abc",
-		"Mobile":         "abc",
-		"VerifyToken":    "abc",
-		"ResetPassToken": "abc",
+		"ID":             "1",
+		"Email":          "123@mail.com",
+		"PasswordHash":   PasswordHash,
+		"Username":       "123",
+		"Mobile":         "123",
+		"VerifyToken":    "123",
+		"ResetPassToken": "123",
 		"Verified":       true,
 		"Avatar":         []byte(""),
 	})
