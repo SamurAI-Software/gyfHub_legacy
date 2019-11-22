@@ -65,11 +65,14 @@ func main() {
 	}
 
 	d := &DBdriver{DB: conn}
+	api := &API{DB: conn}
 
 	http.Handle("/", handler.Playground("GraphQL playground", "/query"))
 	http.Handle("/query", handler.GraphQL(grapql.NewExecutableSchema(grapql.New(conn))))
 
 	http.HandleFunc("/api/insertuser", d.InsertUserHandler)
+	http.HandleFunc("/api/signup", api.signUpHandler)
+	http.HandleFunc("/api/signin", api.signInHandler)
 
 	log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
 	err = http.ListenAndServe(*ServerPort, nil)

@@ -25,7 +25,7 @@ export const landingPageStyles = {
 		boxShadow: "5px 5px #000",
 	},
 	sectionHeader: {
-		marginTop: "3rem",
+		paddingTop: "3rem",
 		fontSize: "2.5rem",
 	},
 	joinBtn: {

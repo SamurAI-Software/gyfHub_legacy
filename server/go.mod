@@ -12,8 +12,11 @@ require (
 	github.com/kat-co/vala v0.0.0-20170210184112-42e1d8b61f12
 	github.com/kelseyhightower/envconfig v1.4.0 // indirect
 	github.com/lib/pq v1.2.0
+	github.com/nullbio/inflect v0.0.0-20170731032957-3edb4592a77b // indirect
 	github.com/rs/cors v1.7.0 // indirect
+	github.com/spf13/cobra v0.0.5 // indirect
 	github.com/spf13/viper v1.5.0
+	github.com/vattle/sqlboiler v2.5.0+incompatible
 	github.com/vektah/gqlparser v1.1.2
 	github.com/volatiletech/inflect v0.0.0-20170731032912-e7201282ae8d // indirect
 	github.com/volatiletech/null v8.0.0+incompatible
