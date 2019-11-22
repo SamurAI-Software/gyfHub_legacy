@@ -63,12 +63,35 @@ func main() {
 		port = defaultPort
 	}
 
+	d := &DBdriver{DB: conn}
+
 	http.Handle("/", handler.Playground("GraphQL playground", "/query"))
 	http.Handle("/query", handler.GraphQL(grapql.NewExecutableSchema(grapql.New(conn))))
+
+	http.HandleFunc("/api/insertuser", d.InsertUserHandler)
 
 	log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
 	err = http.ListenAndServe(*ServerPort, nil)
 	if err != nil {
 		fmt.Printf("SEVER FAILED TO START, MESSAGE: %s", err.Error())
 	}
+}
+
+type DBdriver struct {
+	DB *sqlx.DB
+}
+
+func (d *DBdriver) InsertUserHandler(w http.ResponseWriter, r *http.Request) {
+	d.DB.NamedExec(`INSERT INTO users (id, email,password_hash,username,mobile,verify_token,reset_pass_token,verified,avatar) VALUES ( :ID, :Email, :PasswordHash, :Username, :Mobile, :VerifyToken, :ResetPassToken, :Verified, :Avatar)`, map[string]interface{}{
+		"ID":             "2",
+		"Email":          "abc@mail.com",
+		"PasswordHash":   []byte("abc"),
+		"Username":       "abc",
+		"Mobile":         "abc",
+		"VerifyToken":    "abc",
+		"ResetPassToken": "abc",
+		"Verified":       true,
+		"Avatar":         []byte(""),
+	})
+
 }

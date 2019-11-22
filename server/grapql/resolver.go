@@ -1,7 +1,7 @@
 package grapql
 
 import (
-	"context"
+	context "context"
 	"crypto/sha256"
 	"fmt"
 	"time"
@@ -16,7 +16,8 @@ import (
 ) // THIS CODE IS A STARTING POINT ONLY. IT WILL NOT BE UPDATED WITH SCHEMA CHANGES.
 
 type Resolver struct {
-	DB *sqlx.DB
+	DB           *sqlx.DB
+	EnterRequest map[string]map[string]string
 }
 
 func New(db *sqlx.DB) Config {
@@ -130,12 +131,14 @@ func (r *mutationResolver) MoveGif(ctx context.Context, uid string, currCat stri
 func (r *mutationResolver) ToggleFollower(ctx context.Context, uid string, followerName string) ([]*Follower, error) {
 	var passback []*Follower
 
+	fmt.Println("check user exist")
 	find, err := models.Users(qm.Where("username = ?", followerName)).One(context.Background(), r.DB)
 	if err != nil {
 		fmt.Println(err)
 		return nil, err
 	}
 
+	fmt.Println("check follower in list")
 	exist, err := models.Followers(qm.Where("user_id = ?", uid), qm.And("follower_id = ?", find.ID)).Exists(context.Background(), r.DB)
 	if err != nil {
 		fmt.Println(err)
@@ -347,7 +350,7 @@ func (r *mutationResolver) RmFavoriteGif(ctx context.Context, uid string, gifID 
 
 	var passback []*Gif
 	for _, v := range gifs {
-		gif, err := v.Gif().One()
+		gif, err := v.Gif().One(context.Background(), r.DB)
 		if err != nil {
 			fmt.Println(err)
 			return nil, err
@@ -357,7 +360,6 @@ func (r *mutationResolver) RmFavoriteGif(ctx context.Context, uid string, gifID 
 	}
 	return passback, nil
 }
-
 func (r *mutationResolver) FavoriteGif(ctx context.Context, uid string, gifData string, category string) ([]*Gif, error) {
 	id := ImageToID(gifData)
 	exist, err := models.GifExists(context.Background(), r.DB, id)
@@ -411,7 +413,6 @@ func (r *mutationResolver) FavoriteGif(ctx context.Context, uid string, gifData 
 	return passback, nil
 }
 func (r *mutationResolver) CreateHub(ctx context.Context, uid string, hubName string, status bool) ([]*Hub, error) {
-	//check whether hubname exist
 	exist, err := models.HubExists(context.Background(), r.DB, hubName)
 	if err != nil {
 		fmt.Println(err)
@@ -483,10 +484,19 @@ func (r *mutationResolver) CreateHub(ctx context.Context, uid string, hubName st
 			fmt.Println(err)
 			return nil, err
 		}
-		h := &Hub{ID: hub.ID, Name: hub.ID, Logo: string(hub.Logo), Hubers: int(hubers), Status: hub.IsPrivate, Close: hub.IsClose, LatestActive: latestMsg.CreateAt, Username: owner.Username}
+		h := &Hub{ID: hub.ID, Logo: string(hub.Logo), Hubers: int(hubers), Status: hub.IsPrivate, Close: hub.IsClose, LatestActive: latestMsg.CreateAt, Username: owner.Username}
 		passback = append(passback, h)
 	}
 	return passback, nil
+}
+func (r *mutationResolver) AddJoinedHub(ctx context.Context, uid string, hubName string) ([]*Hub, error) {
+	panic("not implemented")
+}
+func (r *mutationResolver) ExitJoinedHub(ctx context.Context, uid string, hubName string) ([]*Hub, error) {
+	panic("not implemented")
+}
+func (r *mutationResolver) PermitHubers(ctx context.Context, huberName string, hubName string) (bool, error) {
+	panic("not implemented")
 }
 func (r *mutationResolver) ChangeLogo(ctx context.Context, uid string, logo string) (bool, error) {
 	panic("not implemented")
@@ -527,10 +537,10 @@ func (r *queryResolver) GetGlobalHubs(ctx context.Context, search string) ([]*Hu
 func (r *queryResolver) GetOtherUser(ctx context.Context, userID string) (*Follower, error) {
 	panic("not implemented")
 }
-func (r *queryResolver) FirstLoadChatHub(ctx context.Context, hubID string) ([]*Message, error) {
+func (r *queryResolver) EnterHub(ctx context.Context, userID string, hubID string) ([]*Message, error) {
 	panic("not implemented")
 }
-func (r *queryResolver) LoadMoreChat(ctx context.Context, hubID string, createAt time.Time) ([]*Message, error) {
+func (r *queryResolver) LoadMoreChat(ctx context.Context, userID string, hubID string, createAt time.Time) ([]*Message, error) {
 	panic("not implemented")
 }
 

@@ -12,7 +12,6 @@ type Gif {
 
 type Hub {
   id: ID!
-  name: String!
   logo: String!
   hubers: Int!
   status: Boolean!
@@ -51,8 +50,8 @@ type Query {
   getCustGif(uid: String!): [Gif!]
   getGlobalHubs(search: String!): [Hub!]
   getOtherUser(userID: String!): Follower!
-  firstLoadChatHub(hubID: String!): [Message!]
-  loadMoreChat(hubID: String!, createAt: Time!): [Message!]!
+  enterHub(userID: String!, hubID: String!): [Message!]
+  loadMoreChat(userID: String!, hubID: String!, createAt: Time!): [Message!]!
 }
 
 type Mutation {
@@ -70,6 +69,9 @@ type Mutation {
   rmFavoriteGif(uid: String!, gifID: String!): [Gif!]
   favoriteGif(uid: String!, gifData: String!, category: String!): [Gif!]!
   createHub(uid: String!, hubName: String!, status: Boolean!): [Hub!]!
+  addJoinedHub(uid: String!, hubName: String!): [Hub!]!
+  exitJoinedHub(uid: String!, hubName: String!): [Hub!]!
+  permitHubers(huberName: String!, hubName: String!): Boolean!
   changeLogo(uid: String!, logo: String!): Boolean!
   toggleClosingHub(uid: String!, hubID: String!): Boolean!
   toggleHubStatus(uid: String!, hubID: String!): Boolean!
