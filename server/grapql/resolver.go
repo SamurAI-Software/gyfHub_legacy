@@ -490,7 +490,17 @@ func (r *mutationResolver) CreateHub(ctx context.Context, uid string, hubName st
 	return passback, nil
 }
 func (r *mutationResolver) AddJoinedHub(ctx context.Context, uid string, hubName string) ([]*Hub, error) {
-	panic("not implemented")
+	exist, err := models.HubExists(context.Background(), r.DB, hubName)
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+
+	if !exist {
+		fmt.Println("hub is not exist!")
+		return nil, err
+	}
+
 }
 func (r *mutationResolver) ExitJoinedHub(ctx context.Context, uid string, hubName string) ([]*Hub, error) {
 	panic("not implemented")
