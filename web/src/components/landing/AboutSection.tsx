@@ -29,14 +29,9 @@ function About() {
 								Ipsa ratione vel laborum rerum numquam quas debitis, voluptates veniam quidem, qui ipsdeserunt soluta reprehenderit. Illum nisi praesentium
 								omnis eligendi! Ipsa ratione vel laborum rerum numquam quas debitis, voluptates Lorem ipsum dolor sit amet consectetur adipisicing elit.
 								Expedita suscipit quia eaque accusamus libero. Impedit itaque, voluptatibus reiciendis facere quas possimus porro. veniam quidem, qui ipsum
-								placeat deserunt itaque error fugit? Lorem ipsum dolor sit amet consectetur adipisicing elit. Cumque minus blanditiis at consequatur? Sit beatae
-								placeat illo iusto nobis, labore iste assumenda voluptas quia ad perspiciatis quasi ipsam rem eos suscipit odio numquam quis quaerat sed. Fugit
-								ea doloribus perspiciatis.
+								placeat deserunt itaqu
 							</p>
-							<p>
-								Lorem ipsum dolor sit amet, consectetur adipisicing elit. Reprehenderit fuga dolorum qui iusto, iure deserunt earum minus tempore, doloremque
-								quibusdam sit molestias nam nisi recusandae inventore, doloribus enim voluptates! Sed!
-							</p>
+
 							<p>
 								Lorem ipsum dolor sit amet consectetur adipisicing elit. Ipsam omnis quisquam, quis quam tempore aliquam quo illo animi doloribus, at
 								praesentium commodi magni porro debitis corporis obcaecati ullam rerum maxime temporibus officiis modi suscipit. Reprehenderit laborum qui
