@@ -49,9 +49,9 @@ type Query {
   getUserHub(uid: String!): [Hub!]
   getCustGif(uid: String!): [Gif!]
   getGlobalHubs(search: String!): [Hub!]
-  getOtherUser(userID: String!): Follower!
-  enterHub(userID: String!, hubID: String!): [Message!]
-  loadMoreChat(userID: String!, hubID: String!, createAt: Time!): [Message!]!
+  getOtherUser(username: String!): Follower!
+  enterHub(uid: String!, hubID: String!): [Message!]
+  loadMoreChat(uid: String!, hubID: String!, createAt: Time!): [Message!]!
 }
 
 type Mutation {
@@ -71,8 +71,8 @@ type Mutation {
   createHub(uid: String!, hubName: String!, status: Boolean!): [Hub!]!
   addJoinedHub(uid: String!, hubName: String!): [Hub!]!
   exitJoinedHub(uid: String!, hubName: String!): [Hub!]!
-  permitHubers(huberName: String!, hubName: String!): Boolean!
-  changeLogo(uid: String!, logo: String!): Boolean!
+  permitHubers(uid: String!, huberName: String!, hubName: String!): Boolean!
+  changeLogo(uid: String!, hubName: String!, logo: String!): Boolean!
   toggleClosingHub(uid: String!, hubID: String!): Boolean!
   toggleHubStatus(uid: String!, hubID: String!): Boolean!
   addChatGif(uid: String!, gifData: String!, hubID: String!): Message!

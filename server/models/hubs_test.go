@@ -983,7 +983,7 @@ func testHubsSelect(t *testing.T) {
 }
 
 var (
-	hubDBTypes = map[string]string{`ID`: `text`, `Logo`: `bytea`, `UserID`: `text`, `IsPrivate`: `boolean`, `IsClose`: `boolean`}
+	hubDBTypes = map[string]string{`ID`: `text`, `Logo`: `bytea`, `UserID`: `text`, `LastActive`: `timestamp without time zone`, `IsPrivate`: `boolean`, `IsClose`: `boolean`}
 	_          = bytes.MinRead
 )
 

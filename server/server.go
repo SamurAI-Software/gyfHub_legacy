@@ -9,16 +9,15 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/go-chi/jwtauth"
 	"github.com/jmoiron/sqlx"
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
-	"golang.org/x/crypto/bcrypt"
-
-	"github.com/99designs/gqlgen/handler"
-	grapql "github.com/SamurAI-Software/gyfHub/grapql"
 )
 
-const defaultPort = "8080"
+func auther() *jwtauth.JWTAuth {
+	return jwtauth.New("HS256", []byte("secret"), nil)
+}
 
 func main() {
 	if err := godotenv.Load(); err != nil {
@@ -47,61 +46,22 @@ func main() {
 		*DBHost, *DBPort, *DBUser, *DBPass, *DBName)
 
 	conn, err := sqlx.Open("postgres", dbInfo)
-
 	if err != nil {
 		panic(err)
 	}
-	_, err = sqlx.Connect("postgres", dbInfo)
-
-	if err != nil {
-		log.Fatalln(err)
-	}
-	fmt.Println("connetcted")
 
 	defer conn.Close()
 
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = defaultPort
+	_, err = sqlx.Connect("postgres", dbInfo)
+	if err != nil {
+		log.Fatalln(err)
 	}
 
-	d := &DBdriver{DB: conn}
-	api := &API{DB: conn}
+	dbDriver := &DBdriver{DB: conn}
+	api := &API{DBDriver: dbDriver}
 
-	http.Handle("/", handler.Playground("GraphQL playground", "/query"))
-	http.Handle("/query", handler.GraphQL(grapql.NewExecutableSchema(grapql.New(conn))))
-
-	http.HandleFunc("/api/insertuser", d.InsertUserHandler)
-	http.HandleFunc("/api/signup", api.signUpHandler)
-	http.HandleFunc("/api/signin", api.signInHandler)
-
-	log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
-	err = http.ListenAndServe(*ServerPort, nil)
+	err = http.ListenAndServe(*ServerPort, api.SetupNewRouter())
 	if err != nil {
 		fmt.Printf("SEVER FAILED TO START, MESSAGE: %s", err.Error())
 	}
-}
-
-type DBdriver struct {
-	DB *sqlx.DB
-}
-
-func (d *DBdriver) InsertUserHandler(w http.ResponseWriter, r *http.Request) {
-	PasswordHash, err := bcrypt.GenerateFromPassword([]byte("123"), bcrypt.DefaultCost)
-	if err != nil {
-		fmt.Println("new")
-	}
-
-	d.DB.NamedExec(`INSERT INTO users (id, email,password_hash,username,mobile,verify_token,reset_pass_token,verified,avatar) VALUES ( :ID, :Email, :PasswordHash, :Username, :Mobile, :VerifyToken, :ResetPassToken, :Verified, :Avatar)`, map[string]interface{}{
-		"ID":             "1",
-		"Email":          "123@mail.com",
-		"PasswordHash":   PasswordHash,
-		"Username":       "123",
-		"Mobile":         "123",
-		"VerifyToken":    "123",
-		"ResetPassToken": "123",
-		"Verified":       true,
-		"Avatar":         []byte(""),
-	})
-
 }

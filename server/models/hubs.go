@@ -23,28 +23,31 @@ import (
 
 // Hub is an object representing the database table.
 type Hub struct {
-	ID        string `boil:"id" json:"id" toml:"id" yaml:"id"`
-	Logo      []byte `boil:"logo" json:"logo" toml:"logo" yaml:"logo"`
-	UserID    string `boil:"user_id" json:"user_id" toml:"user_id" yaml:"user_id"`
-	IsPrivate bool   `boil:"is_private" json:"is_private" toml:"is_private" yaml:"is_private"`
-	IsClose   bool   `boil:"is_close" json:"is_close" toml:"is_close" yaml:"is_close"`
+	ID         string    `boil:"id" json:"id" toml:"id" yaml:"id"`
+	Logo       []byte    `boil:"logo" json:"logo" toml:"logo" yaml:"logo"`
+	UserID     string    `boil:"user_id" json:"user_id" toml:"user_id" yaml:"user_id"`
+	LastActive time.Time `boil:"last_active" json:"last_active" toml:"last_active" yaml:"last_active"`
+	IsPrivate  bool      `boil:"is_private" json:"is_private" toml:"is_private" yaml:"is_private"`
+	IsClose    bool      `boil:"is_close" json:"is_close" toml:"is_close" yaml:"is_close"`
 
 	R *hubR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L hubL  `boil:"-" json:"-" toml:"-" yaml:"-"`
 }
 
 var HubColumns = struct {
-	ID        string
-	Logo      string
-	UserID    string
-	IsPrivate string
-	IsClose   string
+	ID         string
+	Logo       string
+	UserID     string
+	LastActive string
+	IsPrivate  string
+	IsClose    string
 }{
-	ID:        "id",
-	Logo:      "logo",
-	UserID:    "user_id",
-	IsPrivate: "is_private",
-	IsClose:   "is_close",
+	ID:         "id",
+	Logo:       "logo",
+	UserID:     "user_id",
+	LastActive: "last_active",
+	IsPrivate:  "is_private",
+	IsClose:    "is_close",
 }
 
 // Generated where
@@ -59,17 +62,19 @@ func (w whereHelperbool) GT(x bool) qm.QueryMod  { return qmhelper.Where(w.field
 func (w whereHelperbool) GTE(x bool) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.GTE, x) }
 
 var HubWhere = struct {
-	ID        whereHelperstring
-	Logo      whereHelper__byte
-	UserID    whereHelperstring
-	IsPrivate whereHelperbool
-	IsClose   whereHelperbool
+	ID         whereHelperstring
+	Logo       whereHelper__byte
+	UserID     whereHelperstring
+	LastActive whereHelpertime_Time
+	IsPrivate  whereHelperbool
+	IsClose    whereHelperbool
 }{
-	ID:        whereHelperstring{field: "\"hubs\".\"id\""},
-	Logo:      whereHelper__byte{field: "\"hubs\".\"logo\""},
-	UserID:    whereHelperstring{field: "\"hubs\".\"user_id\""},
-	IsPrivate: whereHelperbool{field: "\"hubs\".\"is_private\""},
-	IsClose:   whereHelperbool{field: "\"hubs\".\"is_close\""},
+	ID:         whereHelperstring{field: "\"hubs\".\"id\""},
+	Logo:       whereHelper__byte{field: "\"hubs\".\"logo\""},
+	UserID:     whereHelperstring{field: "\"hubs\".\"user_id\""},
+	LastActive: whereHelpertime_Time{field: "\"hubs\".\"last_active\""},
+	IsPrivate:  whereHelperbool{field: "\"hubs\".\"is_private\""},
+	IsClose:    whereHelperbool{field: "\"hubs\".\"is_close\""},
 }
 
 // HubRels is where relationship names are stored.
@@ -99,8 +104,8 @@ func (*hubR) NewStruct() *hubR {
 type hubL struct{}
 
 var (
-	hubAllColumns            = []string{"id", "logo", "user_id", "is_private", "is_close"}
-	hubColumnsWithoutDefault = []string{"id", "logo", "user_id", "is_private", "is_close"}
+	hubAllColumns            = []string{"id", "logo", "user_id", "last_active", "is_private", "is_close"}
+	hubColumnsWithoutDefault = []string{"id", "logo", "user_id", "last_active", "is_private", "is_close"}
 	hubColumnsWithDefault    = []string{}
 	hubPrimaryKeyColumns     = []string{"id"}
 )

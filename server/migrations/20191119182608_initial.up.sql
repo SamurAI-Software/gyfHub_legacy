@@ -31,6 +31,7 @@ CREATE TABLE hubs
     id TEXT PRIMARY KEY NOT NULL,
     logo BYTEA NOT NULL,
     user_id TEXT NOT NULL,
+    last_active TIMESTAMP NOT NULL,
     is_private BOOLEAN NOT NULL,
     is_close BOOLEAN NOT NULL,
 
